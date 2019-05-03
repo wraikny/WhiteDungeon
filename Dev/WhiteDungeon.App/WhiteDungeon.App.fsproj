@@ -50,10 +50,40 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <None Include="..\Lib\Altseed.dll">
+      <Link>Altseed.dll</Link>
+    </None>
+    <None Include="..\Lib\Altseed_core.dll">
+      <Link>Altseed_core.dll</Link>
+    </None>
+    <None Include="..\Lib\MilleFeuille.Core.dll">
+      <Link>MilleFeuille.Core.dll</Link>
+    </None>
+    <None Include="..\Lib\MilleFeuille.Fs.dll">
+      <Link>MilleFeuille.Fs.dll</Link>
+    </None>
+    <None Include="..\Lib\Tart.Advanced.dll">
+      <Link>Tart.Advanced.dll</Link>
+    </None>
+    <None Include="..\Lib\Tart.Core.dll">
+      <Link>Tart.Core.dll</Link>
+    </None>
+    <None Include="..\Lib\Tart.Helper.dll">
+      <Link>Tart.Helper.dll</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Altseed">
+      <HintPath>..\Lib\Altseed.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MilleFeuille.Core">
+      <HintPath>..\Lib\MilleFeuille.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MilleFeuille.Fs">
+      <HintPath>..\Lib\MilleFeuille.Fs.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -62,6 +92,15 @@
     <Reference Include="System.ValueTuple">
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Tart.Advanced">
+      <HintPath>..\Lib\Tart.Advanced.dll</HintPath>
+    </Reference>
+    <Reference Include="Tart.Core">
+      <HintPath>..\Lib\Tart.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Tart.Helper">
+      <HintPath>..\Lib\Tart.Helper.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
