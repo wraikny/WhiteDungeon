@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.App", "WhiteDungeon.App\WhiteDungeon.App.fsproj", "{49500357-46CF-4A96-BE5C-6C84A1312AED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8F65B50-CE37-44BF-80B9-D181CAD3C3E2}
+	EndGlobalSection
+EndGlobal
