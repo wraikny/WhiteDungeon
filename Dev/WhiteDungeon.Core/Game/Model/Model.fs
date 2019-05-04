@@ -31,7 +31,7 @@ module Model =
 
     let gameSetting (model : Model) = model.gameSetting
 
-    let init (players, dungeonBuilder, dungeonModel, gameSetting) = {
+    let init players dungeonBuilder dungeonModel gameSetting = {
         count = 0u
 
         nextPlayerID = players |> List.length |> uint32

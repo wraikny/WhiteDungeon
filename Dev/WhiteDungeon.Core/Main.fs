@@ -2,7 +2,16 @@
 
 open WhiteDungeon.Core
 
+open wraikny.Tart.Helper
 open wraikny.Tart.Core
+open wraikny.Tart.Core.Libraries
+open wraikny.Tart.Advanced
+
+[<Struct>]
+type Scene =
+    | Preparation
+    | Game
+
 
 type Model =
     | PreparationModel of Preparation.Model
@@ -12,6 +21,8 @@ type Model =
 type Msg =
     | PreparationMsg of Preparation.Msg
     | GameMsg of Game.Msg.Msg
+    | ToGame
+    | GeneratedDungeonModel of Dungeon.DungeonModel
 
 
 type ErrorKind =
@@ -45,6 +56,29 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             |> Cmd.mapViewMsgs GameViewMsg
 
         GameModel model, cmd
+
+    | ToGame, PreparationModel pModel ->
+        let taskCmd =
+            (fun () ->
+                pModel.dungeonBuilder
+                |> Dungeon.DungeonBuilder.generate
+                |> Result<_, Basic.Never>.Ok
+            )
+            |> Task.init
+            |> Task.perform GeneratedDungeonModel
+
+        model, taskCmd
+
+    | GeneratedDungeonModel dungeonModel, PreparationModel pModel ->
+        let players = []
+        let gameModel =
+            Game.Model.Model.init
+                players
+                pModel.dungeonBuilder
+                dungeonModel
+                pModel.gameSetting
+
+        GameModel gameModel, Cmd.none
 
     | _ ->
         // TODO: Error ModelMsgMismatch
