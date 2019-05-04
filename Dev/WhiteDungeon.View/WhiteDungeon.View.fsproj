@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="Game\GameScene.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Altseed">
