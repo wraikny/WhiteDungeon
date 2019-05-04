@@ -1,5 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.Model
 
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Advanced

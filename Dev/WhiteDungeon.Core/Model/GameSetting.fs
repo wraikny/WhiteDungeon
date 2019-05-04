@@ -1,10 +1,11 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
 type GameSetting = {
     dungeonCellSize : float32 Vec2
+    maxPlayerCount : int
 }
 
 module GameSetting =

@@ -35,8 +35,8 @@ module Actor =
         let maxStatus = actor.maxStatus
         f currentStatus / f maxStatus
 
-    let init status objectBase = {
+    let init size position status = {
         currentStatus = status
         maxStatus = status
-        objectBase = objectBase
+        objectBase = ObjectBase.init size position
     }
