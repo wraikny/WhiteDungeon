@@ -45,6 +45,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
     <Compile Include="Model\GameSetting.fs" />
+    <Compile Include="Model\Character.fs" />
     <Compile Include="Game\Model\ObjectBase.fs" />
     <Compile Include="Game\Model\Actor\Actor.fs" />
     <Compile Include="Game\Model\Actor\Player.fs" />

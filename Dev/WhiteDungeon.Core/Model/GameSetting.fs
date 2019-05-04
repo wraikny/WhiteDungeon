@@ -5,6 +5,7 @@ open wraikny.Tart.Helper.Geometry
 
 type GameSetting = {
     dungeonCellSize : float32 Vec2
+    minPlayerCount : int
     maxPlayerCount : int
 }
 
