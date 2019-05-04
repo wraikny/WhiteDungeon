@@ -47,7 +47,25 @@ module PlayerView =
         >> Map.ofList
 
 
+type CameraView = {
+    position : float32 Vec2
+}
+
+module CameraView =
+    let init position = {
+        position = position
+    }
+
+    let fromPlayers (players : (Model.Actor.PlayerID * Model.Actor.Player) list) =
+        players
+        |> List.sortBy (fun (id, _) -> id.Value)
+        |> List.map (fun (_, p) -> p.actor.objectBase.position)
+        |> List.map init
+
+
+
 type ViewModel = {
+    camera : CameraView list
     players : UpdaterViewModel<PlayerView>
 }
 
@@ -56,6 +74,10 @@ open WhiteDungeon.Core.Game.Model
 
 module ViewModel =
     let view (model : Model) : ViewModel = {
+        camera =
+            model.players
+            |> CameraView.fromPlayers
+
         players = {
             nextID = model.nextPlayerID
             objects =

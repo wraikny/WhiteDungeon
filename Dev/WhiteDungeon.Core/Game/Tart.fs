@@ -4,14 +4,21 @@ open wraikny.Tart.Core
 open WhiteDungeon.Core.Game
 
 
-let initModel p = Model.Model.init p, Cmd.none
+let private initModel p =
+    let (_, _, dungeonModel, gameSetting) = p
+
+    let dungeonView =
+        dungeonModel
+        |> ViewMsg.DungeonView.fromModel gameSetting
+
+    Model.Model.init p, Cmd.viewMsg [ViewMsg.GenerateDungeonView dungeonView]
 
 
 let createMessage updater initParam =
     Messenger.buildMessenger
         {
             seed = 0
-            updater = updater
+            updater = Some updater
         }
         {
             init = initModel initParam

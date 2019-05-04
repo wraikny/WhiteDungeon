@@ -1,5 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.ViewMsg
 
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
 
 open wraikny.Tart.Helper.Math
@@ -17,10 +18,10 @@ module DungeonView =
         Map.toList
         >> List.map (snd >> fun (space : Dungeon.Space) ->
             space.rect
-            |> Rect.map (Model.GameSetting.fromDungeonCell cellSize)
+            |> Rect.map (GameSetting.fromDungeonCell cellSize)
         )
 
-    let fromModel (gameSetting : Model.GameSetting) (dungeonModel : Dungeon.DungeonModel) = {
+    let fromModel (gameSetting : GameSetting) (dungeonModel : Dungeon.DungeonModel) = {
         largeRooms =
             dungeonModel.largeRooms
             |> roomsToList gameSetting.dungeonCellSize
