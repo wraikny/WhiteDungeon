@@ -29,3 +29,29 @@ module Player =
     let occupation (player : Player) = player.occupation
 
     let objectBase (player : Player) = player.actor.objectBase
+
+    let init size position status id occupation = {
+        actor = Actor.Actor.init size position status
+        id = id
+        occupation = occupation
+    }
+
+
+open wraikny.Tart.Helper.Math
+
+
+type PlayerBuilder = {
+    size : float32 Vec2
+    status : Actor.ActorStatus
+    id : PlayerID
+    occupation : Occupation
+}
+
+module PlayerBuilder =
+    let build (position) (builder : PlayerBuilder) =
+        Player.init
+            builder.size
+            position
+            builder.status
+            builder.id
+            builder.occupation
