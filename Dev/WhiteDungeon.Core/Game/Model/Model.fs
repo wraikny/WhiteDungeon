@@ -2,7 +2,7 @@
 
 open WhiteDungeon.Core.Game.Model
 
-open wraikny.Tart.Advanced.Dungeon
+open wraikny.Tart.Advanced
 
 
 
@@ -11,7 +11,9 @@ type Model = {
 
     players : (Actor.PlayerID * Actor.Player) list
 
-    dungeonModel : DungeonModel
+    dungeonModel : Dungeon.DungeonModel
+
+    gameSetting : GameSetting
 }
 
 
@@ -20,10 +22,12 @@ module Model =
 
     let dungeonModel m = m.dungeonModel
 
-    let init (players, dungeonModel) = {
+    let init (players, dungeonModel, gameSetting) = {
         count = 0u
 
         players = players
 
         dungeonModel = dungeonModel
+
+        gameSetting = gameSetting
     }
