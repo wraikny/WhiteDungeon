@@ -61,6 +61,7 @@
     <Compile Include="Preparation\Model.fs" />
     <Compile Include="Preparation\Msg.fs" />
     <Compile Include="Preparation\Update.fs" />
+    <Compile Include="Preparation\View.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>

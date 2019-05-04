@@ -7,9 +7,10 @@ open wraikny.Tart.Advanced
 
 type Model = {
     playerCount : int
-    players : Game.Model.Actor.PlayerBuilder list
+    players : Map<uint32, CharacterID option>
 
     dungeonBuilder : Dungeon.DungeonBuilder
 
     gameSetting : GameSetting
+    savedData : SavedData
 }

@@ -3,12 +3,18 @@
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
-
+[<Struct>]
 type PlayerEdit =
     | Occupation of Occupation
 
 
+[<Struct>]
 type Msg =
     | IncrPlayer
     | DecrPlayer
-    | EditPlayer of Actor.PlayerID * PlayerEdit
+    | SelectCharacter of uint32 * CharacterID option
+
+
+[<Struct>]
+type ViewMsg =
+    | Nothing
