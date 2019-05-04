@@ -47,6 +47,7 @@
     <Compile Include="Game\Model\ObjectBase.fs" />
     <Compile Include="Game\Model\Actor\Actor.fs" />
     <Compile Include="Game\Model\Actor\Player.fs" />
+    <Compile Include="Game\Model\GameSetting.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />
