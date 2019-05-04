@@ -11,7 +11,7 @@ type GameSetting = {
 module GameSetting =
     let fromDungeonCell (cellSize : float32 Vec2) (cell : int Vec2) : float32 Vec2 =
         let cellf = cell |> Vec2.map float32
-        Vec2.init(cellf.x * cellSize.x, cellf.y * cellSize.y)
+        cellf * cellSize
 
     let toDungeonCell (cellSize : float32 Vec2) (coordinate : float32 Vec2) : int Vec2 =
         Vec2.init(coordinate.x / cellSize.x, coordinate.y / cellSize.y)

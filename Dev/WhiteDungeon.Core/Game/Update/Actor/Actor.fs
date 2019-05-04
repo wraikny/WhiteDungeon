@@ -27,5 +27,5 @@ let move (move : ActorMove) (direction : float32 Vec2) (actor : Actor) : Actor =
 
     actor
     |> updateObjectBase(
-        Update.ObjectBase.addPosition (speed * direction)
+        Update.ObjectBase.addPosition (Vec2.fromScalar speed * direction)
     )
