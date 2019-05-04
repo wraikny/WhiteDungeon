@@ -39,6 +39,10 @@ module Update =
             model
             |> updatePlayerOf id (
                 Update.Actor.Player.updateActor <|
-                    Update.Actor.Actor.move move direction
+                    Update.Actor.Actor.move
+                        model.gameSetting
+                        model.dungeonModel
+                        move
+                        direction
             )
             , Cmd.none
