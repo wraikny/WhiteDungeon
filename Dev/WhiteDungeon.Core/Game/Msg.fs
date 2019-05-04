@@ -1,3 +1,16 @@
-﻿namespace WhiteDungeon.Core.Game
+﻿namespace WhiteDungeon.Core.Game.Msg
 
-type Msg = NoOps
+open wraikny.Tart.Helper.Math
+
+open WhiteDungeon.Core.Game
+
+
+[<Struct>]
+type ActorMove =
+    | Walk
+    | Dash
+
+
+type Msg =
+    | TimePasses
+    | PlayerMove of Model.Actor.PlayerID * ActorMove * (float32 Vec2)
