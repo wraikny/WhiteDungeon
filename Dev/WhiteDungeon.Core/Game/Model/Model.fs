@@ -6,7 +6,7 @@ open wraikny.Tart.Advanced.Dungeon
 type Model = {
     count : uint32
 
-    players : (PlayerID * Player) list
+    players : (Actor.PlayerID * Actor.Player) list
 
     dungeonModel : DungeonModel
 }
