@@ -31,10 +31,9 @@ module ObjectBase =
             size = o.size
         }
 
-    let init size position =
-        {
-            size = size
-            position = position
-            lastPosition = position
-            velocity = Vec2.zero()
-        }
+    let init size position = {
+        size = size
+        position = position
+        lastPosition = position
+        velocity = Vec2.zero()
+    }

@@ -15,7 +15,7 @@ module ActorStatus =
 
     let dashSpeed a = a.dashSpeed
 
-
+     
 type Actor = {
     objectBase : ObjectBase
 
@@ -24,15 +24,19 @@ type Actor = {
 }
 
 module Actor =
-    let currentStatus a = a.currentStatus
+    let currentStatus (actor : Actor) = actor.currentStatus
 
-    let maxStatus a = a.maxStatus
+    let maxStatus (actor : Actor) = actor.maxStatus
 
-    let objectBase a = a.objectBase
+    let objectBase (actor : Actor) = actor.objectBase
 
-    let init status objectBase =
-        {
-            currentStatus = status
-            maxStatus = status
-            objectBase = objectBase
-        }
+    let inline stateRate (f : ActorStatus -> ^a) (actor : Actor) =
+        let currentStatus = actor.currentStatus
+        let maxStatus = actor.maxStatus
+        f currentStatus / f maxStatus
+
+    let init status objectBase = {
+        currentStatus = status
+        maxStatus = status
+        objectBase = objectBase
+    }

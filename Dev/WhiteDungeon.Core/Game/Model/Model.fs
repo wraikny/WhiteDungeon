@@ -1,6 +1,9 @@
 ﻿namespace WhiteDungeon.Core.Game.Model
 
+open WhiteDungeon.Core.Game.Model
+
 open wraikny.Tart.Advanced.Dungeon
+
 
 
 type Model = {
@@ -17,11 +20,10 @@ module Model =
 
     let dungeonModel m = m.dungeonModel
 
-    let init (players, dungeonModel) =
-        {
-            count = 0u
+    let init (players, dungeonModel) = {
+        count = 0u
 
-            players = players
+        players = players
 
-            dungeonModel = dungeonModel
-        }
+        dungeonModel = dungeonModel
+    }
