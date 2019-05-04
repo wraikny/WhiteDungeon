@@ -25,9 +25,14 @@ type Occupation =
     | Magic
 
 
+[<Struct>]
+type CharacterID = CharacterID of int with
+    member this.Value = this |> function | CharacterID x -> x
+
+
 type Character = {
+    id : CharacterID
     name : string
-    status : ActorStatus
-    occupation : Occupation
-    occupations : Map<Occupation, Level>
+    currentOccupation : Occupation
+    occupations : Map<Occupation, ActorStatus>
 }
