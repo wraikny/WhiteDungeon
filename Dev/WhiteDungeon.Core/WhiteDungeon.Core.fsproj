@@ -57,7 +57,7 @@
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
     <Compile Include="Game\Tart.fs" />
-    <Compile Include="Preparation\Model\Model.fs" />
+    <Compile Include="Preparation\Model.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
