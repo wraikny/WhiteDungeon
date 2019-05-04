@@ -66,6 +66,12 @@
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Tart.Advanced">
+      <HintPath>..\Lib\Tart.Advanced.dll</HintPath>
+    </Reference>
+    <Reference Include="Tart.Core">
+      <HintPath>..\Lib\Tart.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Tart.Helper">
       <HintPath>..\Lib\Tart.Helper.dll</HintPath>
     </Reference>
