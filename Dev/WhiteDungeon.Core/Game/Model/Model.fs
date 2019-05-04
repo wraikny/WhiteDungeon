@@ -5,6 +5,9 @@ open wraikny.Tart.Advanced.Dungeon
 
 type Model = {
     count : uint32
+
+    players : (PlayerID * Player) list
+
     dungeonModel : DungeonModel
 }
 
@@ -12,8 +15,13 @@ type Model = {
 module Model =
     let count m = m.count
 
-    let init (dungeonModel) =
+    let dungeonModel m = m.dungeonModel
+
+    let init (players, dungeonModel) =
         {
             count = 0u
+
+            players = players
+
             dungeonModel = dungeonModel
         }
