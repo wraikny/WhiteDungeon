@@ -1,5 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.ViewModel
 
+open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 
 type ViewModel = Model
