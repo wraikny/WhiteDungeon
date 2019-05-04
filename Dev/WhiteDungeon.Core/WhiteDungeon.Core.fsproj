@@ -44,10 +44,14 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="Game\Model\ObjectBase.fs" />
+    <Compile Include="Game\Model\Actor\Actor.fs" />
+    <Compile Include="Game\Model\Actor\Player.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg\Msg.fs" />
     <Compile Include="Game\Msg\ViewMsg.fs" />
     <Compile Include="Game\Update\Update.fs" />
+    <Compile Include="Game\ViewModel.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
