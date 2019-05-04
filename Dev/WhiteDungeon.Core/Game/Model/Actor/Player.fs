@@ -24,8 +24,10 @@ type Player = {
 }
 
 module Player =
-    let actor p = p.actor
+    let actor (player : Player) = player.actor
 
-    let id p = p.id
+    let id (player : Player) = player.id
 
-    let occupation p = p.occupation
+    let occupation (player : Player) = player.occupation
+
+    let objectBase (player : Player) = player.actor.objectBase
