@@ -20,6 +20,25 @@ module Update =
                 )
     }
 
+    let updatePlayerOf id f (model : Model) : Model = {
+        model with
+            players = 
+                model.players
+                |> List.map(fun (pID, player) ->
+                    pID, if pID = id then f player else player
+                )
+    }
 
-    let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
-        model, Cmd.none
+    open WhiteDungeon.Core.Game.Msg
+
+    let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
+        msg |> function
+        | TimePasses ->
+            model, Cmd.none
+        | PlayerMove (id, move, direction) ->
+            model
+            |> updatePlayerOf id (
+                Update.Actor.Player.updateActor <|
+                    Update.Actor.Actor.move move direction
+            )
+            , Cmd.none
