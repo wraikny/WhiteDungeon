@@ -8,6 +8,3 @@ open WhiteDungeon.Core
 [<Class>]
 type GameScene() =
     inherit Scene()
-
-    let messenger =
-        Game.Tart.createMessage
