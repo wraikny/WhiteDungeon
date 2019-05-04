@@ -4,10 +4,8 @@ open WhiteDungeon.Core.Game.Model
 
 
 [<Struct>]
-type PlayerID = PlayerID of id : int
-
-module PlayerID =
-    let id = function | PlayerID x -> x
+type PlayerID = PlayerID of id : uint32 with
+    member this.Value = this |> function | PlayerID x -> x
 
 
 [<Struct>]
