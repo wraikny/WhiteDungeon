@@ -9,8 +9,10 @@ open wraikny.Tart.Advanced
 type Model = {
     count : uint32
 
+    nextPlayerID : uint32
     players : (Actor.PlayerID * Actor.Player) list
 
+    dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
 
     gameSetting : GameSetting
@@ -18,15 +20,23 @@ type Model = {
 
 
 module Model =
-    let count m = m.count
+    let count (model : Model) = model.count
 
-    let dungeonModel m = m.dungeonModel
+    let nextPlayerID (model : Model) = model.nextPlayerID
+    let players (model : Model) = model.players
 
-    let init (players, dungeonModel, gameSetting) = {
+    let dungeonBuilder (model : Model) = model.dungeonBuilder
+    let dungeonModel (model : Model) = model.dungeonModel
+
+    let gameSetting (model : Model) = model.gameSetting
+
+    let init (players, dungeonBuilder, dungeonModel, gameSetting) = {
         count = 0u
 
+        nextPlayerID = players |> List.length |> uint32
         players = players
 
+        dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
 
         gameSetting = gameSetting
