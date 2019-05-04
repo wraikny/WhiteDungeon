@@ -36,5 +36,6 @@ module DungeonView =
     }
 
 
+[<Struct>]
 type ViewMsg =
     | GenerateDungeonView of DungeonView

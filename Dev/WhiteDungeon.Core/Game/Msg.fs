@@ -11,6 +11,7 @@ type ActorMove =
     | Dash
 
 
+[<Struct>]
 type Msg =
     | TimePasses
     | PlayerMove of Model.Actor.PlayerID * ActorMove * (float32 Vec2)

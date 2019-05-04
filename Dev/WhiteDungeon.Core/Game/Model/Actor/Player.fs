@@ -1,5 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.Model.Actor
 
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 
@@ -8,17 +9,11 @@ type PlayerID = PlayerID of id : uint32 with
     member this.Value = this |> function | PlayerID x -> x
 
 
-[<Struct>]
-type Occupation =
-    | Sword
-    | Magic
-
-
 type Player = {
     actor : Actor
 
     id : PlayerID
-    occupation : Occupation
+    character : Character
 }
 
 module Player =
@@ -26,32 +21,25 @@ module Player =
 
     let id (player : Player) = player.id
 
-    let occupation (player : Player) = player.occupation
+    let character (player : Player) = player.character
 
     let objectBase (player : Player) = player.actor.objectBase
 
-    let init size position status id occupation = {
+    let init size position status id character = {
         actor = Actor.Actor.init size position status
         id = id
-        occupation = occupation
+        character = character
     }
 
 
 open wraikny.Tart.Helper.Math
 
 
-type PlayerBuilder = {
-    size : float32 Vec2
-    status : Actor.ActorStatus
-    id : PlayerID
-    occupation : Occupation
-}
-
 module PlayerBuilder =
-    let build (position) (builder : PlayerBuilder) =
+    let build size position id status (character : Character) =
         Player.init
-            builder.size
+            size
             position
-            builder.status
-            builder.id
-            builder.occupation
+            status
+            id
+            character
