@@ -2,8 +2,8 @@
 
 open wraikny.Tart.Core
 
+open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Msg
 
 
 module Update =
