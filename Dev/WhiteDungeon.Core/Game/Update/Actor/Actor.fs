@@ -2,17 +2,11 @@
 
 open WhiteDungeon.Core.Game
 
-open WhiteDungeon.Core.Game.Update
-
 
 let setObjectBase (objectBase : Model.ObjectBase) (actor : Model.Actor.Actor) =
     { actor with objectBase = objectBase }
 
 
-let updateObjectBase (actor : Model.Actor.Actor) =
-    let updatedObjectBase =
-        actor.objectBase
-        |> ObjectBase.update
-
+let updateObjectBase f (actor : Model.Actor.Actor) =
     actor
-    |> setObjectBase updatedObjectBase
+    |> setObjectBase (f actor.objectBase)
