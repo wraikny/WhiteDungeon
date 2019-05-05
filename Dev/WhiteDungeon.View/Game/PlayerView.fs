@@ -34,9 +34,6 @@ type PlayerView() =
 
     override this.OnAdded() =
         this.Shape <- rect
-
-        this.SetSize(lastSize)
-        this.SetPosition(lastPosition)
         
 
     member this.SetPosition(pos) =
