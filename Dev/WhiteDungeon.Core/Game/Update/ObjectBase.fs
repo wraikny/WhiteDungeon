@@ -25,8 +25,11 @@ let move
     =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
+    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
+
     let existsNextCell =
-        [lu; rd]
+        // TODO: bug(ずれる)
+        [(lu - gameSetting.dungeonCellSize); rd; ld; ru]
         |> List.map(fun point ->
             let nextPosition = point + diff
             let nextCell =
