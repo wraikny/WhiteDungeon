@@ -23,7 +23,7 @@ type PreparationScene(viewSetting, createTitleScene) =
     let viewSetting = viewSetting
 
     let gameSetting : Model.GameSetting = {
-        dungeonCellSize = Vec2.init(100.0f, 100.0f)
+        dungeonCellSize = Vec2.init(200.0f, 200.0f)
         minPlayerCount = 1
         maxPlayerCount = 1
         characterSize = Vec2.init(100.0f, 100.0f)

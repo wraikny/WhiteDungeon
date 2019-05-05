@@ -157,7 +157,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
         for space in dungeonView.corridors do
             new asd.GeometryObject2D(
                 Shape = getRectangleShape space
-                , Color = ColorPalette.sakura
+                , Color = ColorPalette.ume
             )
             |> dungeonLayer.AddObject
 
