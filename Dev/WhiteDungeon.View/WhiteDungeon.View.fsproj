@@ -44,7 +44,18 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="ViewSetting.fs" />
+    <Compile Include="Utils\Math.fs" />
+    <Compile Include="Utils\Geometry.fs" />
+    <Compile Include="UI\BackGround.fs" />
+    <Compile Include="UI\Button.fs" />
+    <Compile Include="UI\Keyboard.fs" />
+    <Compile Include="Tart\Updater.fs" />
+    <Compile Include="Game\PlayerView.fs" />
+    <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\GameScene.fs" />
+    <Compile Include="Preparation\PreparationScene.fs" />
+    <Compile Include="Title\TitleScene.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Altseed">
