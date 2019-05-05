@@ -35,22 +35,30 @@ let decrPlayer (model : Model) : Model * Cmd<Msg, _> =
 
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
-    msg |> function
-    | IncrPlayer ->
-        incrPlayer model
+    model.mode |> function
+    | WaitingDungeonGenerating ->
+        model, Cmd.none
 
-    | DecrPlayer ->
-        decrPlayer model
+    | Default ->
+        msg |> function
+        | IncrPlayer ->
+            incrPlayer model
 
-    | SelectCharacter(index, character) ->
-        character |> function
-        | None -> model, Cmd.none
-        | Some(chara) ->
-            if model.savedData.charactersList |> Map.containsKey chara then
-                { model with
-                    players =
-                        model.players
-                        |> Map.add index character
-                }, Cmd.none
-            else
-                model, Cmd.none
+        | DecrPlayer ->
+            decrPlayer model
+
+        | SelectCharacter(index, character) ->
+            character |> function
+            | None -> model, Cmd.none
+            | Some(chara) ->
+                if model.savedData.charactersList |> Map.containsKey chara then
+                    { model with
+                        players =
+                            model.players
+                            |> Map.add index character
+                    }, Cmd.none
+                else
+                    model, Cmd.none
+
+        | SetRandomRoomIndex index ->
+            { model with randomRoomIndex = index }, Cmd.none

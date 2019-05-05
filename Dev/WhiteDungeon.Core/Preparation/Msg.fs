@@ -13,8 +13,9 @@ type Msg =
     | IncrPlayer
     | DecrPlayer
     | SelectCharacter of uint32 * CharacterID option
+    | SetRandomRoomIndex of int
 
 
 [<Struct>]
 type ViewMsg =
-    | Nothing
+    | ChangeToGame

@@ -12,6 +12,23 @@ type ActorMove =
 
 
 [<Struct>]
+type MoveDirection =
+    | Right
+    | Left
+    | Up
+    | Down
+
+
+[<Struct>]
+type PlayerInput =
+    | RightKey
+    | LeftKey
+    | UpKey
+    | DownKey
+    | DashKey
+
+
+
 type Msg =
     | TimePasses
-    | PlayerMove of Model.Actor.PlayerID * ActorMove * (float32 Vec2)
+    | PlayerInput of Model.Actor.PlayerID * PlayerInput Set

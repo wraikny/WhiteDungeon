@@ -1,5 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.ViewModel
 
+open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
 // open WhiteDungeon.Core.Game.Model
 
@@ -9,34 +10,35 @@ open wraikny.Tart.Core.View
 
 
 type ObjectBaseView = {
-    position : float32 Vec2
+    area : float32 Rect
 }
 
 module ObjectBaseView =
     let fromModel (objectBase : Model.ObjectBase) = {
-        position =
+        area =
             objectBase
             |> Model.ObjectBase.area
-            |> Rect.position
     }
 
 
 type ActorView = {
-    objectBase : ObjectBaseView
+    objectBaseView : ObjectBaseView
 }
 
 module ActorView =
     let fromModel (actor : Model.Actor.Actor) = {
-        objectBase = actor.objectBase |> ObjectBaseView.fromModel
+        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
 
 type PlayerView = {
+    character : Model.Character
     actorView : ActorView
 }
 
 module PlayerView =
     let fromModel (player : Model.Actor.Player) = {
+        character = player.character
         actorView = player.actor |> ActorView.fromModel
     }
 
@@ -73,6 +75,9 @@ type ViewModel = {
 open WhiteDungeon.Core.Game.Model
 
 module ViewModel =
+    let selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
+        viewModel.players
+
     let view (model : Model) : ViewModel = {
         camera =
             model.players

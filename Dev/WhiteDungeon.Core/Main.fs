@@ -3,6 +3,10 @@
 open WhiteDungeon.Core
 
 open wraikny.Tart.Helper
+open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Geometry
+open wraikny.Tart.Helper.Monad
+open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 open wraikny.Tart.Advanced
@@ -58,19 +62,90 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         GameModel model, cmd
 
     | ToGame, PreparationModel pModel ->
-        let taskCmd =
-            (fun () ->
-                pModel.dungeonBuilder
-                |> Dungeon.DungeonBuilder.generate
-                |> Result<_, Basic.Never>.Ok
-            )
-            |> Task.init
-            |> Task.perform GeneratedDungeonModel
+        let allPlayersSelectedChatacer =
+            pModel.players
+            |> Map.toList
+            |> List.take pModel.playerCount
+            |> List.map(snd)
+            |> List.exists(fun id -> id = None)
+            |> not
 
-        model, taskCmd
+        if allPlayersSelectedChatacer then
+            let randMsg = Preparation.SetRandomRoomIndex >> PreparationMsg
+            let generator = Random.int 0 (pModel.dungeonBuilder.roomCount - 1)
+
+            let randCmd = Random.generate randMsg generator
+
+            let taskCmd =
+                (fun () ->
+                    pModel.dungeonBuilder
+                    |> Dungeon.DungeonBuilder.generate
+                    |> Result<_, Basic.Never>.Ok
+                )
+                |> Task.init
+                |> Task.perform GeneratedDungeonModel
+
+            model, Cmd.batch [randCmd; taskCmd; Cmd.viewMsg [PreparationViewMsg Preparation.ViewMsg.ChangeToGame]]
+        else
+            model, Cmd.none
+
 
     | GeneratedDungeonModel dungeonModel, PreparationModel pModel ->
-        let players = []
+        let largeRooms =
+            dungeonModel.largeRooms
+            |> Map.toList
+
+        let largeRoomsCount =
+            largeRooms
+            |> List.length
+
+        let targetRoomIndex =
+            pModel.randomRoomIndex % largeRoomsCount
+
+        let targetRoom = snd largeRooms.[targetRoomIndex]
+
+        let fromCell =
+            pModel.gameSetting.dungeonCellSize
+            |> Model.GameSetting.fromDungeonCell
+
+        let targetPosition =
+            targetRoom.rect
+            |> Rect.map fromCell
+            |> Rect.centerPosition
+        
+        // TODO
+        let players =
+            pModel.players
+            |> Map.toList
+            |> List.indexed
+            |> Seq.filterMap(fun (index, (id, charaID)) ->
+                maybe {
+                    let! charaID = charaID
+                    let! character =
+                        pModel.savedData.charactersList
+                        |> Map.tryFind charaID
+
+                    let size =
+                        pModel.gameSetting.characterSize
+
+                    let! status =
+                        character.occupations
+                        |> Map.tryFind character.currentOccupation
+
+                    let player =
+                        Game.Model.Actor.Player.init
+                            size
+                            (targetPosition - (Vec2.init(float32 index, 0.0f) * size))
+                            status
+                            (Game.Model.Actor.PlayerID id)
+                            character
+
+                    return
+                        (Game.Model.Actor.PlayerID id, player)
+                }
+            )
+            |> Seq.toList
+
         let gameModel =
             Game.Model.Model.init
                 players
@@ -78,7 +153,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 dungeonModel
                 pModel.gameSetting
 
-        GameModel gameModel, Cmd.none
+        let dungeonView =
+            dungeonModel
+            |> Game.ViewMsg.DungeonView.fromModel pModel.gameSetting
+
+
+        GameModel gameModel, Cmd.viewMsg [
+            GameViewMsg <| Game.ViewMsg.GenerateDungeonView dungeonView
+        ]
 
     | _ ->
         // TODO: Error ModelMsgMismatch
@@ -102,7 +184,7 @@ let view (model : Model) : ViewModel =
 
 
 
-let init pModel =
+let init (pModel : Preparation.Model) =
     PreparationModel pModel, Cmd.none
 
 

@@ -7,6 +7,7 @@ type GameSetting = {
     dungeonCellSize : float32 Vec2
     minPlayerCount : int
     maxPlayerCount : int
+    characterSize : float32 Vec2
 }
 
 module GameSetting =
@@ -15,5 +16,5 @@ module GameSetting =
         cellf * cellSize
 
     let toDungeonCell (cellSize : float32 Vec2) (coordinate : float32 Vec2) : int Vec2 =
-        Vec2.init(coordinate.x / cellSize.x, coordinate.y / cellSize.y)
+        coordinate / cellSize
         |> Vec2.map int
