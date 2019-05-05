@@ -40,6 +40,20 @@ type GameScene(viewSetting, notifier, updater, controllers) =
         }
 
     let dungeonCamera = new GameCamera()
+    let minimapCamera =
+        new GameCamera(
+            Zoom = 3.0f
+            , Dst =(
+                let windowSize = asd.Engine.WindowSize
+                let size = windowSize / 8
+                let pos = new asd.Vector2DI(windowSize.X - 50, 50)
+                new asd.RectI(
+                    pos - (new asd.Vector2DI(size.X, 0))
+                    , size
+                )
+            )
+        )
+
     let playerCamera = new GameCamera()
 
     let backLayer =
@@ -84,6 +98,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
 
 
         dungeonLayer.AddObject(dungeonCamera)
+        // dungeonLayer.AddObject(minimapCamera)
         playerLayer.AddComponent(playersUpdater, playersUpdater.Name)
         playerLayer.AddObject(playerCamera)
 
@@ -92,6 +107,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
 
         notifier.ClearObservers()
         notifier.AddObserver(dungeonCamera)
+        // notifier.AddObserver(minimapCamera)
         notifier.AddObserver(playerCamera)
         notifyer.AddObserver(playersUpdater)
 
