@@ -52,24 +52,31 @@
     <Content Include="packages.config" />
     <None Include="..\Lib\Altseed.dll">
       <Link>Altseed.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\Altseed_core.dll">
       <Link>Altseed_core.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\MilleFeuille.Core.dll">
       <Link>MilleFeuille.Core.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\MilleFeuille.Fs.dll">
       <Link>MilleFeuille.Fs.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\Tart.Advanced.dll">
       <Link>Tart.Advanced.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\Tart.Core.dll">
       <Link>Tart.Core.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Lib\Tart.Helper.dll">
       <Link>Tart.Helper.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +86,9 @@
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="MilleFeuille.Core">
+      <HintPath>..\Lib\MilleFeuille.Core.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -86,6 +96,9 @@
     <Reference Include="System.ValueTuple">
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Tart.Helper">
+      <HintPath>..\Lib\Tart.Helper.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
