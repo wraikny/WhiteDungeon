@@ -17,6 +17,8 @@ type PlayerView() =
     let mutable lastSize = Vec2.zero()
     let mutable lastPosition = Vec2.zero()
 
+    let rect = new asd.RectangleShape()
+
     interface IObjectUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.actorView.objectBaseView
@@ -28,9 +30,11 @@ type PlayerView() =
 
             if area.size <> lastSize then
                 this.SetSize(area.size)
-            
+
 
     override this.OnAdded() =
+        this.Shape <- rect
+
         this.SetSize(lastSize)
         this.SetPosition(lastPosition)
         
@@ -41,8 +45,4 @@ type PlayerView() =
 
     member this.SetSize(size) =
         let size = Vec2.toVector2DF size
-        let rect =
-            new asd.RectangleShape(
-                DrawingArea = new asd.RectF(new asd.Vector2DF(0.0f, 0.0f), size)
-            )
-        this.Shape <- rect
+        rect.DrawingArea <- new asd.RectF(new asd.Vector2DF(0.0f, 0.0f), size)
