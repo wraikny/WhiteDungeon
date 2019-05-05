@@ -17,7 +17,10 @@ type GameCamera() =
         )
     )
 
+
     let mutable srcPosition = Vec2.zero()
+
+    member val Zoom = 1.0f with get, set
 
     interface IObserver<Main.ViewModel> with
         member this.UpdateFromNotify(viewModel) =
@@ -32,9 +35,10 @@ type GameCamera() =
     member this.SetSrc(srcPos) =
         srcPosition <- srcPos
 
-        let size = asd.Engine.WindowSize
+        let size = asd.Engine.WindowSize.To2DF() / this.Zoom
+        let size = size.To2DI()
 
         this.Src <- new asd.RectI(
             (Vec2.toVector2DI srcPos) - size / 2
-            , (asd.Engine.WindowSize)
+            , size
         )
