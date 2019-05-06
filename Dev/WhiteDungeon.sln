@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.App", "WhiteDungeon.App\WhiteDungeon.App.fsproj", "{49500357-46CF-4A96-BE5C-6C84A1312AED}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.Core", "WhiteDungeon.Core\WhiteDungeon.Core.fsproj", "{C7CD8B28-7D56-4BFA-A613-28E535426DA9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.View", "WhiteDungeon.View\WhiteDungeon.View.fsproj", "{C82A8074-A822-48DD-AAD8-C1263EC6B506}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49500357-46CF-4A96-BE5C-6C84A1312AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7CD8B28-7D56-4BFA-A613-28E535426DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7CD8B28-7D56-4BFA-A613-28E535426DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7CD8B28-7D56-4BFA-A613-28E535426DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7CD8B28-7D56-4BFA-A613-28E535426DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C82A8074-A822-48DD-AAD8-C1263EC6B506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C82A8074-A822-48DD-AAD8-C1263EC6B506}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C82A8074-A822-48DD-AAD8-C1263EC6B506}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C82A8074-A822-48DD-AAD8-C1263EC6B506}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

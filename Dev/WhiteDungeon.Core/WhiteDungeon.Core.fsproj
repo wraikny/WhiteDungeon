@@ -5,15 +5,15 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>49500357-46cf-4a96-be5c-6c84a1312aed</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>WhiteDungeon.App</RootNamespace>
-    <AssemblyName>WhiteDungeon.App</AssemblyName>
+    <ProjectGuid>c7cd8b28-7d56-4bfa-a613-28e535426da9</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WhiteDungeon.Core</RootNamespace>
+    <AssemblyName>WhiteDungeon.Core</AssemblyName>
+    <UseStandardResourceNames>true</UseStandardResourceNames>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <UseStandardResourceNames>true</UseStandardResourceNames>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
-    <Name>WhiteDungeon.App</Name>
+    <Name>WhiteDungeon.Core</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,9 +23,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,9 +32,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -47,47 +43,30 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Program.fs" />
-    <None Include="App.config" />
     <Content Include="packages.config" />
-    <None Include="..\Lib\Altseed.dll">
-      <Link>Altseed.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Altseed_core.dll">
-      <Link>Altseed_core.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\MilleFeuille.Core.dll">
-      <Link>MilleFeuille.Core.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\MilleFeuille.Fs.dll">
-      <Link>MilleFeuille.Fs.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Advanced.dll">
-      <Link>Tart.Advanced.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Core.dll">
-      <Link>Tart.Core.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Helper.dll">
-      <Link>Tart.Helper.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Compile Include="Model\GameSetting.fs" />
+    <Compile Include="Model\Character.fs" />
+    <Compile Include="Model\SavedData.fs" />
+    <Compile Include="Game\Model\ObjectBase.fs" />
+    <Compile Include="Game\Model\Actor\Actor.fs" />
+    <Compile Include="Game\Model\Actor\Player.fs" />
+    <Compile Include="Game\Model\Model.fs" />
+    <Compile Include="Game\Msg.fs" />
+    <Compile Include="Game\ViewMsg.fs" />
+    <Compile Include="Game\Update\ObjectBase.fs" />
+    <Compile Include="Game\Update\Actor\Actor.fs" />
+    <Compile Include="Game\Update\Actor\Player.fs" />
+    <Compile Include="Game\Update\Update.fs" />
+    <Compile Include="Game\ViewModel.fs" />
+    <Compile Include="Preparation\Model.fs" />
+    <Compile Include="Preparation\Msg.fs" />
+    <Compile Include="Preparation\Update.fs" />
+    <Compile Include="Preparation\View.fs" />
+    <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Altseed">
-      <HintPath>..\Lib\Altseed.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MilleFeuille.Core">
-      <HintPath>..\Lib\MilleFeuille.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -97,21 +76,15 @@
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Tart.Advanced">
+      <HintPath>..\Lib\Tart.Advanced.dll</HintPath>
+    </Reference>
+    <Reference Include="Tart.Core">
+      <HintPath>..\Lib\Tart.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Tart.Helper">
       <HintPath>..\Lib\Tart.Helper.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WhiteDungeon.Core\WhiteDungeon.Core.fsproj">
-      <Name>WhiteDungeon.Core</Name>
-      <Project>{c7cd8b28-7d56-4bfa-a613-28e535426da9}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WhiteDungeon.View\WhiteDungeon.View.fsproj">
-      <Name>WhiteDungeon.View</Name>
-      <Project>{c82a8074-a822-48dd-aad8-c1263ec6b506}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
