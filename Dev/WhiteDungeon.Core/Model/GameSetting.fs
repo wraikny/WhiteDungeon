@@ -7,6 +7,7 @@ type GameSetting = {
     dungeonCellSize : float32 Vec2
     minPlayerCount : int
     maxPlayerCount : int
+    binarySearchCountMovingOnWall : int
     characterSize : float32 Vec2
 }
 
