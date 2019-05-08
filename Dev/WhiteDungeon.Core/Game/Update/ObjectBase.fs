@@ -28,7 +28,7 @@ let move
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
 
-    let objectAreaPoints = [(lu - gameSetting.dungeonCellSize); rd; ld; ru]
+    let objectAreaPoints = [lu; rd; ld; ru]
 
     let rec serchMaxDiff count diffSum current target =
         if count <= 0 then diffSum
@@ -37,7 +37,6 @@ let move
             let newDiffSum = diffSum + (middle - current)
 
             let existsNextCell =
-                // TODO: bug(ずれる)
                 objectAreaPoints
                 |> List.map(fun point ->
                     let nextPosition = point + newDiffSum

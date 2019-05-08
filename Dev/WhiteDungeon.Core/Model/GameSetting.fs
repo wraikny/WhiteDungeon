@@ -18,4 +18,4 @@ module GameSetting =
 
     let toDungeonCell (cellSize : float32 Vec2) (coordinate : float32 Vec2) : int Vec2 =
         coordinate / cellSize
-        |> Vec2.map int
+        |> Vec2.map (floor >> int)
