@@ -7,6 +7,7 @@ open wraikny.MilleFeuille.Fs.Input.Controller
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
+open WhiteDungeon.View.Utils.Color
 
 
 [<Class>]

@@ -7,6 +7,7 @@ open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Math
+open WhiteDungeon.View.Utils.Color
 
 
 type PlayerView() =

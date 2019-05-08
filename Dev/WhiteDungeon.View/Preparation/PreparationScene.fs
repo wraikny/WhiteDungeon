@@ -14,6 +14,8 @@ open wraikny.MilleFeuille.Core.Input
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
+open WhiteDungeon.View.Utils.Color
+
 
 type PreparationScene(viewSetting, createTitleScene) =
     inherit Scene()

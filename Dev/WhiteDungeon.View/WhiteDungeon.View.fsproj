@@ -47,6 +47,7 @@
     <Compile Include="ViewSetting.fs" />
     <Compile Include="Utils\Math.fs" />
     <Compile Include="Utils\Geometry.fs" />
+    <Compile Include="Utils\Color.fs" />
     <Compile Include="UI\BackGround.fs" />
     <Compile Include="UI\Button.fs" />
     <Compile Include="UI\Keyboard.fs" />
