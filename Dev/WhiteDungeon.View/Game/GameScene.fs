@@ -23,7 +23,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
     let viewSetting : ViewSetting = viewSetting
 
     let notifyer : Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel> = notifier
-    let updater : Tart.Updater = updater
+    let port : Tart.Port = updater
     let messenger = notifier.Messenger
 
     let controllers : (Model.Actor.PlayerID * Controller.IController<Msg.PlayerInput>) list =
@@ -112,7 +112,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
         notifyer.AddObserver(playersUpdater)
 
 
-        updater.UpdateGame <- fun msg ->
+        port.UpdateGame <- fun msg ->
             msg |> function
             | ViewMsg.GenerateDungeonView dungeonView ->
                 this.MessageText <- ""
@@ -122,8 +122,8 @@ type GameScene(viewSetting, notifier, updater, controllers) =
 
 
     override this.OnUpdated() =
-        updater.Update()
-        notifyer.Update()
+        port.Pop()
+        notifyer.Pull() |> ignore
 
         if this.IsDungeonLoaded then
             this.PushControllerInput()

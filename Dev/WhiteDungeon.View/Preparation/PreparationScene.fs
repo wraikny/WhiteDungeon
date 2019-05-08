@@ -65,7 +65,7 @@ type PreparationScene(viewSetting, createTitleScene) =
     }
 
     let viewSetting = viewSetting
-    let updater = new Tart.Updater()
+    let port = new Tart.Port()
     
     let messenger : IMessenger<Main.Msg, Main.ViewModel> =
         let pModel =
@@ -83,7 +83,7 @@ type PreparationScene(viewSetting, createTitleScene) =
                 |> Map.ofList
             }
 
-        Main.createMessenger (0, updater) pModel
+        Main.createMessenger (0, port) pModel
 
 
     let notifier =
@@ -179,10 +179,10 @@ type PreparationScene(viewSetting, createTitleScene) =
         
         uiLayer.AddComponent(selecter, "Selecter")
 
-        updater.UpdatePreparation <- fun msg ->
+        port.UpdatePreparation <- fun msg ->
             msg |> function
             | Preparation.ChangeToGame ->
-                this.ChangeScene(new Game.GameScene(viewSetting, notifier, updater, controllers))
+                this.ChangeScene(new Game.GameScene(viewSetting, notifier, port, controllers))
                 |> ignore
                 
 
@@ -190,5 +190,5 @@ type PreparationScene(viewSetting, createTitleScene) =
 
 
     override this.OnUpdated() =
-        notifier.Update()
-        updater.Update()
+        notifier.Pull() |> ignore
+        port.Pop()
