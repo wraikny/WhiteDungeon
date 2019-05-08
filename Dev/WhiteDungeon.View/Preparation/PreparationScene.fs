@@ -26,6 +26,7 @@ type PreparationScene(viewSetting, createTitleScene) =
         dungeonCellSize = Vec2.init(200.0f, 200.0f)
         minPlayerCount = 1
         maxPlayerCount = 1
+        binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init(100.0f, 100.0f)
     }
 
