@@ -30,7 +30,7 @@ let move
 
     let objectAreaPoints = [(lu - gameSetting.dungeonCellSize); rd; ld; ru]
 
-    let rec serchMaxDiff count diffSum (current, target) =
+    let rec serchMaxDiff count diffSum current target =
         if count <= 0 then diffSum
         else
             let middle = (current + target) / Vec2.fromScalar(2.0f)
@@ -52,18 +52,27 @@ let move
                 |> List.fold (&&) true
 
             if existsNextCell then
-                serchMaxDiff (count - 1) newDiffSum (middle, target)
+                serchMaxDiff (count - 1) newDiffSum middle target
             else
-                serchMaxDiff (count - 1) diffSum (current, middle)
+                serchMaxDiff (count - 1) diffSum current middle
 
-
-    let diff =
+    let searchDiff =
+        ((+) obj.position)
+        >>
         serchMaxDiff
             gameSetting.binarySearchCountMovingOnWall
             (Vec2.fromScalar 0.0f)
-            (obj.position, obj.position + diff)
+            obj.position
+
+    let diffX =
+        searchDiff ({ diff with y = 0.0f } : _ Vec2)
+        |> Vec2.x
+
+    let diffY =
+        searchDiff ({ diff with x = 0.0f } : _ Vec2)
+        |> Vec2.y
     
-    obj |> addPosition diff
+    obj |> addPosition (Vec2.init(diffX, diffY))
 
 
 let setVelocity velocity (obj : ObjectBase) = {
