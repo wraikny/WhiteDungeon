@@ -2,7 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper
+open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
