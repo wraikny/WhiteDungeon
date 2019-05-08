@@ -32,7 +32,7 @@ module Update =
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
 
-    let getPlayerMoveFromInput (inputSet : PlayerInput Set) : ActorMove * float32 Vec2 =
+    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : ActorMove * float32 Vec2 =
         let actorMove =
             if inputSet |> Set.contains PlayerInput.DashKey then Dash else Walk
 
@@ -60,7 +60,7 @@ module Update =
         | TimePasses ->
             model, Cmd.none
         | PlayerInput (id, inputSet) ->
-            let move, direction = getPlayerMoveFromInput inputSet
+            let move, direction = getPlayerMoveFromInputs inputSet
             
             let model =
                 if direction <> Vec2.zero() then
