@@ -24,7 +24,7 @@ module ObjectBase =
 
     let velocity o = o.velocity
 
-    let area (o : ObjectBase) : float32 Rect =
+    let area (o : ObjectBase) : float32 Vec2 Rect =
         let leftUp = o.position - { o.size with x = o.size.x * 0.5f }
         {
             position = leftUp

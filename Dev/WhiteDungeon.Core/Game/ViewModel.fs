@@ -10,7 +10,7 @@ open wraikny.Tart.Core.View
 
 
 type ObjectBaseView = {
-    area : float32 Rect
+    area : float32 Vec2 Rect
 }
 
 module ObjectBaseView =
@@ -46,7 +46,6 @@ module PlayerView =
         List.map(fun (id : Model.Actor.PlayerID, player) ->
             (id.Value, fromModel player)
         )
-        >> Map.ofList
 
 
 type CameraView = {
@@ -84,7 +83,6 @@ module ViewModel =
             |> CameraView.fromPlayers
 
         players = {
-            nextID = model.nextPlayerID
             objects =
                 model
                 |> Model.players

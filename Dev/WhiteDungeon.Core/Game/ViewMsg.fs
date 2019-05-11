@@ -8,9 +8,9 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 
 type DungeonView = {
-    largeRooms : float32 Rect list
-    smallRooms : float32 Rect list
-    corridors : float32 Rect list
+    largeRooms : float32 Vec2 Rect list
+    smallRooms : float32 Vec2 Rect list
+    corridors : float32 Vec2 Rect list
 }
 
 module DungeonView =
