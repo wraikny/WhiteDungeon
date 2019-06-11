@@ -20,7 +20,7 @@ type PlayerView() =
 
     let rect = new asd.RectangleShape()
 
-    interface IObjectUpdatee<Game.ViewModel.PlayerView> with
+    interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.actorView.objectBaseView
 

@@ -3,8 +3,8 @@
 open wraikny
 open WhiteDungeon.Core
 
-type Port() =
-    inherit Tart.Core.Port<Main.ViewMsg>()
+type Port(messenger) =
+    inherit Tart.Core.Port<Main.Msg, Main.ViewMsg>(messenger)
 
     let mutable updatePreparation = fun (_ : Preparation.ViewMsg) -> ()
 

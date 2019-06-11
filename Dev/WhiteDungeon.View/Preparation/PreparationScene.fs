@@ -68,9 +68,8 @@ type PreparationScene(viewSetting, createTitleScene) =
     }
 
     let viewSetting = viewSetting
-    let port = new Tart.Port()
     
-    let messenger : IMessenger<Main.Msg, Main.ViewModel> =
+    let messenger : IMessenger<Main.Msg, Main.ViewMsg, Main.ViewModel> =
         let pModel =
             Preparation.Model.init
                 dungeonBuilder
@@ -86,7 +85,12 @@ type PreparationScene(viewSetting, createTitleScene) =
                 |> Map.ofList
             }
 
-        Main.createMessenger (0, port) pModel
+        Main.createMessenger (0) pModel
+
+    let port =
+        let port = new Tart.Port(messenger)
+        messenger.SetPort(port)
+        port
 
 
     let notifier =
@@ -194,4 +198,4 @@ type PreparationScene(viewSetting, createTitleScene) =
 
     override this.OnUpdated() =
         notifier.Pull() |> ignore
-        port.Pop()
+        port.Update()

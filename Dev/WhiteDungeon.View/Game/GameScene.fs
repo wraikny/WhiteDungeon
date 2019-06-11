@@ -123,7 +123,7 @@ type GameScene(viewSetting, notifier, updater, controllers) =
 
 
     override this.OnUpdated() =
-        port.Pop()
+        port.Update()
         notifyer.Pull() |> ignore
 
         if this.IsDungeonLoaded then

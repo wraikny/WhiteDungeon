@@ -188,11 +188,10 @@ let init (pModel : Preparation.Model) =
     PreparationModel pModel, Cmd.none
 
 
-let createMessenger (seed, updater) pModel =
+let createMessenger (seed) pModel =
     Messenger.buildMessenger
         {
             seed = seed
-            updater = Some updater
         }
         {
             init = init pModel
