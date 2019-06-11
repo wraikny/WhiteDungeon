@@ -33,7 +33,7 @@ let move
     let rec serchMaxDiff count diffSum current target =
         if count <= 0 then diffSum
         else
-            let middle = (current + target) / Vec2.fromScalar(2.0f)
+            let middle = (current + target) / Vec2.init1(2.0f)
             let newDiffSum = diffSum + (middle - current)
 
             let existsNextCell =
@@ -60,7 +60,7 @@ let move
         >>
         serchMaxDiff
             gameSetting.binarySearchCountMovingOnWall
-            (Vec2.fromScalar 0.0f)
+            (Vec2.init1 0.0f)
             obj.position
 
     let diffX =

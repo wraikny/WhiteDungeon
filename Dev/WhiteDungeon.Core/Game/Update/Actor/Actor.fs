@@ -30,5 +30,5 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
         Update.ObjectBase.move
             gameSetting
             dungeonModel
-            (Vec2.fromScalar speed * direction)
+            (Vec2.init1 speed * direction)
     )
