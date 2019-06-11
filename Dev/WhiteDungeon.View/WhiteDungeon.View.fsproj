@@ -51,7 +51,6 @@
     <Compile Include="UI\BackGround.fs" />
     <Compile Include="UI\Button.fs" />
     <Compile Include="UI\Keyboard.fs" />
-    <Compile Include="Tart\Updater.fs" />
     <Compile Include="Game\PlayerView.fs" />
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\GameScene.fs" />

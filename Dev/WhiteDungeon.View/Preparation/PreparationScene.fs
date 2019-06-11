@@ -17,7 +17,7 @@ open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 
-type PreparationScene(viewSetting, createTitleScene) =
+type PreparationScene(viewSetting, createTitleScene) as this =
     inherit Scene()
 
     let createTitleScene : ViewSetting -> asd.Scene = createTitleScene
@@ -87,14 +87,8 @@ type PreparationScene(viewSetting, createTitleScene) =
 
         Main.createMessenger (0) pModel
 
-    let port =
-        let port = new Tart.Port(messenger)
-        messenger.SetPort(port)
-        port
 
-
-    let notifier =
-        new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
+    // let notifier = new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
 
     let keyboard = UI.Keybaord.createUIKeyboard()
 
@@ -151,6 +145,18 @@ type PreparationScene(viewSetting, createTitleScene) =
     let controllers = [
         Game.Model.Actor.PlayerID 0u, gameKeybaord
     ]
+
+    let port = {
+        new Port<Main.Msg, Main.ViewMsg>(messenger) with
+        override __.OnUpdate(msg) =
+            msg |> function
+            | Main.PreparationViewMsg msg ->
+                msg |> function
+                | Preparation.ChangeToGame ->
+                    this.ChangeScene(new Game.GameScene(messenger, viewSetting, controllers))
+                    |> ignore
+            | _ -> ()
+    }
     
 
     override this.OnRegistered() =
@@ -186,16 +192,11 @@ type PreparationScene(viewSetting, createTitleScene) =
         
         uiLayer.AddComponent(selecter, "Selecter")
 
-        port.UpdatePreparation <- fun msg ->
-            msg |> function
-            | Preparation.ChangeToGame ->
-                this.ChangeScene(new Game.GameScene(viewSetting, notifier, port, controllers))
-                |> ignore
-                
 
+        messenger.SetPort(port)
         messenger.StartAsync() |> ignore
 
 
     override this.OnUpdated() =
-        notifier.Pull() |> ignore
+        // notifier.Pull() |> ignore
         port.Update()

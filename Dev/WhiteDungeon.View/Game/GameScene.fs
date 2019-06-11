@@ -18,14 +18,27 @@ open WhiteDungeon.View.Utils.Geometry
 
 
 [<Class>]
-type GameScene(viewSetting, notifier, updater, controllers) =
+type GameScene(messenger, viewSetting, controllers) as this =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
 
-    let notifyer : Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel> = notifier
-    let port : Tart.Port = updater
-    let messenger = notifier.Messenger
+    let messenger = messenger
+    let notifier = new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
+
+    let port = {
+        new Port<Main.Msg, Main.ViewMsg>(messenger) with
+        override __.OnUpdate(msg) =
+            msg |> function
+            | Main.GameViewMsg msg ->
+                msg |> function
+                | ViewMsg.GenerateDungeonView dungeonView ->
+                    this.MessageText <- ""
+                    this.IsDungeonLoaded <- true
+
+                    this.AddDungeonView(dungeonView)
+            | _ -> ()
+    }
 
     let controllers : (Model.Actor.PlayerID * Controller.IController<Msg.PlayerInput>) list =
         controllers
@@ -106,25 +119,15 @@ type GameScene(viewSetting, notifier, updater, controllers) =
         uiLayer.AddObject(messageText)
         this.MessageText <- "Loading Dungeon"
 
-        notifier.ClearObservers()
         notifier.AddObserver(dungeonCamera)
         // notifier.AddObserver(minimapCamera)
         notifier.AddObserver(playerCamera)
-        notifyer.AddObserver(playersUpdater)
-
-
-        port.UpdateGame <- fun msg ->
-            msg |> function
-            | ViewMsg.GenerateDungeonView dungeonView ->
-                this.MessageText <- ""
-                this.IsDungeonLoaded <- true
-
-                this.AddDungeonView(dungeonView)
+        notifier.AddObserver(playersUpdater)
 
 
     override this.OnUpdated() =
         port.Update()
-        notifyer.Pull() |> ignore
+        notifier.Pull() |> ignore
 
         if this.IsDungeonLoaded then
             this.PushControllerInput()
@@ -158,11 +161,11 @@ type GameScene(viewSetting, notifier, updater, controllers) =
         )
         |> List.fold (||) false
         |> function
-            | x when x ->
-                Msg.TimePasses
-                |> Main.GameMsg
-                |> messenger.PushMsg
-            | _ -> ()
+        | true ->
+            Msg.TimePasses
+            |> Main.GameMsg
+            |> messenger.PushMsg
+        | false -> ()
 
 
     member this.AddDungeonView(dungeonView : ViewMsg.DungeonView) =
