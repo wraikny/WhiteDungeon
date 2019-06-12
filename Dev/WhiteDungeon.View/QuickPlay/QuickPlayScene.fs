@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.View.Preparation
+﻿namespace WhiteDungeon.View.QuickPlay
 
 open wraikny
 open wraikny.Tart.Helper.Math
@@ -17,7 +17,7 @@ open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 
-type PreparationScene(viewSetting, createTitleScene) as this =
+type QuickPlayScene(viewSetting, createTitleScene) as this =
     inherit Scene()
 
     let createTitleScene : ViewSetting -> asd.Scene = createTitleScene
@@ -71,7 +71,7 @@ type PreparationScene(viewSetting, createTitleScene) as this =
     
     let messenger : IMessenger<Main.Msg, Main.ViewMsg, Main.ViewModel> =
         let pModel =
-            Preparation.Model.init
+            QuickPlay.Model.init
                 dungeonBuilder
                 gameSetting
                 savedData
@@ -150,9 +150,9 @@ type PreparationScene(viewSetting, createTitleScene) as this =
         new Port<Main.Msg, Main.ViewMsg>(messenger) with
         override __.OnUpdate(msg) =
             msg |> function
-            | Main.PreparationViewMsg msg ->
+            | Main.QuickPlayViewMsg msg ->
                 msg |> function
-                | Preparation.ChangeToGame ->
+                | QuickPlay.ChangeToGame(gameModel) ->
                     this.ChangeScene(new Game.GameScene(messenger, viewSetting, controllers))
                     |> ignore
             | _ -> ()

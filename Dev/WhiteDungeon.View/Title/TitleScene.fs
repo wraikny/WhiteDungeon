@@ -89,6 +89,6 @@ type TitleScene(viewSetting) =
 
         gameButton.Button.add_OnReleasedEvent(fun _ ->
             let createTitleScene = fun vs -> new TitleScene(vs) :> asd.Scene
-            this.ChangeScene(new Preparation.PreparationScene(viewSetting, createTitleScene))
+            this.ChangeScene(new QuickPlay.QuickPlayScene(viewSetting, createTitleScene))
             |> ignore
         )

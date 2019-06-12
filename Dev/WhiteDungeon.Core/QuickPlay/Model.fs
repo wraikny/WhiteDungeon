@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Preparation
+﻿namespace WhiteDungeon.Core.QuickPlay
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core

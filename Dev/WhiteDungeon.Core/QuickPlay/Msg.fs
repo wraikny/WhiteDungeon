@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Preparation
+﻿namespace WhiteDungeon.Core.QuickPlay
 
 open WhiteDungeon.Core.Model
 open wraikny.Tart.Advanced
@@ -19,4 +19,4 @@ type Msg =
 
 
 type ViewMsg =
-    | ChangeToGame of Dungeon.DungeonModel * Game.Model.Model
+    | ChangeToGame of Game.Model.Model

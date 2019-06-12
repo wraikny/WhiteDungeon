@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.Core.Preparation.Update
+﻿module WhiteDungeon.Core.QuickPlay.Update
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Extension
@@ -159,4 +159,4 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     dungeonModel
                     model.gameSetting
 
-            model, Cmd.viewMsg [ViewMsg.ChangeToGame (dungeonModel, gameModel)]
+            model, Cmd.viewMsg [ViewMsg.ChangeToGame (gameModel)]

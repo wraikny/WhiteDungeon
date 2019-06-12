@@ -58,10 +58,10 @@
     <Compile Include="Game\Update\Actor\Player.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
-    <Compile Include="Preparation\Model.fs" />
-    <Compile Include="Preparation\Msg.fs" />
-    <Compile Include="Preparation\Update.fs" />
-    <Compile Include="Preparation\View.fs" />
+    <Compile Include="QuickPlay\Model.fs" />
+    <Compile Include="QuickPlay\Msg.fs" />
+    <Compile Include="QuickPlay\Update.fs" />
+    <Compile Include="QuickPlay\View.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
-﻿namespace WhiteDungeon.Core.Preparation
+﻿namespace WhiteDungeon.Core.QuickPlay
 
 open wraikny.Tart.Core
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Preparation
+open WhiteDungeon.Core.QuickPlay
 
 
 type ViewModel = {
