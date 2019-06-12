@@ -1,21 +1,22 @@
 ﻿namespace WhiteDungeon.Core.Preparation
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
+open wraikny.Tart.Advanced
+open WhiteDungeon.Core
 
-[<Struct>]
 type PlayerEdit =
     | Occupation of Occupation
 
 
-[<Struct>]
 type Msg =
     | IncrPlayer
     | DecrPlayer
     | SelectCharacter of uint32 * CharacterID option
+    | GenerateDungeon
     | SetRandomRoomIndex of int
+    | GeneratedDungeonModel of Dungeon.DungeonModel
 
 
-[<Struct>]
+
 type ViewMsg =
-    | ChangeToGame
+    | ChangeToGame of Dungeon.DungeonModel * Game.Model.Model
