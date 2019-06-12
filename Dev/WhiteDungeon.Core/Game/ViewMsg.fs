@@ -21,18 +21,18 @@ module DungeonView =
             |> Rect.map (GameSetting.fromDungeonCell cellSize)
         )
 
-    let fromModel (gameSetting : GameSetting) (dungeonModel : Dungeon.DungeonModel) = {
+    let fromModel (model : Model.Model) = {
         largeRooms =
-            dungeonModel.largeRooms
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.largeRooms
+            |> roomsToList model.gameSetting.dungeonCellSize
             
         smallRooms =
-            dungeonModel.smallRooms
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.smallRooms
+            |> roomsToList model.gameSetting.dungeonCellSize
 
         corridors =
-            dungeonModel.corridors
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.corridors
+            |> roomsToList model.gameSetting.dungeonCellSize
     }
 
 

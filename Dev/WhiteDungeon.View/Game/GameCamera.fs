@@ -6,7 +6,7 @@ open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
-open WhiteDungeon.Core
+open WhiteDungeon.Core.Game
 open WhiteDungeon.View.Utils.Math
 
 type GameCamera() =
@@ -22,14 +22,10 @@ type GameCamera() =
 
     member val Zoom = 1.0f with get, set
 
-    interface IObserver<Main.ViewModel> with
+    interface IObserver<ViewModel.ViewModel> with
         member this.UpdateFromNotify(viewModel) =
-            viewModel |> function
-            | Main.ViewModel.GameViewModel viewModel ->
-                let cameraView = viewModel.camera |> List.head
-                this.SetSrc(cameraView.position |> Vec2.map int)
-
-            | _ -> ()
+            let cameraView = viewModel.camera |> List.head
+            this.SetSrc(cameraView.position |> Vec2.map int)
 
 
     member this.SetSrc(srcPos) =

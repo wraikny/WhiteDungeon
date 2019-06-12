@@ -4,6 +4,7 @@
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Core
+open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.Input
@@ -18,39 +19,41 @@ open WhiteDungeon.View.Utils.Geometry
 
 
 [<Class>]
-type GameScene(messenger, viewSetting, controllers) as this =
+type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
 
-    let messenger = messenger
-    let notifier = new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
+    let messenger : IMessenger<_, _, _> =
+        Messenger.buildMessenger
+            { seed = 0 }
+            {
+                init = gameModel, Cmd.viewMsg [ViewMsg.GenerateDungeonView (ViewMsg.DungeonView.fromModel gameModel)]
+                view = ViewModel.ViewModel.view
+                update = Update.Update.update
+            }
+
+    let notifier = new Notifier<_, _, _>(messenger)
 
     let port = {
-        new Port<Main.Msg, Main.ViewMsg>(messenger) with
+        new Port<_, ViewMsg.ViewMsg>(messenger) with
         override __.OnUpdate(msg) =
             msg |> function
-            | Main.GameViewMsg msg ->
-                msg |> function
-                | ViewMsg.GenerateDungeonView dungeonView ->
-                    this.MessageText <- ""
-                    this.IsDungeonLoaded <- true
+            | ViewMsg.GenerateDungeonView dungeonView ->
+                this.MessageText <- ""
+                this.IsDungeonLoaded <- true
 
-                    this.AddDungeonView(dungeonView)
-            | _ -> ()
+                this.AddDungeonView(dungeonView)
     }
 
     let controllers : (Model.Actor.PlayerID * Controller.IController<Msg.PlayerInput>) list =
         controllers
 
 
-    let playersUpdater : ActorsUpdater<Main.ViewModel, PlayerView, ViewModel.PlayerView> =
+    let playersUpdater : ActorsUpdater<ViewModel.ViewModel, PlayerView, ViewModel.PlayerView> =
         ActorsUpdaterBuilder.build "PlayersUpdater" {
             initActor = fun () -> new PlayerView()
-            selectActor = function
-                | Main.GameViewModel viewModel ->
-                    viewModel |> ViewModel.ViewModel.selectPlayers |> Some
-                | _ -> None
+            selectActor = ViewModel.ViewModel.selectPlayers >> Some
         }
 
     let dungeonCamera = new GameCamera()
@@ -124,6 +127,12 @@ type GameScene(messenger, viewSetting, controllers) as this =
         notifier.AddObserver(playerCamera)
         notifier.AddObserver(playersUpdater)
 
+        messenger.SetPort(port)
+        messenger.StartAsync() |> ignore
+
+    override this.OnDispose() =
+        messenger.Stop()
+
 
     override this.OnUpdated() =
         port.Update()
@@ -154,7 +163,6 @@ type GameScene(messenger, viewSetting, controllers) as this =
             | [] -> false
             | inputs ->
                 Msg.PlayerInput (id, inputs |> Set.ofList)
-                |> Main.GameMsg
                 |> messenger.PushMsg
 
                 true
@@ -163,7 +171,6 @@ type GameScene(messenger, viewSetting, controllers) as this =
         |> function
         | true ->
             Msg.TimePasses
-            |> Main.GameMsg
             |> messenger.PushMsg
         | false -> ()
 

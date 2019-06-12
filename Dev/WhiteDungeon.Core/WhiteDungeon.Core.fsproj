@@ -62,7 +62,6 @@
     <Compile Include="QuickPlay\Msg.fs" />
     <Compile Include="QuickPlay\Update.fs" />
     <Compile Include="QuickPlay\View.fs" />
-    <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

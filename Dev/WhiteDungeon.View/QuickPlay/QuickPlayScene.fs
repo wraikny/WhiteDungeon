@@ -69,15 +69,15 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
     let viewSetting = viewSetting
     
-    let messenger : IMessenger<Main.Msg, Main.ViewMsg, Main.ViewModel> =
-        let pModel =
+    let messenger : IMessenger<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel> =
+        let model =
             QuickPlay.Model.init
                 dungeonBuilder
                 gameSetting
                 savedData
 
-        let pModel =
-            { pModel with
+        let model =
+            { model with
                 playerCount = 1
                 players = [
                     0u, Some <| Model.CharacterID 0
@@ -85,10 +85,16 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
                 |> Map.ofList
             }
 
-        Main.createMessenger (0) pModel
+        Messenger.buildMessenger
+            { seed = 0 }
+            {
+                init = model, Cmd.none
+                view = QuickPlay.ViewModel.view
+                update = QuickPlay.Update.update
+            }
 
 
-    // let notifier = new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
+    // let notifier = new Notifier<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel>(messenger)
 
     let keyboard = UI.Keybaord.createUIKeyboard()
 
@@ -147,15 +153,12 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     ]
 
     let port = {
-        new Port<Main.Msg, Main.ViewMsg>(messenger) with
+        new Port<_, _>(messenger) with
         override __.OnUpdate(msg) =
             msg |> function
-            | Main.QuickPlayViewMsg msg ->
-                msg |> function
-                | QuickPlay.ChangeToGame(gameModel) ->
-                    this.ChangeScene(new Game.GameScene(messenger, viewSetting, controllers))
-                    |> ignore
-            | _ -> ()
+            | QuickPlay.ChangeToGame(gameModel) ->
+                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, controllers))
+                |> ignore
     }
     
 
@@ -182,7 +185,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         )
 
         startButton.Button.add_OnReleasedEvent (fun _ ->
-            messenger.PushMsg(Main.Msg.ToGame)
+            messenger.PushMsg(QuickPlay.Msg.GenerateDungeon)
         )
 
 
