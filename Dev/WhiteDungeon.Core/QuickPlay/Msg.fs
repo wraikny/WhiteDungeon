@@ -11,7 +11,7 @@ type PlayerEdit =
 type Msg =
     | IncrPlayer
     | DecrPlayer
-    | SelectCharacter of uint32 * CharacterID option
+    | SelectOccupation of uint32 * Occupation
     | GenerateDungeon
     | SetRandomRoomIndex of int
     | GeneratedDungeonModel of Dungeon.DungeonModel

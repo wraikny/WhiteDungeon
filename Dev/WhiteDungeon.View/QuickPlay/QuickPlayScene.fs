@@ -30,26 +30,14 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init(100.0f, 100.0f)
-    }
-
-    let savedData : Model.SavedData = {
-        charactersList = [
-            ({
-                id = Model.CharacterID 0
-                name = "rainy"
-                currentOccupation = Model.Sword
-                occupations = [
-                    Model.Sword, ({
-                        level = 1
-                        hp = 100
-                        walkSpeed = 4.0f
-                        dashSpeed = 8.0f
-                    } : Model.ActorStatus)
-                ] |> Map.ofList
-            } : Model.Character)
-        ]
-        |> List.map(fun (c : Model.Character) -> c.id, c)
-        |> Map.ofList
+        occupationDefaultStatus = [
+            Model.Sword, ({
+                level = 1
+                hp = 100
+                walkSpeed = 4.0f
+                dashSpeed = 8.0f
+            } : Model.ActorStatus)
+        ] |> Map.ofList
     }
 
     let dungeonBuilder : Dungeon.DungeonBuilder = {
@@ -74,13 +62,12 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             QuickPlay.Model.init
                 dungeonBuilder
                 gameSetting
-                savedData
 
         let model =
             { model with
                 playerCount = 1
                 players = [
-                    0u, Some <| Model.CharacterID 0
+                    0u, ("Player1", Some Model.Occupation.Sword)
                 ]
                 |> Map.ofList
             }

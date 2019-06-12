@@ -24,7 +24,7 @@ let incrPlayer (model : Model) : Model * Cmd<Msg, _> =
                 let id = uint32 playerCount
 
                 model.players
-                |> Map.add id None
+                |> Map.add id (sprintf "Player%d" id, None)
         }, Cmd.none
     else
         model, Cmd.none
@@ -54,18 +54,19 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | DecrPlayer ->
             decrPlayer model
 
-        | SelectCharacter(index, character) ->
-            character |> function
-            | None -> model, Cmd.none
-            | Some(chara) ->
-                if model.savedData.charactersList |> Map.containsKey chara then
-                    { model with
-                        players =
-                            model.players
-                            |> Map.add index character
-                    }, Cmd.none
-                else
-                    model, Cmd.none
+        | SelectOccupation(index, occupation) ->
+            model.gameSetting.occupationDefaultStatus
+            |> Map.containsKey occupation
+            |> function
+            | true ->
+                let name = model.players |> Map.find index |> fst
+                { model with
+                    players =
+                        model.players
+                        |> Map.add index (name, Some occupation)
+                }, Cmd.none
+            | false ->
+                model, Cmd.none
 
         | SetRandomRoomIndex index ->
             { model with randomRoomIndex = index }, Cmd.none
@@ -76,7 +77,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 |> Map.toList
                 |> List.take model.playerCount
                 |> List.map(snd)
-                |> List.exists(fun id -> id = None)
+                |> List.exists(fun id -> snd id = None)
                 |> not
 
             if allPlayersSelectedChatacer then
@@ -96,6 +97,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 model, Cmd.batch[rand; task]
             else
                 model, Cmd.none
+
         | GeneratedDungeonModel dungeonModel ->
             let largeRooms =
                 dungeonModel.largeRooms
@@ -124,19 +126,20 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 model.players
                 |> Map.toList
                 |> List.indexed
-                |> Seq.filterMap(fun (index, (id, charaID)) ->
+                |> Seq.filterMap(fun (index, (id, (name, occupation))) ->
                     maybe {
-                        let! charaID = charaID
-                        let! character =
-                            model.savedData.charactersList
-                            |> Map.tryFind charaID
+                        let! occupation = occupation
+                        let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
+                        let character : Model.Character = {
+                            id = Model.CharacterID -(int id)
+                            name = name
+                            currentOccupation = occupation
+                            occupations = [
+                                occupation, status
+                            ] |> Map.ofList
+                        }
 
-                        let size =
-                            model.gameSetting.characterSize
-
-                        let! status =
-                            character.occupations
-                            |> Map.tryFind character.currentOccupation
+                        let size = model.gameSetting.characterSize
 
                         let player =
                             Game.Model.Actor.Player.init

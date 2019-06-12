@@ -8,7 +8,7 @@ open WhiteDungeon.Core.QuickPlay
 
 type ViewModel = {
     playerCount : int
-    characters : (uint32 * Model.Character option) list
+    characters : (uint32 * string * Model.Occupation option) list
 }
 
 open wraikny.Tart.Helper.Monad
@@ -19,12 +19,5 @@ module ViewModel =
         characters =
             model.players
             |> Map.toList
-            |> List.map(fun (id, charaID) ->
-                id, maybe {
-                    let! id = charaID
-                    return!
-                        model.savedData.charactersList
-                        |> Map.tryFind id
-                }
-            )
+            |> List.map(fun (id, (name, occ)) -> id, name, occ)
     }

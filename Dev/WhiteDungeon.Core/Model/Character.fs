@@ -26,8 +26,9 @@ type Occupation =
 
 
 [<Struct>]
-type CharacterID = CharacterID of int with
-    member this.Value = this |> function | CharacterID x -> x
+type CharacterID = CharacterID of int
+    //with
+    //member this.Value = this |> function | CharacterID x -> x
 
 
 type Character = {

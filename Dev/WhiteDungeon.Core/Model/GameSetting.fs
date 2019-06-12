@@ -2,6 +2,7 @@
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
+// open WhiteDungeon.Core.Model
 
 type GameSetting = {
     dungeonCellSize : float32 Vec2
@@ -9,6 +10,7 @@ type GameSetting = {
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
     characterSize : float32 Vec2
+    occupationDefaultStatus : Map<Occupation, ActorStatus>
 }
 
 module GameSetting =
