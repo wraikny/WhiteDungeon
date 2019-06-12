@@ -19,4 +19,5 @@ type Msg =
 
 
 type ViewMsg =
+    // | StartLoading
     | ChangeToGame of Game.Model.Model

@@ -172,16 +172,23 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         )
 
         startButton.Button.add_OnReleasedEvent (fun _ ->
+            uiLayer.Dispose()
+            let messageLayer =
+                new UI.MessageLayer(
+                    viewSetting,
+                    MessageText = "Loading Dungeon"
+                )
+            this.AddLayer(messageLayer)
+            
             messenger.PushMsg(QuickPlay.Msg.GenerateDungeon)
         )
 
-
         let selecter = new Button.ControllerButtonSelecter( titleButton.Button )
+
         
         selecter.AddController(keyboard) |> ignore
         
         uiLayer.AddComponent(selecter, "Selecter")
-
 
         messenger.SetPort(port)
         messenger.StartAsync() |> ignore

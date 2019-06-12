@@ -19,7 +19,7 @@ open WhiteDungeon.View.Utils.Geometry
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
+type GameScene(gameModel : Model.Model, viewSetting, controllers) =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
@@ -37,13 +37,7 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
 
     let port = {
         new Port<_, ViewMsg.ViewMsg>(messenger) with
-        override __.OnUpdate(msg) =
-            msg |> function
-            | ViewMsg.GenerateDungeonView dungeonView ->
-                this.MessageText <- ""
-                this.IsDungeonLoaded <- true
-
-                this.AddDungeonView(dungeonView)
+        override __.OnUpdate(msg) = ()
     }
 
     let controllers : (Model.Actor.PlayerID * Controller.IController<Msg.PlayerInput>) list =
@@ -83,27 +77,6 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
 
     let uiLayer = new asd.Layer2D()
 
-    let messageFont =
-        asd.Engine.Graphics.CreateDynamicFont(
-            viewSetting.uiFontPath
-            , viewSetting.messageFontSize
-            , ColorPalette.sumire
-            , 0
-            , ColorPalette.sumire
-        )
-
-    let messageTextPosition = asd.Engine.WindowSize.To2DF() / 2.0f
-    let messageText = new asd.TextObject2D(Text = "", Font = messageFont)
-
-    member this.MessageText
-        with get() = messageText.Text
-        and  set(value) =
-            messageText.Text <- value
-            let size =
-                messageFont.CalcTextureSize(value, asd.WritingDirection.Horizontal).To2DF()
-
-            messageText.Position <- messageTextPosition - size / 2.0f
-
     member val IsDungeonLoaded = false with get, set
 
 
@@ -113,14 +86,12 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
         this.AddLayer(playerLayer)
         this.AddLayer(uiLayer)
 
+        this.AddDungeonView(gameModel)
 
         dungeonLayer.AddObject(dungeonCamera)
         // dungeonLayer.AddObject(minimapCamera)
         playerLayer.AddComponent(playersUpdater, playersUpdater.Name)
         playerLayer.AddObject(playerCamera)
-
-        uiLayer.AddObject(messageText)
-        this.MessageText <- "Loading Dungeon"
 
         notifier.AddObserver(dungeonCamera)
         // notifier.AddObserver(minimapCamera)
@@ -175,7 +146,9 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) as this =
         | false -> ()
 
 
-    member this.AddDungeonView(dungeonView : ViewMsg.DungeonView) =
+    member this.AddDungeonView(gameModel : Model.Model) =
+        let dungeonView = ViewMsg.DungeonView.fromModel gameModel
+
         let getRectangleShape (rect) =
             new asd.RectangleShape(
                 DrawingArea = Rect.toRectF rect
