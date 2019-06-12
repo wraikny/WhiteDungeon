@@ -3,6 +3,8 @@
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
+let setDirection (direction) (actor : Actor) =
+    { actor with direction = direction }
 
 let setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
     { actor with objectBase = objectBase }
@@ -32,3 +34,4 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
             dungeonModel
             (Vec2.init1 speed * direction)
     )
+    |> setDirection (ActorDirection.fromVector direction)

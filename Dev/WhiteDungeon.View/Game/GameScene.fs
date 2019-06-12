@@ -19,10 +19,11 @@ open WhiteDungeon.View.Utils.Geometry
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, viewSetting, controllers) =
+type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controllers) =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
+    let gameViewSetting : Setting.GameViewSetting = gameViewSetting
 
     let messenger : IMessenger<_, _, _> =
         Messenger.buildMessenger
@@ -46,7 +47,7 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) =
 
     let playersUpdater : ActorsUpdater<ViewModel.ViewModel, PlayerView, ViewModel.PlayerView> =
         ActorsUpdaterBuilder.build "PlayersUpdater" {
-            initActor = fun () -> new PlayerView()
+            initActor = fun () -> new PlayerView(gameViewSetting)
             selectActor = ViewModel.ViewModel.selectPlayers >> Some
         }
 
@@ -77,9 +78,6 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) =
 
     let uiLayer = new asd.Layer2D()
 
-    member val IsDungeonLoaded = false with get, set
-
-
     override this.OnRegistered() =
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
@@ -109,8 +107,7 @@ type GameScene(gameModel : Model.Model, viewSetting, controllers) =
         port.Update()
         notifier.Pull() |> ignore
 
-        if this.IsDungeonLoaded then
-            this.PushControllerInput()
+        this.PushControllerInput()
 
 
     member this.PushControllerInput() =

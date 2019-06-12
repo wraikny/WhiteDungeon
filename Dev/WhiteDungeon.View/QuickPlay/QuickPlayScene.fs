@@ -40,6 +40,21 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         ] |> Map.ofList
     }
 
+    let gameViewSetting : Setting.GameViewSetting = {
+        occupationImages = [
+            Model.Sword, ({
+                front = "Image/Debug/down.png"
+                frontRight = "Image/Debug/rightdown.png"
+                frontLeft = "Image/Debug/leftdown.png"
+                back = "Image/Debug/up.png"
+                backRight = "Image/Debug/rightup.png"
+                backLeft = "Image/Debug/leftup.png"
+                right = "Image/Debug/right.png"
+                left = "Image/Debug/left.png"
+            } : Setting.ActorImages)
+        ] |> Map.ofList
+    }
+
     let dungeonBuilder : Dungeon.DungeonBuilder = {
         seed = 0
         roomCount = 300
@@ -144,7 +159,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         override __.OnUpdate(msg) =
             msg |> function
             | QuickPlay.ChangeToGame(gameModel) ->
-                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, controllers))
+                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting, controllers))
                 |> ignore
     }
     
@@ -173,19 +188,17 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
         startButton.Button.add_OnReleasedEvent (fun _ ->
             uiLayer.Dispose()
-            let messageLayer =
+            this.AddLayer <|
                 new UI.MessageLayer(
                     viewSetting,
                     MessageText = "Loading Dungeon"
                 )
-            this.AddLayer(messageLayer)
             
             messenger.PushMsg(QuickPlay.Msg.GenerateDungeon)
         )
 
         let selecter = new Button.ControllerButtonSelecter( titleButton.Button )
 
-        
         selecter.AddController(keyboard) |> ignore
         
         uiLayer.AddComponent(selecter, "Selecter")

@@ -7,6 +7,7 @@ open WhiteDungeon.Core.Game
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core.View
+open WhiteDungeon.Core.Game.Model
 
 
 type ObjectBaseView = {
@@ -22,11 +23,13 @@ module ObjectBaseView =
 
 
 type ActorView = {
+    direction : Actor.ActorDirection
     objectBaseView : ObjectBaseView
 }
 
 module ActorView =
     let fromModel (actor : Model.Actor.Actor) = {
+        direction = actor.direction
         objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
