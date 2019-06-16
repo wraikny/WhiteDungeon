@@ -5,6 +5,8 @@ open wraikny.Tart.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 
+open WhiteDungeon.Core.Game.Update
+
 
 module Update =
     let incrCount (model : Model) : Model =
@@ -70,6 +72,10 @@ module Update =
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         msg |> function
         | TimePasses ->
+            let model =
+                model
+                |> updatePlayers (Actor.Player.update)
+
             model, Cmd.none
         | PlayerInput (id, inputSet) ->
             let move, direction = getPlayerMoveFromInputs inputSet
