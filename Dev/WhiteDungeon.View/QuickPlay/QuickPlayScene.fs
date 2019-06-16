@@ -31,9 +31,9 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init(100.0f, 100.0f)
         occupationDefaultStatus = [
-            Model.Sword, ({
+            Model.Hunter, ({
                 level = 1
-                hp = 100
+                hp = 100.0f
                 walkSpeed = 4.0f
                 dashSpeed = 8.0f
             } : Model.ActorStatus)
@@ -42,7 +42,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
     let gameViewSetting : Setting.GameViewSetting = {
         occupationImages = [
-            Model.Sword, ({
+            Model.Hunter, ({
                 front = "Image/Debug/down.png"
                 frontRight = "Image/Debug/rightdown.png"
                 frontLeft = "Image/Debug/leftdown.png"
@@ -82,7 +82,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             { model with
                 playerCount = 1
                 players = [
-                    0u, ("Player1", Some Model.Occupation.Sword)
+                    0u, ("Player1", Some Model.Occupation.Hunter)
                 ]
                 |> Map.ofList
             }

@@ -6,12 +6,14 @@ type Level = int
 
 type ActorStatus = {
     level : Level
-    hp : int
+    hp : float32
     walkSpeed : float32
     dashSpeed : float32
 }
 
 module ActorStatus =
+    let level a = a.level
+
     let hp a = a.hp
 
     let walkSpeed a = a.walkSpeed
@@ -21,8 +23,7 @@ module ActorStatus =
 
 [<Struct>]
 type Occupation =
-    | Sword
-    | Magic
+    | Hunter
 
 
 [<Struct>]
