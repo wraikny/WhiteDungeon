@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.Core.Game.Update.ObjectBase
+﻿module WhiteDungeon.Core.Game.Update.GameObject
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
@@ -7,24 +7,24 @@ open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game.Model
 
-let setPosition position (obj : ObjectBase) = {
+let setPosition position (obj : GameObject) = {
     obj with
         position = position
         lastPosition = obj.position
 }
 
 
-let addPosition diff (obj : ObjectBase) =
+let addPosition diff (obj : GameObject) =
     obj |> setPosition (diff + obj.position)
 
 
 let move
     (gameSetting : Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
-    (diff) (obj : ObjectBase)
+    (diff) (obj : GameObject)
     =
 
-    let area = obj |> ObjectBase.area
+    let area = obj |> GameObject.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
 
@@ -74,11 +74,14 @@ let move
     obj |> addPosition (Vec2.init(diffX, diffY))
 
 
-let setVelocity velocity (obj : ObjectBase) = {
+let setVelocity velocity (obj : GameObject) = {
     obj with
         velocity = velocity
 }
 
-let update (obj : ObjectBase) =
+let setDirection (direction) (obj : GameObject) =
+    { obj with direction = direction }
+
+let update (obj : GameObject) =
     obj
     |> addPosition obj.velocity

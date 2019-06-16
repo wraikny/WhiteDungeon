@@ -10,7 +10,7 @@ type GameSetting = {
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
     characterSize : float32 Vec2
-    occupationDefaultStatus : Map<Occupation, ActorStatus>
+    occupationDefaultStatus : Map<Occupation, ObjectStatus * ActorStatus>
 }
 
 module GameSetting =

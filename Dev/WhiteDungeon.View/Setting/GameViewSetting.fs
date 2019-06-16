@@ -17,14 +17,14 @@ type ActorImages = {
 module ActorImages =
     let fromDirection dir images =
         let path= dir |> function
-            | Actor.ActorDirection.Front -> images.front
-            | Actor.ActorDirection.FrontRight -> images.frontRight
-            | Actor.ActorDirection.FrontLeft -> images.frontLeft
-            | Actor.ActorDirection.Back -> images.back
-            | Actor.ActorDirection.BackRight -> images.backRight
-            | Actor.ActorDirection.BackLeft -> images.backLeft
-            | Actor.ActorDirection.Right -> images.right
-            | Actor.ActorDirection.Left -> images.left
+            | MoveDirection.Front -> images.front
+            | MoveDirection.FrontRight -> images.frontRight
+            | MoveDirection.FrontLeft -> images.frontLeft
+            | MoveDirection.Back -> images.back
+            | MoveDirection.BackRight -> images.backRight
+            | MoveDirection.BackLeft -> images.backLeft
+            | MoveDirection.Right -> images.right
+            | MoveDirection.Left -> images.left
 
         path
 

@@ -44,17 +44,17 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
-    <Compile Include="Model\Character.fs" />
+    <Compile Include="Model\GameObject.fs" />
     <Compile Include="Model\GameSetting.fs" />
     <Compile Include="Model\SavedData.fs" />
-    <Compile Include="Game\Model\ObjectBase.fs" />
+    <Compile Include="Game\Model\GameObject.fs" />
     <Compile Include="Game\Model\Actor\Actor.fs" />
     <Compile Include="Game\Model\Actor\Player.fs" />
     <Compile Include="Game\Model\Skill\Skill.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />
-    <Compile Include="Game\Update\ObjectBase.fs" />
+    <Compile Include="Game\Update\GameObject.fs" />
     <Compile Include="Game\Update\Actor\Actor.fs" />
     <Compile Include="Game\Update\Actor\Player.fs" />
     <Compile Include="Game\Update\Update.fs" />

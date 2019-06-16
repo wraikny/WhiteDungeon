@@ -4,18 +4,23 @@
 type Level = int
 
 
-type ActorStatus = {
+type ObjectStatus = {
     level : Level
     hp : float32
+}
+
+module ObjectStatus =
+    let level a = a.level
+
+    let hp a = a.hp
+
+
+type ActorStatus = {
     walkSpeed : float32
     dashSpeed : float32
 }
 
 module ActorStatus =
-    let level a = a.level
-
-    let hp a = a.hp
-
     let walkSpeed a = a.walkSpeed
 
     let dashSpeed a = a.dashSpeed
@@ -36,5 +41,5 @@ type Character = {
     id : CharacterID
     name : string
     currentOccupation : Occupation
-    occupations : Map<Occupation, ActorStatus>
+    occupations : Map<Occupation, ObjectStatus * ActorStatus>
 }

@@ -31,12 +31,13 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init(100.0f, 100.0f)
         occupationDefaultStatus = [
-            Model.Hunter, ({
-                level = 1
-                hp = 100.0f
+            Model.Hunter, (({
+                 level = 1
+                 hp = 100.0f
+            } : Model.ObjectStatus), ({
                 walkSpeed = 4.0f
                 dashSpeed = 8.0f
-            } : Model.ActorStatus)
+            } : Model.ActorStatus))
         ] |> Map.ofList
     }
 

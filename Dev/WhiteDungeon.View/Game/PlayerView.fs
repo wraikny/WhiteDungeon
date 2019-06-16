@@ -20,20 +20,20 @@ type PlayerView(gameViewSetting) =
 
     let mutable lastPosition = Vec2.zero()
     let mutable lastSize = Vec2.zero()
-    let mutable lastDirection = Model.Actor.ActorDirection.Front
+    let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
 
     interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
-            let objectBase = viewModel.actorView.objectBaseView
+            let gameObject = viewModel.actorView.gameObjectView
 
-            let area = objectBase.area
+            let area = gameObject.area
 
             this.SetPosition(area.position)
 
             this.SetSize(area.size)
 
-            this.SetDirection(viewModel.actorView.direction)
+            this.SetDirection(viewModel.actorView.gameObjectView.direction)
 
             this.SetOccupation(viewModel.character.currentOccupation)
 

@@ -31,5 +31,4 @@ type Skill =
         kind : Effect
     }
 
-
 type Generator = GameSetting -> Skill list

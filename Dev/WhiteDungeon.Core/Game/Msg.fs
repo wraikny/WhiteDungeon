@@ -12,7 +12,7 @@ type ActorMove =
 
 
 [<Struct>]
-type MoveDirection =
+type InputDirection =
     | Right
     | Left
     | Up

@@ -12,25 +12,25 @@ open WhiteDungeon.Core.Game.Model
 
 type ObjectBaseView = {
     area : float32 Vec2 Rect
+    direction : MoveDirection
 }
 
 module ObjectBaseView =
-    let fromModel (objectBase : Model.ObjectBase) = {
+    let fromModel (gameObject : Model.GameObject) = {
         area =
-            objectBase
-            |> Model.ObjectBase.area
+            gameObject
+            |> Model.GameObject.area
+        direction = gameObject.direction
     }
 
 
 type ActorView = {
-    direction : Actor.ActorDirection
-    objectBaseView : ObjectBaseView
+    gameObjectView : ObjectBaseView
 }
 
 module ActorView =
     let fromModel (actor : Model.Actor.Actor) = {
-        direction = actor.direction
-        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
+        gameObjectView = actor.gameObject |> ObjectBaseView.fromModel
     }
 
 
@@ -63,7 +63,7 @@ module CameraView =
     let fromPlayers (players : (Model.Actor.PlayerID * Model.Actor.Player) list) =
         players
         |> List.sortBy (fun (id, _) -> id.Value)
-        |> List.map (fun (_, p) -> p.actor.objectBase.position)
+        |> List.map (fun (_, p) -> p.actor.gameObject.position)
         |> List.map init
 
 
