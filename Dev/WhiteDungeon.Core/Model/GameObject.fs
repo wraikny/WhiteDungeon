@@ -1,12 +1,9 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 
-type Level = int
-
-
 type ObjectStatus = {
     level : Level
-    hp : float32
+    hp : HP
 }
 
 module ObjectStatus =
@@ -16,8 +13,8 @@ module ObjectStatus =
 
 
 type ActorStatus = {
-    walkSpeed : float32
-    dashSpeed : float32
+    walkSpeed : Speed
+    dashSpeed : Speed
 }
 
 module ActorStatus =

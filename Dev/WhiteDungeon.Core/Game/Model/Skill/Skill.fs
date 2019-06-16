@@ -8,12 +8,13 @@ open WhiteDungeon.Core.Game.Model
 
 type Invoker =
     | Player of Actor.PlayerID
+    | Enemy //of Actor.EnemyID
 
 
 type Target =
     | Self
-    | Friend of float32 Vec2 Rect
-    | Opponent of float32 Vec2 Rect
+    | Friends of float32 Vec2 Rect
+    | Others of float32 Vec2 Rect
     | Area of float32 Vec2 Rect
 
 
@@ -23,12 +24,27 @@ type Effect =
 
 
 
-type Skill =
+type SkillEmit =
     {
         delay : uint32
+        frame : uint32
         invoker : Invoker
         target : Target
         kind : Effect
     }
 
-type Generator = GameSetting -> Skill list
+
+type SkillList =
+    {
+        waitings : SkillEmit list
+        playersTarget : SkillEmit list
+        enemiesTarget : SkillEmit list
+    }
+
+module SkillList =
+    let init() =
+        {
+            waitings = []
+            playersTarget = []
+            enemiesTarget = []
+        }

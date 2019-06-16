@@ -4,6 +4,11 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 // open WhiteDungeon.Core.Model
 
+type Calcs =
+    {
+        damage : Atk -> Def -> HP
+    }
+
 type GameSetting = {
     dungeonCellSize : float32 Vec2
     minPlayerCount : int

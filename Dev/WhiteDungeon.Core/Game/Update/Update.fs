@@ -54,6 +54,21 @@ module Update =
         
         actorMove, direction
 
+    let updateSkills f (model : Model) : Model =
+        { model with skillEffects = f model.skillEffects }
+
+
+    let appendSkills (skills : Skill.SkillEmit list) (model : Model) : Model * Cmd<_, _> =
+        model |> updateSkills (Skill.SkillList.append skills), Cmd.viewMsg[ViewMsg.AppendSkills skills]
+
+
+    let applySkills (model : Model) : Model =
+        let skills = model.skillEffects
+
+        
+
+        model
+
 
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         msg |> function

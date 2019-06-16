@@ -35,7 +35,9 @@ module DungeonView =
             |> roomsToList model.gameSetting.dungeonCellSize
     }
 
+open WhiteDungeon.Core.Game.Model
 
-[<Struct>]
+
 type ViewMsg =
     | GenerateDungeonView of DungeonView
+    | AppendSkills of Skill.SkillEmit list
