@@ -2,13 +2,10 @@
 
 
 type ObjectStatus = {
-    level : Level
     hp : HP
 }
 
 module ObjectStatus =
-    let level a = a.level
-
     let hp a = a.hp
 
 

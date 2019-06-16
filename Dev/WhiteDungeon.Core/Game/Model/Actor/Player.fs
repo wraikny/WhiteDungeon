@@ -4,11 +4,6 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 
-[<Struct>]
-type PlayerID = PlayerID of id : uint32 with
-    member this.Value = this |> function | PlayerID x -> x
-
-
 type Player = {
     actor : Actor
 

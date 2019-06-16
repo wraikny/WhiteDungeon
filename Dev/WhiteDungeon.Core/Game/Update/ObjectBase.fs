@@ -17,13 +17,15 @@ let setPosition position (obj : ObjectBase) = {
 let addPosition diff (obj : ObjectBase) =
     obj |> setPosition (diff + obj.position)
 
+let setDirection (direction) (obj : ObjectBase) =
+    { obj with direction = direction }
+
 
 let move
     (gameSetting : Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
     (diff) (obj : ObjectBase)
     =
-
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
@@ -71,16 +73,14 @@ let move
         searchDiff ({ diff with x = 0.0f } : _ Vec2)
         |> Vec2.y
     
-    obj |> addPosition (Vec2.init(diffX, diffY))
+    obj
+    |> addPosition (Vec2.init(diffX, diffY))
+    
+    |> setDirection (MoveDirection.fromVector diff)
 
 
-let setVelocity velocity (obj : ObjectBase) = {
-    obj with
-        velocity = velocity
-}
-
-let setDirection (direction) (obj : ObjectBase) =
-    { obj with direction = direction }
+let setVelocity velocity (obj : ObjectBase) =
+    { obj with velocity = velocity }
 
 let update (obj : ObjectBase) =
     obj

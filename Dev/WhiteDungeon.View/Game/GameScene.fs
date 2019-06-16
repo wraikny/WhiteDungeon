@@ -41,7 +41,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
         override __.OnUpdate(msg) = ()
     }
 
-    let controllers : (Model.Actor.PlayerID * Controller.IController<Msg.PlayerInput>) list =
+    let controllers : (Model.PlayerID * Controller.IController<Msg.PlayerInput>) list =
         controllers
 
 

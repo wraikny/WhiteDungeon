@@ -2,6 +2,7 @@
 
 open wraikny.Tart.Helper.Math
 
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
 
 
@@ -31,4 +32,4 @@ type PlayerInput =
 
 type Msg =
     | TimePasses
-    | PlayerInput of Model.Actor.PlayerID * PlayerInput Set
+    | PlayerInput of PlayerID * PlayerInput Set

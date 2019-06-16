@@ -46,7 +46,7 @@ module PlayerView =
     }
 
     let playersView =
-        List.map(fun (id : Model.Actor.PlayerID, player) ->
+        List.map(fun (id : Model.PlayerID, player) ->
             (id.Value, fromModel player)
         )
 
@@ -60,7 +60,7 @@ module CameraView =
         position = position
     }
 
-    let fromPlayers (players : (Model.Actor.PlayerID * Model.Actor.Player) list) =
+    let fromPlayers (players : (Model.PlayerID * Model.Actor.Player) list) =
         players
         |> List.sortBy (fun (id, _) -> id.Value)
         |> List.map (fun (_, p) -> p.actor.objectBase.position)

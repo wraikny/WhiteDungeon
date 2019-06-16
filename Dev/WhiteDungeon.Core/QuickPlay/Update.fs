@@ -146,11 +146,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                                 size
                                 (targetPosition - (Vec2.init(float32 index, 0.0f) * size))
                                 status
-                                (Game.Model.Actor.PlayerID id)
+                                (Model.PlayerID id)
                                 character
 
                         return
-                            (Game.Model.Actor.PlayerID id, player)
+                            (Model.PlayerID id, player)
                     }
                 )
                 |> Seq.toList

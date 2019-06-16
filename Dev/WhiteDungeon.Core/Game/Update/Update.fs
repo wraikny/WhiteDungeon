@@ -49,24 +49,21 @@ module Update =
                 inputSet |> Set.contains key
             )
             |> List.map snd
-            |> List.fold (+) ( Vec2.zero() )
+            |> List.fold (+) (Vec2.zero())
             |> VectorClass.normalize
         
         actorMove, direction
 
-    let updateSkills f (model : Model) : Model =
-        { model with skillEffects = f model.skillEffects }
+    let updateSkillList f (model : Model) : Model =
+        { model with skillList = f model.skillList }
 
 
     let appendSkills (skills : Skill.SkillEmit list) (model : Model) : Model * Cmd<_, _> =
-        model |> updateSkills (Skill.SkillList.append skills), Cmd.viewMsg[ViewMsg.AppendSkills skills]
+        model |> updateSkillList (Skill.SkillList.append skills), Cmd.viewMsg[ViewMsg.AppendSkills skills]
 
 
     let applySkills (model : Model) : Model =
-        let skills = model.skillEffects
-
-        
-
+        // TODO
         model
 
 

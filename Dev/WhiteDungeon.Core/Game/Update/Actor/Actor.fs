@@ -31,4 +31,3 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
             dungeonModel
             (Vec2.init1 speed * direction)
     )
-    |> updateObjectBase (Update.ObjectBase.setDirection (Model.MoveDirection.fromVector direction))

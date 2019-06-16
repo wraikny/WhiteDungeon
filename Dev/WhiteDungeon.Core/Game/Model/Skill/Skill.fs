@@ -5,31 +5,45 @@ open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+type CorrectionKind =
+    | StatusAdd of ActorStatus
+    | SattusMul of ActorStatus
+
+
+type Correction =
+    {
+        frame : uint32
+        kind : CorrectionKind
+    }
+
 
 type Invoker =
-    | Player of Actor.PlayerID
-    | Enemy //of Actor.EnemyID
+    | Player of PlayerID
+    | Enemy //of EnemyID
 
 
 type Target =
-    | Self
-    | Friends of float32 Vec2 Rect
-    | Others of float32 Vec2 Rect
-    | Area of float32 Vec2 Rect
+    | Players of PlayerID list
+    | Enemies //of EnemyID list
+    | Friends of ObjectBase
+    | Others of ObjectBase
+    | Area of ObjectBase
 
 
 
 type Effect =
+    | AddSkillEmits of SkillEmit list
+    | AddCorrections of Correction list
     | Damage of float32
+    | Move of float32 Vec2
 
-
-
-type SkillEmit =
+and SkillEmit =
     {
-        delay : uint32
-        frame : uint32
         invoker : Invoker
         target : Target
+        delay : uint32
+        frame : uint32
+        removedWhenHit : bool
         kind : Effect
     }
 
@@ -37,14 +51,20 @@ type SkillEmit =
 type SkillList =
     {
         waitings : SkillEmit list
-        playersTarget : SkillEmit list
-        enemiesTarget : SkillEmit list
+        playerIDEffects : SkillEmit list
+        enemyIDEffects : SkillEmit list
+        playerEffects : SkillEmit list
+        enemyEffects : SkillEmit list
+        areaEffects : SkillEmit list
     }
 
 module SkillList =
     let init() =
         {
             waitings = []
-            playersTarget = []
-            enemiesTarget = []
+            playerIDEffects = []
+            enemyIDEffects = []
+            playerEffects = []
+            enemyEffects = []
+            areaEffects = []
         }
