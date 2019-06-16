@@ -6,7 +6,7 @@ open WhiteDungeon.Core.Game.Model
 
      
 type Actor = {
-    gameObject : GameObject
+    objectBase : ObjectBase
     statusCurrent : ActorStatus
     statusDefault : ActorStatus
 }
@@ -16,15 +16,15 @@ module Actor =
 
     let statusDefault (actor : Actor) = actor.statusDefault
 
-    let gameObject (actor : Actor) = actor.gameObject
+    let objectBase (actor : Actor) = actor.objectBase
 
     let inline stateRate (f : ActorStatus -> ^a) (actor : Actor) =
         let currentStatus = actor.statusCurrent
         let maxStatus = actor.statusDefault
         f currentStatus / f maxStatus
 
-    let init size position objectStatus actorStatus = {
+    let init size position actorStatus = {
         statusCurrent = actorStatus
         statusDefault = actorStatus
-        gameObject = GameObject.init size position objectStatus
+        objectBase = ObjectBase.init size position
     }

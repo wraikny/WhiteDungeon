@@ -16,21 +16,21 @@ type ObjectBaseView = {
 }
 
 module ObjectBaseView =
-    let fromModel (gameObject : Model.GameObject) = {
+    let fromModel (objectBase : Model.ObjectBase) = {
         area =
-            gameObject
-            |> Model.GameObject.area
-        direction = gameObject.direction
+            objectBase
+            |> Model.ObjectBase.area
+        direction = objectBase.direction
     }
 
 
 type ActorView = {
-    gameObjectView : ObjectBaseView
+    objectBaseView : ObjectBaseView
 }
 
 module ActorView =
     let fromModel (actor : Model.Actor.Actor) = {
-        gameObjectView = actor.gameObject |> ObjectBaseView.fromModel
+        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
 
@@ -63,7 +63,7 @@ module CameraView =
     let fromPlayers (players : (Model.Actor.PlayerID * Model.Actor.Player) list) =
         players
         |> List.sortBy (fun (id, _) -> id.Value)
-        |> List.map (fun (_, p) -> p.actor.gameObject.position)
+        |> List.map (fun (_, p) -> p.actor.objectBase.position)
         |> List.map init
 
 

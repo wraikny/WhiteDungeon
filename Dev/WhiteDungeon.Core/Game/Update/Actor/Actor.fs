@@ -3,13 +3,13 @@
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
-let setObjectBase (gameObject : Model.GameObject) (actor : Actor) =
-    { actor with gameObject = gameObject }
+let setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
+    { actor with objectBase = objectBase }
 
 
 let updateObjectBase f (actor : Actor) =
     actor
-    |> setObjectBase (f actor.gameObject)
+    |> setObjectBase (f actor.objectBase)
 
 
 open WhiteDungeon.Core.Game.Msg
@@ -26,9 +26,9 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 
     actor
     |> updateObjectBase(
-        Update.GameObject.move
+        Update.ObjectBase.move
             gameSetting
             dungeonModel
             (Vec2.init1 speed * direction)
     )
-    |> updateObjectBase (Update.GameObject.setDirection (Model.MoveDirection.fromVector direction))
+    |> updateObjectBase (Update.ObjectBase.setDirection (Model.MoveDirection.fromVector direction))

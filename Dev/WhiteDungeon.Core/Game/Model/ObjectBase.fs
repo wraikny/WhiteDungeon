@@ -46,7 +46,7 @@ module MoveDirection =
         result
 
 
-type GameObject = {
+type ObjectBase = {
     size : float32 Vec2
 
     /// center down
@@ -57,12 +57,9 @@ type GameObject = {
     velocity : float32 Vec2
 
     direction : MoveDirection
-
-    statusCurrent : ObjectStatus
-    statusDefault : ObjectStatus
 }
 
-module GameObject =
+module ObjectBase =
     let size o = o.size
     
     let position o = o.position
@@ -73,23 +70,17 @@ module GameObject =
 
     let direction o = o.direction
 
-    let area (o : GameObject) : float32 Vec2 Rect =
+    let area (o : ObjectBase) : float32 Vec2 Rect =
         let leftUp = o.position - { o.size with x = o.size.x * 0.5f }
         {
             position = leftUp
             size = o.size
         }
 
-    let statusCurrent (actor : GameObject) = actor.statusCurrent
-
-    let statusDefault (actor : GameObject) = actor.statusDefault
-
-    let init size position status = {
+    let init size position = {
         size = size
         position = position
         lastPosition = position
         velocity = Vec2.zero()
         direction = Front
-        statusCurrent = status
-        statusDefault = status
     }

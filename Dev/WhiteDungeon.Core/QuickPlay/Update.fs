@@ -130,7 +130,6 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     maybe {
                         let! occupation = occupation
                         let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
-                        let objectStatus, actorStatus = status
                         let character : Model.Character = {
                             id = Model.CharacterID -(int id)
                             name = name
@@ -146,8 +145,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             Game.Model.Actor.Player.init
                                 size
                                 (targetPosition - (Vec2.init(float32 index, 0.0f) * size))
-                                objectStatus
-                                actorStatus
+                                status
                                 (Game.Model.Actor.PlayerID id)
                                 character
 

@@ -25,15 +25,15 @@ type PlayerView(gameViewSetting) =
 
     interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
-            let gameObject = viewModel.actorView.gameObjectView
+            let objectBase = viewModel.actorView.objectBaseView
 
-            let area = gameObject.area
+            let area = objectBase.area
 
             this.SetPosition(area.position)
 
             this.SetSize(area.size)
 
-            this.SetDirection(viewModel.actorView.gameObjectView.direction)
+            this.SetDirection(viewModel.actorView.objectBaseView.direction)
 
             this.SetOccupation(viewModel.character.currentOccupation)
 

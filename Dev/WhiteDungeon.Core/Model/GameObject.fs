@@ -13,11 +13,17 @@ module ObjectStatus =
 
 
 type ActorStatus = {
+    level : Level
+    hp : HP
     walkSpeed : Speed
     dashSpeed : Speed
 }
 
 module ActorStatus =
+    let level a = a.level
+
+    let hp a = a.hp
+
     let walkSpeed a = a.walkSpeed
 
     let dashSpeed a = a.dashSpeed
@@ -38,5 +44,5 @@ type Character = {
     id : CharacterID
     name : string
     currentOccupation : Occupation
-    occupations : Map<Occupation, ObjectStatus * ActorStatus>
+    occupations : Map<Occupation, ActorStatus>
 }

@@ -3,7 +3,9 @@
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Skill
 
-type Generator = Model -> GameObject -> SkillEmit list
+
+type Generator = Model -> SkillEmit list
+
 
 module SkillList =
     let append skills skillList =

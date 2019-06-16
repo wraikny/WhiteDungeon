@@ -23,10 +23,10 @@ module Player =
 
     let character (player : Player) = player.character
 
-    let gameObject (player : Player) = player.actor.gameObject
+    let objectBase (player : Player) = player.actor.objectBase
 
-    let init size position objectStatus actorStatus id character = {
-        actor = Actor.Actor.init size position objectStatus actorStatus
+    let init size position actorStatus id character = {
+        actor = Actor.Actor.init size position actorStatus
         id = id
         character = character
     }
@@ -36,11 +36,10 @@ open wraikny.Tart.Helper.Math
 
 
 module PlayerBuilder =
-    let build size position id objectStatus actorStatus (character : Character) =
+    let build size position id actorStatus (character : Character) =
         Player.init
             size
             position
-            objectStatus
             actorStatus
             id
             character
