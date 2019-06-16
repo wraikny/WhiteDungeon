@@ -13,6 +13,8 @@ type Model = {
     nextPlayerID : uint32
     players : (PlayerID * Actor.Player) list
 
+    enemies : (EnemyID * Actor.Enemy) list
+
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
 
@@ -38,6 +40,8 @@ module Model =
 
         nextPlayerID = players |> List.length |> uint32
         players = players
+
+        enemies = []
 
         skillList = Skill.SkillList.init()
 

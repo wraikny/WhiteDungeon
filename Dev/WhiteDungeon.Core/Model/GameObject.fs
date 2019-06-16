@@ -62,7 +62,6 @@ module ActorStatus =
         
 
 
-[<Struct>]
 type Occupation =
     | Hunter
 
@@ -79,3 +78,7 @@ type Character = {
     currentOccupation : Occupation
     occupations : Map<Occupation, ActorStatus>
 }
+
+
+type EnemyKind =
+    | Slime

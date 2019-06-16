@@ -31,6 +31,15 @@ module Update =
                 )
     }
 
+    let updateEnemies f (model : Model) : Model = {
+        model with
+            enemies =
+                model.enemies
+                |> List.map(fun (id, enemy) ->
+                    (id, f enemy)
+                )
+    }
+
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
 
@@ -75,8 +84,10 @@ module Update =
             let model =
                 model
                 |> updatePlayers (Actor.Player.update)
+                |> updateEnemies (Actor.Enemy.update)
 
             model, Cmd.none
+
         | PlayerInput (id, inputSet) ->
             let move, direction = getPlayerMoveFromInputs inputSet
             

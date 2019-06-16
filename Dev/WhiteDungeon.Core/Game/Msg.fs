@@ -2,8 +2,8 @@
 
 open wraikny.Tart.Helper.Math
 
-open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 
 
 [<Struct>]

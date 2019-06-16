@@ -151,7 +151,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         
 
     let controllers = [
-        Model.PlayerID 0u, gameKeybaord
+        Game.Model.PlayerID 0u, gameKeybaord
     ]
 
     let port = {
