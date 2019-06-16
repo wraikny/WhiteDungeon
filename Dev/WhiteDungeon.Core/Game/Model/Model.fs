@@ -13,6 +13,8 @@ type Model = {
     nextPlayerID : uint32
     players : (Actor.PlayerID * Actor.Player) list
 
+    skillEffects : Skill.Skill list
+
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
 
@@ -36,6 +38,8 @@ module Model =
 
         nextPlayerID = players |> List.length |> uint32
         players = players
+
+        skillEffects = []
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
