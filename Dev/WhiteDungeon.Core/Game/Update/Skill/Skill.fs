@@ -2,6 +2,7 @@
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Update
 open WhiteDungeon.Core.Game.Model.Skill
 
 
@@ -21,46 +22,56 @@ module SkillEmit =
         (actor : 'a) : 'a =
         actor |> updater (applyToActor gameSetting skill)
 
+
 module SkillList =
     let append skills skillList =
+        let skillsCount = skills |> List.length
         { skillList with
+            nextID = skillList.nextID + uint64 skillsCount
             waitings =
                 skillList.waitings
-                |> List.append skills
+                |> List.append (
+                    skills
+                    |> List.indexed
+                    |> List.map(fun (i, x) -> (skillList.nextID + uint64 i, x))
+                )
         }
 
     let popWaitingSkills (skillList : SkillList) =
         let rec popWaitings ws pis eis ps es ars =
             function
             | [] -> ws, pis, eis, ps, es, ars
-            | x::xs ->
+            | skill::xs ->
+                let id, x = skill
                 xs |>
                 if x.delay = 0u then
                     let pis, eis, ps, es, ars =
                         (x.invoker, x.target) |> function
                         | _, Players _ ->
-                            (x::pis), eis, ps, es, ars
+                            (skill::pis), eis, ps, es, ars
                         | _, Enemies _ ->
-                            pis, (x::eis), ps, es, ars
+                            pis, (skill::eis), ps, es, ars
                         | _, Area _ ->
-                            pis, eis, ps, es, (x::ars)
+                            pis, eis, ps, es, (skill::ars)
                         | Player _, Friends _
                         | Enemy, Others _
                             ->
-                            pis, eis, (x::ps), es, ars
+                            pis, eis, (skill::ps), es, ars
                         | _, Enemies
                         | Enemy, Friends _
                         | Player _, Others _
                             ->
-                            pis, eis, ps, (x::es), ars
+                            pis, eis, ps, (skill::es), ars
                     popWaitings ws pis eis ps es ars
                         
                 else
-                    popWaitings ({x with delay = x.delay - 1u}::ws) pis eis ps es ars
+                    popWaitings ((id, {x with delay = x.delay - 1u})::ws) pis eis ps es ars
 
-        let waitings, playerIDs, enemyIDs, players, enemies, areas = popWaitings [] [] [] [] [] [] skillList.waitings
+        let waitings, playerIDs, enemyIDs, players, enemies, areas =
+            popWaitings [] [] [] [] [] [] skillList.waitings
 
         {
+            nextID = skillList.nextID
             waitings = waitings
             playerIDEffects = playerIDs
             enemyIDEffects = enemyIDs

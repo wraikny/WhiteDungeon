@@ -70,7 +70,10 @@ module Update =
 
 
     let appendSkills (skills : Skill.SkillEmit list) (model : Model) : Model * Cmd<_, _> =
-        model |> updateSkillList (Skill.SkillList.append skills), Cmd.viewMsg[ViewMsg.AppendSkills skills]
+        model
+        |> updateSkillList
+            (Skill.SkillList.append skills)
+        , Cmd.viewMsg[ViewMsg.AppendSkills skills]
 
 
     let applySkills (model : Model) : Model =

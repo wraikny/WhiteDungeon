@@ -52,19 +52,24 @@ and SkillEmit =
     }
 
 
+type SkillID = uint64
+
+
 type SkillList =
     {
-        waitings : SkillEmit list
-        playerIDEffects : SkillEmit list
-        enemyIDEffects : SkillEmit list
-        playerEffects : SkillEmit list
-        enemyEffects : SkillEmit list
-        areaEffects : SkillEmit list
+        nextID : SkillID
+        waitings : (SkillID * SkillEmit) list
+        playerIDEffects : (SkillID * SkillEmit) list
+        enemyIDEffects : (SkillID * SkillEmit) list
+        playerEffects : (SkillID * SkillEmit) list
+        enemyEffects : (SkillID * SkillEmit) list
+        areaEffects : (SkillID * SkillEmit) list
     }
 
 module SkillList =
     let init() =
         {
+            nextID = 0uL
             waitings = []
             playerIDEffects = []
             enemyIDEffects = []
