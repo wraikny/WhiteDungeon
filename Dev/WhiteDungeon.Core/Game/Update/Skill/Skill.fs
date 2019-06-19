@@ -2,6 +2,7 @@
 
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Monad
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
@@ -11,24 +12,61 @@ open WhiteDungeon.Core.Game.Model.Skill
 
 // type Generator = Model -> SkillEmit list
 
+module EmitMove =
+    let apply gameSetting dungeonModel move (obj : ObjectBase) =
+        move |> function
+        | Stay -> obj
+        | Move diff ->
+            ObjectBase.move gameSetting dungeonModel diff obj
+
+
+module AreaSkill =
+    let move gameSetting dungeonModel areaSkill =
+        areaSkill.move |> function
+        | [] -> None
+        | x::xs ->
+            Some {
+                area =
+                    areaSkill.area
+                    |> EmitMove.apply gameSetting dungeonModel x
+                move = xs
+            }
+
+
 module SkillEmit =
     let move gameSetting dungeonModel (emit : SkillEmit) =
-        let moveObj = ObjectBase.move gameSetting dungeonModel
+        let applyMove = AreaSkill.move gameSetting dungeonModel
+
         emit.target |> function
-        | Friends o ->
-            { emit with target = Friends (moveObj o.velocity o)}
-        | Others o ->
-            { emit with target = Others (moveObj o.velocity o)}
-        | Area o ->
-            { emit with target = Area (moveObj o.velocity o)}
-        | _ ->
-            emit
+        | Friends area ->
+            applyMove area
+            |> Option.map(fun area -> { emit with target = Friends area })
+        | Others area ->
+            applyMove area
+            |> Option.map(fun area -> { emit with target = Others area })
+        | Area area ->
+            applyMove area
+            |> Option.map(fun area -> { emit with target = Area area })
+        | Players (ids, frame) ->
+            if frame = 0u then
+                None
+            else
+                Some { emit with target = Players(ids, frame - 1u)}
+
+        | Enemies (ids, frame) ->
+            if frame = 0u then
+                None
+            else
+                Some { emit with target = Enemies(ids, frame - 1u)}
+
+        |> Option.map(fun emit -> { emit with frame = emit.frame - 1u})
+
 
     let private isCollided (emit : SkillEmit) (actor : Actor.Actor) : bool =
         emit.target |> function
-        | Friends o
-        | Others o
-        | Area o ->
+        | Friends { area = o }
+        | Others { area = o }
+        | Area { area = o } ->
             Rect.isCollided
                 (o |> ObjectBase.area)
                 (actor.objectBase |> ObjectBase.area)
@@ -92,49 +130,30 @@ module SkillList =
 
     let skillEmitFuncToEffectsList f = List.map (fun (id, x) -> (id, f x))
 
-    let private updateIDEffects f skillList =
+    let private mapIDEffects f skillList =
         { skillList with
             playerIDEffects = f skillList.playerIDEffects
             enemyIDEffects = f skillList.enemyIDEffects
         }
 
-    let private updateAreaEffects f skillList =
+    let private mapAreaEffects f skillList =
         { skillList with
             playerEffects = f skillList.playerEffects
             enemyEffects = f skillList.enemyEffects
             areaEffects = f skillList.areaEffects
         }
 
-    let private updateUnWaitingEffects f skillList =
+    let private map f skillList =
         skillList
-        |> updateIDEffects f
-        |> updateAreaEffects f
-
-    let private decrFrame (skillList : SkillList) : SkillList =
-        let decr emit =
-            if emit.frame = 0u then
-                None
-            else
-                Some {
-                    emit with
-                        frame = emit.frame - 1u
-                }
-
-        let f =
-            Seq.filterMap(fun (id, x) ->
-                decr x |> function
-                | Some x -> Some (id, x)
-                | None -> None
-            ) >> Seq.toList
-
-        updateUnWaitingEffects f skillList
+        |> mapIDEffects f
+        |> mapAreaEffects f
 
     let private popWaitingSkills (skillList : SkillList) : SkillList =
         let rec popWaitings ws pis eis ps es ars =
             function
             | [] -> ws, pis, eis, ps, es, ars
             | skill::xs ->
-                let id, x = skill
+                let id, (x : SkillEmit) = skill
                 xs |>
                 if x.delay = 0u then
                     let pis, eis, ps, es, ars =
@@ -175,14 +194,17 @@ module SkillList =
     
     let private move gameSetting dungeonModel (skillList) : SkillList =
         skillList
-        |> updateAreaEffects (
-            (SkillEmit.move gameSetting dungeonModel)
-            |> skillEmitFuncToEffectsList
+        |> map(
+            Seq.filterMap (fun (id, x) -> maybe {
+                let! v =
+                    x
+                    |> SkillEmit.move gameSetting dungeonModel
+                yield (id, v)
+            })
+            >> Seq.toList
         )
-        
 
     let update (model : Model) skillList =
         skillList
         |> move model.gameSetting model.dungeonModel
-        |> decrFrame
         |> popWaitingSkills

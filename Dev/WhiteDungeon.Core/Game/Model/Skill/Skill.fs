@@ -21,39 +21,80 @@ open WhiteDungeon.Core.Game.Model
 //    let priority c = c.priority
 
 
+type EmitMove =
+    | Stay
+    | Move of float32 Vec2
+
+
 type InvokerID =
     | Player of PlayerID
     | Enemy of EnemyID
 
 
-type Target =
-    | Players of PlayerID Set
-    | Enemies of EnemyID Set
-    | Friends of ObjectBase
-    | Others of ObjectBase
-    | Area of ObjectBase
+type AreaSkill =
+    {
+        area : ObjectBase
+        move : EmitMove list
+    }
 
+type Target =
+    | Players of PlayerID Set * uint32
+    | Enemies of EnemyID Set * uint32
+    | Friends of AreaSkill
+    | Others of AreaSkill
+    | Area of AreaSkill
 
 
 type Effect =
     // | AddSkillEmits of SkillEmit list
     // | AddConditions of Condition list
     | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
+        
 
 type SkillEmit =
-    {
+    internal {
         invokerActor : Actor.Actor
         invokerID : InvokerID
         target : Target
         delay : uint32
         frame : uint32
         frameFirst : uint32
-        // removedWhenHit : bool
         kind : Effect
     }
 
 module SkillEmit =
     let getTarget s = s.target
+
+
+type SkillEmitBuilder =
+    {
+        invokerActor : Actor.Actor
+        invokerID : InvokerID
+        target : Target
+        delay : uint32
+        kind : Effect
+    }
+
+module SkillEmitBuilder =
+    let build (builder : SkillEmitBuilder) : SkillEmit =
+        let frame = builder.target |> function
+            | Friends { move = move }
+            | Others { move = move }
+            | Area { move = move } ->
+                move |> List.length |> uint32
+            | Players (_, frame)
+            | Enemies (_, frame) ->
+                frame
+
+        {
+            invokerActor = builder.invokerActor
+            invokerID = builder.invokerID
+            target = builder.target
+            delay = builder.delay
+            frame = frame
+            frameFirst = frame
+            kind = builder.kind
+        }
 
 
 type SkillID = uint32

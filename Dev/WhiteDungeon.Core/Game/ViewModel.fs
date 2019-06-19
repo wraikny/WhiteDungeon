@@ -63,9 +63,9 @@ type AreaSkillEmitView = {
 module AreaSkillEmitView =
     let fromModel (emit : Model.Skill.SkillEmit) =
         emit.target |> function
-        | Model.Skill.Friends o
-        | Model.Skill.Others o
-        | Model.Skill.Area o ->
+        | Model.Skill.Friends { area = o }
+        | Model.Skill.Others { area = o }
+        | Model.Skill.Area { area = o } ->
             Some {
                 baseView =
                     o |> ObjectBaseView.fromModel

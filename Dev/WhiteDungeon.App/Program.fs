@@ -3,9 +3,11 @@
 open wraikny.Tart.Helper.Math
 open WhiteDungeon
 
+open WhiteDungeon.Core.Game.Model.Skill
+
 
 [<EntryPoint>]
-let main _ = 
+let main _ =
     let viewSetting : View.ViewSetting = {
         uiFontPath = "Font/mplus-1c-light.ttf"
         menuButtonSize = new asd.Vector2DF(400.0f, 100.0f)

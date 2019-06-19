@@ -50,9 +50,13 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (skills : Skill.SkillEmit list) (model : Model) : Model =
+    let appendSkills (skills : Skill.SkillEmitBuilder list) (model : Model) : Model =
         model
-        |> updateSkillList (Skill.SkillList.append skills)
+        |> updateSkillList (
+            skills
+            |> List.map(Skill.SkillEmitBuilder.build)
+            |> Skill.SkillList.append
+        )
 
 
     let applySkills (model : Model) : Model =
@@ -72,7 +76,7 @@ module Update =
                         snd
                         >> Skill.SkillEmit.getTarget
                         >> function
-                        | Skill.Players ids ->
+                        | Skill.Players (ids, _) ->
                             ids |> Set.contains id
                         | _ -> false
                     )
@@ -92,7 +96,7 @@ module Update =
                         snd
                         >> Skill.SkillEmit.getTarget
                         >> function
-                        | Skill.Enemies ids ->
+                        | Skill.Enemies (ids, _) ->
                             ids |> Set.contains id
                         | _ -> false
                     )
@@ -137,6 +141,8 @@ module Update =
 
             model, Cmd.none
 
+        #if DEBUG
+
         | AppendSkillEmits ->
             let id = PlayerID 0u
             let player0 = model.players |> Map.find id
@@ -148,18 +154,18 @@ module Update =
                 player0.actor.objectBase.position
                 |> (+) (Vec2.init1(100.0f) * dir)
 
-            let emit : Skill.SkillEmit = {
+            let emit : Skill.SkillEmitBuilder = {
                 invokerActor = player0.actor
                 invokerID = Skill.InvokerID.Player id
                 target = Skill.Target.Area {
-                        ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
-                            with velocity = dir * Vec2.init1 10.0f
+                        area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
+                        move = seq {
+                            for _ in 1..120 -> Skill.Move(dir * Vec2.init1 5.0f)
+                        } |> Seq.toList
                     }
                 
                 
                 delay = 0u
-                frame = 60u
-                frameFirst = 60u
                 kind = Skill.Damage(fun gs atk def ->
                     0.0f
                 )
@@ -167,3 +173,5 @@ module Update =
             let emits = [emit]
 
             model |> appendSkills emits, Cmd.none
+
+        #endif
