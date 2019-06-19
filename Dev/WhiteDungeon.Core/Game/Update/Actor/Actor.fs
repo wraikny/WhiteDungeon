@@ -13,6 +13,25 @@ let updateObjectBase f (actor : Actor) =
     |> setObjectBase (f actor.objectBase)
 
 
+let setActorStatusCurrent status actor : Actor =
+    { actor with statusCurrent = status }
+
+let updateActorStatusCurrent f actor : Actor =
+    { actor with statusCurrent = f actor.statusCurrent }
+
+
+let addHP damage (actor : Actor) =
+    let hp =
+        (actor.statusCurrent.hp + damage)
+        |> max 0.0f
+        |> min actor.statusDefault.hp
+
+    actor
+    |> updateActorStatusCurrent(fun status ->
+        { status with hp = hp }
+    )
+
+
 open WhiteDungeon.Core.Game.Msg
 
 open wraikny.Tart.Helper.Math
