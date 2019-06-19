@@ -110,7 +110,9 @@ module Update =
                 model
                 |> updateEachPlayer Actor.Player.update
                 |> updateEachEnemy Actor.Enemy.update
-                |> updateSkillList Skill.SkillList.update
+            let model =
+                model
+                |> updateSkillList (Skill.SkillList.update model)
                 |> applySkills
 
             model, Cmd.none
@@ -138,15 +140,21 @@ module Update =
         | AppendSkillEmits ->
             let id = PlayerID 0u
             let player0 = model.players |> Map.find id
+            let dir = 
+                player0.actor.objectBase.direction
+                |> Model.MoveDirection.toVector
+
             let pos =
                 player0.actor.objectBase.position
-                |> (+) (Vec2.init1(100.0f) * Model.MoveDirection.toVector player0.actor.objectBase.direction)
+                |> (+) (Vec2.init1(100.0f) * dir)
+
             let emit : Skill.SkillEmit = {
                 invokerActor = player0.actor
                 invokerID = Skill.InvokerID.Player id
-                target =
-                    Skill.Target.Area
-                        (ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos)
+                target = Skill.Target.Area {
+                        ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
+                            with velocity = dir * Vec2.init1 10.0f
+                    }
                 
                 
                 delay = 0u

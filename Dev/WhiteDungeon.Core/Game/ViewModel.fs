@@ -73,6 +73,7 @@ module AreaSkillEmitView =
                 frameFirst = emit.frameFirst
             }
         | _ -> None
+        |> Option.get
 
 
 type CameraView = {
@@ -123,10 +124,6 @@ module ViewModel =
             objects =
                 model.skillList
                 |> Model.Skill.SkillList.allAreaEffects
-                |> Seq.filterMap (fun (id, e) -> maybe {
-                    let! v = AreaSkillEmitView.fromModel e
-                    return (id, v)
-                })
-                |> Seq.toList
+                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
         }
     }

@@ -12,8 +12,20 @@ open WhiteDungeon.Core.Game.Model.Skill
 // type Generator = Model -> SkillEmit list
 
 module SkillEmit =
-    let private isCollided (skill : SkillEmit) (actor : Actor.Actor) : bool =
-        skill.target |> function
+    let move gameSetting dungeonModel (emit : SkillEmit) =
+        let moveObj = ObjectBase.move gameSetting dungeonModel
+        emit.target |> function
+        | Friends o ->
+            { emit with target = Friends (moveObj o.velocity o)}
+        | Others o ->
+            { emit with target = Others (moveObj o.velocity o)}
+        | Area o ->
+            { emit with target = Area (moveObj o.velocity o)}
+        | _ ->
+            emit
+
+    let private isCollided (emit : SkillEmit) (actor : Actor.Actor) : bool =
+        emit.target |> function
         | Friends o
         | Others o
         | Area o ->
@@ -22,16 +34,16 @@ module SkillEmit =
                 (actor.objectBase |> ObjectBase.area)
         | _ -> false
     
-    let private apply (gameSetting : GameSetting) (skill : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
+    let private apply (gameSetting : GameSetting) (emit : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
         // TODO
-        isCollided skill actor |> function
+        isCollided emit actor |> function
         | true ->
-            skill.kind |> function
+            emit.kind |> function
             | Damage calc ->
                 let damage =
                     calc
                         gameSetting
-                        skill.invokerActor.statusCurrent
+                        emit.invokerActor.statusCurrent
                         actor.statusCurrent
 
                 actor
@@ -78,6 +90,26 @@ module SkillList =
                 )
         }
 
+    let skillEmitFuncToEffectsList f = List.map (fun (id, x) -> (id, f x))
+
+    let private updateIDEffects f skillList =
+        { skillList with
+            playerIDEffects = f skillList.playerIDEffects
+            enemyIDEffects = f skillList.enemyIDEffects
+        }
+
+    let private updateAreaEffects f skillList =
+        { skillList with
+            playerEffects = f skillList.playerEffects
+            enemyEffects = f skillList.enemyEffects
+            areaEffects = f skillList.areaEffects
+        }
+
+    let private updateUnWaitingEffects f skillList =
+        skillList
+        |> updateIDEffects f
+        |> updateAreaEffects f
+
     let private decrFrame (skillList : SkillList) : SkillList =
         let decr emit =
             if emit.frame = 0u then
@@ -95,13 +127,7 @@ module SkillList =
                 | None -> None
             ) >> Seq.toList
 
-        { skillList with
-            playerIDEffects = f skillList.playerIDEffects
-            enemyIDEffects = f skillList.enemyIDEffects
-            playerEffects = f skillList.playerEffects
-            enemyEffects = f skillList.enemyEffects
-            areaEffects = f skillList.areaEffects
-        }
+        updateUnWaitingEffects f skillList
 
     let private popWaitingSkills (skillList : SkillList) : SkillList =
         let rec popWaitings ws pis eis ps es ars =
@@ -146,7 +172,17 @@ module SkillList =
             areaEffects = areas |> List.append skillList.areaEffects
         }
 
-    let update skillList =
+    
+    let private move gameSetting dungeonModel (skillList) : SkillList =
         skillList
+        |> updateAreaEffects (
+            (SkillEmit.move gameSetting dungeonModel)
+            |> skillEmitFuncToEffectsList
+        )
+        
+
+    let update (model : Model) skillList =
+        skillList
+        |> move model.gameSetting model.dungeonModel
         |> decrFrame
         |> popWaitingSkills
