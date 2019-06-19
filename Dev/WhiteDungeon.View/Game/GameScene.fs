@@ -138,17 +138,27 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         port.Update()
         notifier.Pull() |> ignore
 
-        this.PushControllerInput()
-
+        #if DEBUG
+        this.PushControllerInput() |> function
+        | true ->
+            messenger.PushMsg(Msg.TimePasses)
+        | false ->
+            if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
+                messenger.PushMsg(Msg.TimePasses)
+            ()
         if asd.Engine.Keyboard.GetKeyState(asd.Keys.Space) = asd.ButtonState.Push then
             messenger.PushMsg(Msg.AppendSkillEmits)
             messenger.PushMsg(Msg.TimePasses)
-
-        if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
+        #else
+        this.PushControllerInput() |> function
+        | true ->
             messenger.PushMsg(Msg.TimePasses)
+        | false ->
+            ()
+        #endif
 
 
-    member this.PushControllerInput() =
+    member this.PushControllerInput() : bool =
         controllers
         |> List.map(fun (id, controller) ->
             let getStateIs (state : asd.ButtonState) key =
@@ -168,10 +178,6 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
                 true
         )
         |> List.fold (||) false
-        |> function
-        | true ->
-            messenger.PushMsg(Msg.TimePasses)
-        | false -> ()
 
 
     member this.AddDungeonView(gameModel : Model.Model) =
