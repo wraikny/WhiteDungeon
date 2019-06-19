@@ -153,7 +153,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             (Game.Model.PlayerID id, player)
                     }
                 )
-                |> Seq.toList
+                |> Map.ofSeq
 
             let gameModel =
                 Game.Model.Model.init

@@ -11,9 +11,9 @@ type Model = {
     count : uint32
 
     nextPlayerID : uint32
-    players : (PlayerID * Actor.Player) list
+    players : Map<PlayerID, Actor.Player>
 
-    enemies : (EnemyID * Actor.Enemy) list
+    enemies : Map<EnemyID, Actor.Enemy>
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
@@ -38,10 +38,10 @@ module Model =
     let init players dungeonBuilder dungeonModel gameSetting = {
         count = 0u
 
-        nextPlayerID = players |> List.length |> uint32
+        nextPlayerID = players |> Map.count |> uint32
         players = players
 
-        enemies = []
+        enemies = Map.empty
 
         skillList = Skill.SkillList.init()
 

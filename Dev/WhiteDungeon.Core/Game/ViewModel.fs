@@ -46,7 +46,8 @@ module PlayerView =
     }
 
     let playersView =
-        List.map(fun (id : Model.PlayerID, player) ->
+        Map.toList
+        >> List.map(fun (id : Model.PlayerID, player) ->
             (id.Value, fromModel player)
         )
 
@@ -60,8 +61,9 @@ module CameraView =
         position = position
     }
 
-    let fromPlayers (players : (Model.PlayerID * Model.Actor.Player) list) =
+    let fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
         players
+        |> Map.toList
         |> List.sortBy (fun (id, _) -> id.Value)
         |> List.map (fun (_, p) -> p.actor.objectBase.position)
         |> List.map init

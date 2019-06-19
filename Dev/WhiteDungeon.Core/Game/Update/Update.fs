@@ -17,27 +17,27 @@ module Update =
         model with
             players =
                 model.players
-                |> List.map(fun (id, player) ->
-                    (id, f player)
-                )
+                |> Map.map(fun _ x -> f x)
     }
 
-    let updatePlayerOf id f (model : Model) : Model = {
-        model with
-            players = 
-                model.players
-                |> List.map(fun (pID, player) ->
-                    pID, if pID = id then f player else player
-                )
-    }
+    let updatePlayerOf id f (model : Model) : Model =
+        model.players |> Map.tryFind id
+        |> function
+        | Some player ->
+            {
+                model with
+                    players = 
+                        model.players
+                        |> Map.add id (f player)
+            }
+        | None ->
+            model
 
     let updateEnemies f (model : Model) : Model = {
         model with
             enemies =
                 model.enemies
-                |> List.map(fun (id, enemy) ->
-                    (id, f enemy)
-                )
+                |> Map.map(fun _ x -> f x)
     }
 
     open wraikny.Tart.Helper.Math
