@@ -5,20 +5,20 @@ open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
-type ConditionKind =
-    | StatusAdd of ActorStatus
-    | StatusMul of ActorStatus
+//type ConditionKind =
+//    | StatusAdd of ActorStatus
+//    | StatusMul of ActorStatus
 
 
-type Condition =
-    {
-        priority : int
-        frame : uint32
-        kind : ConditionKind
-    }
+//type Condition =
+//    {
+//        priority : int
+//        frame : uint32
+//        kind : ConditionKind
+//    }
 
-module Condition =
-    let priority c = c.priority
+//module Condition =
+//    let priority c = c.priority
 
 
 type Invoker =
@@ -37,7 +37,7 @@ type Target =
 
 type Effect =
     | AddSkillEmits of SkillEmit list
-    | AddConditions of Condition list
+    // | AddConditions of Condition list
     | Damage of float32
     | Move of float32 Vec2
 

@@ -33,70 +33,70 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
             (Vec2.init1 speed * direction)
     )
 
-let calcStatusCurrent (actor : Actor) =
-    let rec applyCorrection corrections result =
-        corrections |> function
-        | [] -> result
-        | (c : Model.Skill.Condition)::cs ->
-            let result = c.kind |> function
-                | Model.Skill.StatusAdd s ->
-                    result + s
-                | Model.Skill.StatusMul s ->
-                    result * s
+//let calcStatusCurrent (actor : Actor) =
+//    let rec applyCorrection corrections result =
+//        corrections |> function
+//        | [] -> result
+//        | (c : Model.Skill.Condition)::cs ->
+//            let result = c.kind |> function
+//                | Model.Skill.StatusAdd s ->
+//                    result + s
+//                | Model.Skill.StatusMul s ->
+//                    result * s
 
-            applyCorrection cs result
-
-
-    { actor with
-        statusCurrent =
-            applyCorrection actor.conditions actor.statusDefault
-            |> ActorStatus.max ( ActorStatus.zero() )
-    }
+//            applyCorrection cs result
 
 
-let setConditions conditions (actor : Actor) =
-    { actor with conditions = conditions }
+//    { actor with
+//        statusCurrent =
+//            applyCorrection actor.conditions actor.statusDefault
+//            |> ActorStatus.max ( ActorStatus.zero() )
+//    }
 
 
-let appendConditions (conditions : Model.Skill.Condition list) (actor : Actor) : Actor =
-    let conditions =
-        conditions
-        |> List.filter(fun c -> c.frame > 0u)
-
-    if conditions |> List.length > 0 then
-        let conditions =
-            actor.conditions
-            |> List.append conditions
-            |> List.sortBy (fun c -> c.priority)
-
-        actor
-        |> setConditions conditions
-        |> calcStatusCurrent
-
-    else
-        actor
+//let setConditions conditions (actor : Actor) =
+//    { actor with conditions = conditions }
 
 
-let updateConditions (actor : Actor) : Actor =
-    let rec search cs result recalc =
-        cs |> function
-        | [] -> result, recalc
-        | (c : Model.Skill.Condition)::cs ->
-            if c.frame = 0u then
-                search cs result true
-            else
-                search cs ({c with frame = c.frame - 1u}::result) recalc
+//let appendConditions (conditions : Model.Skill.Condition list) (actor : Actor) : Actor =
+//    let conditions =
+//        conditions
+//        |> List.filter(fun c -> c.frame > 0u)
 
-    let conditions, recalc = search actor.conditions [] false
+//    if conditions |> List.length > 0 then
+//        let conditions =
+//            actor.conditions
+//            |> List.append conditions
+//            |> List.sortBy (fun c -> c.priority)
 
-    if recalc then
-        actor
-        |> setConditions conditions
-        |> calcStatusCurrent
-    else
-        actor
-        |> setConditions conditions
+//        actor
+//        |> setConditions conditions
+//        |> calcStatusCurrent
+
+//    else
+//        actor
+
+
+//let updateConditions (actor : Actor) : Actor =
+//    let rec search cs result recalc =
+//        cs |> function
+//        | [] -> result, recalc
+//        | (c : Model.Skill.Condition)::cs ->
+//            if c.frame = 0u then
+//                search cs result true
+//            else
+//                search cs ({c with frame = c.frame - 1u}::result) recalc
+
+//    let conditions, recalc = search actor.conditions [] false
+
+//    if recalc then
+//        actor
+//        |> setConditions conditions
+//        |> calcStatusCurrent
+//    else
+//        actor
+//        |> setConditions conditions
 
 let update actor : Actor =
     actor
-    |> updateConditions
+    //|> updateConditions

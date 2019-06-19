@@ -1,12 +1,12 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 
-type ObjectStatus = {
-    hp : HP
-}
+//type ObjectStatus = {
+//    hp : HP
+//}
 
-module ObjectStatus =
-    let hp a = a.hp
+//module ObjectStatus =
+//    let hp a = a.hp
 
 
 type ActorStatus = {
@@ -29,6 +29,7 @@ type ActorStatus = {
         walkSpeed = a.walkSpeed * b.walkSpeed
         dashSpeed = a.dashSpeed * b.dashSpeed
     }
+
 
 module ActorStatus =
     let level a = a.level

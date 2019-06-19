@@ -9,8 +9,8 @@ type Actor = {
     objectBase : ObjectBase
     statusCurrent : ActorStatus
     statusDefault : ActorStatus
-    skillEmits : Skill.SkillEmit list
-    conditions : Skill.Condition list
+    // skillEmits : Skill.SkillEmit list
+    // conditions : Skill.Condition list
 }
 
 module Actor =
@@ -29,6 +29,6 @@ module Actor =
         statusCurrent = actorStatus
         statusDefault = actorStatus
         objectBase = ObjectBase.init size position
-        skillEmits = []
-        conditions = []
+        // skillEmits = []
+        // conditions = []
     }
