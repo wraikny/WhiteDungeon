@@ -6,6 +6,8 @@ open WhiteDungeon.Core.Game
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
+open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Game.Model
 
@@ -52,6 +54,23 @@ module PlayerView =
         )
 
 
+type AreaSkillEmitView = {
+   baseView : ObjectBaseView
+}
+
+module AreaSkillEmitView =
+    let fromModel (emit : Model.Skill.SkillEmit) =
+        emit.target |> function
+        | Model.Skill.Friends o
+        | Model.Skill.Others o
+        | Model.Skill.Area o ->
+            Some {
+                baseView =
+                    o |> ObjectBaseView.fromModel
+            }
+        | _ -> None
+
+
 type CameraView = {
     position : float32 Vec2
 }
@@ -73,6 +92,7 @@ module CameraView =
 type ViewModel = {
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
+    areaSkillEmits : UpdaterViewModel<AreaSkillEmitView>
 }
 
 
@@ -81,6 +101,9 @@ open WhiteDungeon.Core.Game.Model
 module ViewModel =
     let selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
         viewModel.players
+
+    let selectAreaSkillEmits (viewModel : ViewModel) : UpdaterViewModel<AreaSkillEmitView> =
+        viewModel.areaSkillEmits
 
     let view (model : Model) : ViewModel = {
         camera =
@@ -92,5 +115,16 @@ module ViewModel =
                 model
                 |> Model.players
                 |> PlayerView.playersView
+        }
+
+        areaSkillEmits = {
+            objects =
+                model.skillList
+                |> Model.Skill.SkillList.allAreaEffects
+                |> Seq.filterMap (fun (id, e) -> maybe {
+                    let! v = AreaSkillEmitView.fromModel e
+                    return (id, v)
+                })
+                |> Seq.toList
         }
     }

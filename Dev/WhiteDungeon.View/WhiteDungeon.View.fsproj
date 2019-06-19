@@ -54,6 +54,7 @@
     <Compile Include="UI\MessageLayer.fs" />
     <Compile Include="Setting\GameViewSetting.fs" />
     <Compile Include="Game\PlayerView.fs" />
+    <Compile Include="Game\SkillEmitView.fs" />
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\GameScene.fs" />
     <Compile Include="QuickPlay\QuickPlayScene.fs" />

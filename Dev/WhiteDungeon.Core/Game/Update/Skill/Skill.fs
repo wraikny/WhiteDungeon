@@ -68,13 +68,13 @@ module SkillList =
     let append skills skillList =
         let skillsCount = skills |> List.length
         { skillList with
-            nextID = skillList.nextID + uint64 skillsCount
+            nextID = skillList.nextID + uint32 skillsCount
             waitings =
                 skillList.waitings
                 |> List.append (
                     skills
                     |> List.indexed
-                    |> List.map(fun (i, x) -> (skillList.nextID + uint64 i, x))
+                    |> List.map(fun (i, x) -> (skillList.nextID + uint32 i, x))
                 )
         }
 

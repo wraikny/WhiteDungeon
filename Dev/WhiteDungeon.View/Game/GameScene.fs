@@ -51,6 +51,12 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
             selectActor = ViewModel.ViewModel.selectPlayers >> Some
         }
 
+    let skillEmitsUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
+        ActorsUpdaterBuilder.build "skillEmitsUpdater" {
+            initActor = fun () -> new SkillEmitView(gameViewSetting)
+            selectActor = ViewModel.ViewModel.selectAreaSkillEmits >> Some
+        }
+
     let dungeonCamera = new GameCamera()
     let minimapCamera =
         new GameCamera(

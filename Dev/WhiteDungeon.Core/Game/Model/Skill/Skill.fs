@@ -55,7 +55,7 @@ module SkillEmit =
     let getTarget s = s.target
 
 
-type SkillID = uint64
+type SkillID = uint32
 
 
 type SkillList =
@@ -72,7 +72,7 @@ type SkillList =
 module SkillList =
     let init() =
         {
-            nextID = 0uL
+            nextID = 0u
             waitings = []
             playerIDEffects = []
             enemyIDEffects = []
@@ -88,3 +88,8 @@ module SkillList =
 
     let toEnemies (skillList) =
         withArea skillList skillList.enemyEffects
+
+    let allAreaEffects skillList =
+        skillList.playerEffects
+        |> List.append skillList.enemyEffects
+        |> List.append skillList.areaEffects
