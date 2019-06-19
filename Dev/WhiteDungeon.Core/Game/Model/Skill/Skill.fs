@@ -47,6 +47,7 @@ type SkillEmit =
         target : Target
         delay : uint32
         frame : uint32
+        frameFirst : uint32
         // removedWhenHit : bool
         kind : Effect
     }

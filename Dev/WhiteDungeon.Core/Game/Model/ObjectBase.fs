@@ -46,6 +46,21 @@ module MoveDirection =
         result
 
 
+    let toVector dir =
+        dir |> function
+        | Front -> (0, 1)
+        | Back -> (0, -1)
+        | Right -> (1, 0)
+        | Left -> (-1, 0)
+        | FrontRight -> (1, 1)
+        | FrontLeft -> (-1, 1)
+        | BackRight -> (1, -1)
+        | BackLeft -> (-1, -1)
+        |> Vec2.init
+        |> Vec2.map float32
+        |> VectorClass.normalize
+
+
 type ObjectBase = {
     size : float32 Vec2
 

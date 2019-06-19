@@ -7,7 +7,6 @@ open wraikny.Tart.Advanced
 
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input.Controller
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.Input
@@ -136,30 +135,12 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     //    |> Map.toList
     //    |> List.map snd
 
-    let gameKeybaord =
-        KeyboardBuilder.init()
-        |> KeyboardBuilder.bindKeysList
-            [
-                Game.Msg.UpKey    , asd.Keys.Up
-                Game.Msg.DownKey  , asd.Keys.Down
-                Game.Msg.RightKey , asd.Keys.Right
-                Game.Msg.LeftKey  , asd.Keys.Left
-                Game.Msg.DashKey  , asd.Keys.LeftShift
-            ]
-        |> KeyboardBuilder.build
-        :> Controller.IController<Game.Msg.PlayerInput>
-        
-
-    let controllers = [
-        Game.Model.PlayerID 0u, gameKeybaord
-    ]
-
     let port = {
         new Port<_, _>(messenger) with
         override __.OnUpdate(msg) =
             msg |> function
             | QuickPlay.ChangeToGame(gameModel) ->
-                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting, controllers))
+                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
                 |> ignore
     }
     

@@ -8,7 +8,7 @@ open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.Input
-
+open wraikny.MilleFeuille.Fs.Input.Controller
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
@@ -19,7 +19,7 @@ open WhiteDungeon.View.Utils.Geometry
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controllers) =
+type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
@@ -41,38 +41,55 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
         override __.OnUpdate(msg) = ()
     }
 
-    let controllers : (Model.PlayerID * Controller.IController<Msg.PlayerInput>) list =
-        controllers
+    let gameKeybaord =
+        KeyboardBuilder.init()
+        |> KeyboardBuilder.bindKeysList
+            [
+                Game.Msg.UpKey    , asd.Keys.Up
+                Game.Msg.DownKey  , asd.Keys.Down
+                Game.Msg.RightKey , asd.Keys.Right
+                Game.Msg.LeftKey  , asd.Keys.Left
+                Game.Msg.DashKey  , asd.Keys.LeftShift
+            ]
+        |> KeyboardBuilder.build
+        :> Controller.IController<Game.Msg.PlayerInput>
+        
+
+    let controllers = [
+        Game.Model.PlayerID 0u, gameKeybaord
+    ]
 
 
     let playersUpdater : ActorsUpdater<ViewModel.ViewModel, PlayerView, ViewModel.PlayerView> =
         ActorsUpdaterBuilder.build "PlayersUpdater" {
             initActor = fun () -> new PlayerView(gameViewSetting)
-            selectActor = ViewModel.ViewModel.selectPlayers >> Some
+            selectActor = ViewModel.ViewModel.selectPlayers
         }
 
     let skillEmitsUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
         ActorsUpdaterBuilder.build "skillEmitsUpdater" {
             initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = ViewModel.ViewModel.selectAreaSkillEmits >> Some
+            selectActor = ViewModel.ViewModel.selectAreaSkillEmits
         }
 
     let dungeonCamera = new GameCamera()
-    let minimapCamera =
-        new GameCamera(
-            Zoom = 3.0f
-            , Dst =(
-                let windowSize = asd.Engine.WindowSize
-                let size = windowSize / 8
-                let pos = new asd.Vector2DI(windowSize.X - 50, 50)
-                new asd.RectI(
-                    pos - (new asd.Vector2DI(size.X, 0))
-                    , size
-                )
-            )
-        )
+    //let minimapCamera =
+    //    new GameCamera(
+    //        Zoom = 3.0f
+    //        , Dst =(
+    //            let windowSize = asd.Engine.WindowSize
+    //            let size = windowSize / 8
+    //            let pos = new asd.Vector2DI(windowSize.X - 50, 50)
+    //            new asd.RectI(
+    //                pos - (new asd.Vector2DI(size.X, 0))
+    //                , size
+    //            )
+    //        )
+    //    )
 
     let playerCamera = new GameCamera()
+
+    let skillEffectsCamera = new GameCamera()
 
     let backLayer =
         let color = new asd.Color(255uy, 255uy, 255uy)
@@ -82,12 +99,15 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
 
     let playerLayer = new asd.Layer2D()
 
+    let skillEffectsLayer = new asd.Layer2D()
+
     let uiLayer = new asd.Layer2D()
 
     override this.OnRegistered() =
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
         this.AddLayer(playerLayer)
+        this.AddLayer(skillEffectsLayer)
         this.AddLayer(uiLayer)
 
         this.AddDungeonView(gameModel)
@@ -97,10 +117,15 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
         playerLayer.AddComponent(playersUpdater, playersUpdater.Name)
         playerLayer.AddObject(playerCamera)
 
+        skillEffectsLayer.AddComponent(skillEmitsUpdater, skillEmitsUpdater.Name)
+        skillEffectsLayer.AddObject(skillEffectsCamera)
+
         notifier.AddObserver(dungeonCamera)
         // notifier.AddObserver(minimapCamera)
         notifier.AddObserver(playerCamera)
         notifier.AddObserver(playersUpdater)
+        notifier.AddObserver(skillEmitsUpdater)
+        notifier.AddObserver(skillEffectsCamera)
 
         messenger.SetPort(port)
         messenger.StartAsync() |> ignore
@@ -115,6 +140,13 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
 
         this.PushControllerInput()
 
+        if asd.Engine.Keyboard.GetKeyState(asd.Keys.Space) = asd.ButtonState.Push then
+            messenger.PushMsg(Msg.AppendSkillEmits)
+            messenger.PushMsg(Msg.TimePasses)
+
+        if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
+            messenger.PushMsg(Msg.TimePasses)
+
 
     member this.PushControllerInput() =
         controllers
@@ -125,18 +157,12 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
                 |> Option.map ((=) state)
                 |> Option.defaultValue false
 
-            [
-                Msg.UpKey
-                Msg.DownKey
-                Msg.RightKey
-                Msg.LeftKey
-                Msg.DashKey
-            ]
+            Msg.PlayerInput.inputs
             |> List.filter (getStateIs asd.ButtonState.Hold)
             |> function
             | [] -> false
             | inputs ->
-                Msg.PlayerInput (id, inputs |> Set.ofList)
+                Msg.PlayerInputs (id, inputs |> Set.ofList)
                 |> messenger.PushMsg
 
                 true
@@ -144,8 +170,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting, controller
         |> List.fold (||) false
         |> function
         | true ->
-            Msg.TimePasses
-            |> messenger.PushMsg
+            messenger.PushMsg(Msg.TimePasses)
         | false -> ()
 
 

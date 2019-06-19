@@ -56,6 +56,8 @@ module PlayerView =
 
 type AreaSkillEmitView = {
    baseView : ObjectBaseView
+   frameCurrent : uint32
+   frameFirst : uint32
 }
 
 module AreaSkillEmitView =
@@ -67,6 +69,8 @@ module AreaSkillEmitView =
             Some {
                 baseView =
                     o |> ObjectBaseView.fromModel
+                frameCurrent = emit.frame
+                frameFirst = emit.frameFirst
             }
         | _ -> None
 
@@ -95,8 +99,6 @@ type ViewModel = {
     areaSkillEmits : UpdaterViewModel<AreaSkillEmitView>
 }
 
-
-open WhiteDungeon.Core.Game.Model
 
 module ViewModel =
     let selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
