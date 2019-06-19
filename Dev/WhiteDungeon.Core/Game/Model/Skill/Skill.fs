@@ -21,14 +21,14 @@ open WhiteDungeon.Core.Game.Model
 //    let priority c = c.priority
 
 
-type Invoker =
+type InvokerID =
     | Player of PlayerID
-    | Enemy //of EnemyID
+    | Enemy of EnemyID
 
 
 type Target =
-    | Players of PlayerID list
-    | Enemies //of EnemyID list
+    | Players of PlayerID Set
+    | Enemies of EnemyID Set
     | Friends of ObjectBase
     | Others of ObjectBase
     | Area of ObjectBase
@@ -38,18 +38,21 @@ type Target =
 type Effect =
     // | AddSkillEmits of SkillEmit list
     // | AddConditions of Condition list
-    | Damage of (ActorStatus -> ActorStatus -> float32)
+    | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
 
 type SkillEmit =
     {
-        invoker : Actor.Actor
-        invokerKind : Invoker
+        invokerActor : Actor.Actor
+        invokerID : InvokerID
         target : Target
         delay : uint32
         frame : uint32
-        removedWhenHit : bool
+        // removedWhenHit : bool
         kind : Effect
     }
+
+module SkillEmit =
+    let getTarget s = s.target
 
 
 type SkillID = uint64
@@ -77,3 +80,11 @@ module SkillList =
             enemyEffects = []
             areaEffects = []
         }
+
+    let private withArea skillList = List.append skillList.areaEffects
+
+    let toPlayers (skillList) =
+        withArea skillList skillList.playerEffects
+
+    let toEnemies (skillList) =
+        withArea skillList skillList.enemyEffects

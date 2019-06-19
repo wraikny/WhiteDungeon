@@ -12,28 +12,31 @@ module Update =
     let incrCount (model : Model) : Model =
         { model with count = model.count + 1u }
 
+    let setPlayers players model =
+        { model with players = players }
 
-    let updatePlayers f (model : Model) : Model = {
-        model with
-            players =
-                model.players
-                |> Map.map(fun _ x -> f x)
-    }
+    let updatePlayers f (model : Model) : Model =
+        { model with players = f model.players }
 
-    let updatePlayerOf id f (model : Model) : Model =
-        model.players |> Map.tryFind id
-        |> function
-        | Some player ->
-            {
-                model with
-                    players = 
-                        model.players
-                        |> Map.add id (f player)
-            }
-        | None ->
+
+    let updateEachPlayer f (model : Model) : Model =
+        model
+        |> setPlayers(
+            model.players
+            |> Map.map(fun _ x -> f x)
+        )
+
+
+    let updatePlayerOf id f (model : Model) =
+        model.players
+        |> Map.tryFind id
+        |> Option.map (fun player ->
             model
+            |> updatePlayers (Map.add id (f player))
+        )
+        |> Option.defaultValue model
 
-    let updateEnemies f (model : Model) : Model = {
+    let updateEachEnemy f (model : Model) : Model = {
         model with
             enemies =
                 model.enemies
@@ -77,8 +80,52 @@ module Update =
 
 
     let applySkills (model : Model) : Model =
-        // TODO
-        model
+        let gameSetting = model.gameSetting
+        let skillList = model.skillList
+
+        { model with
+            players =
+                model.players
+                |> Skill.SkillEmit.applyToActorHolders
+                    gameSetting
+                    Actor.Player.updateActor
+                    (Skill.SkillList.toPlayers skillList)
+                |> Map.map(fun id ->
+                    skillList.playerIDEffects
+                    |> List.filter(
+                        snd
+                        >> Skill.SkillEmit.getTarget
+                        >> function
+                        | Skill.Players ids ->
+                            ids |> Set.contains id
+                        | _ -> false
+                    )
+                    |> Skill.SkillEmit.getFoledSkills gameSetting
+                    |> Actor.Player.updateActor
+                )
+
+            enemies =
+                model.enemies
+                |> Skill.SkillEmit.applyToActorHolders
+                    model.gameSetting
+                    Actor.Enemy.updateActor
+                    (Skill.SkillList.toEnemies model.skillList)
+                |> Map.map(fun id ->
+                    skillList.enemyIDEffects
+                    |> List.filter(
+                        snd
+                        >> Skill.SkillEmit.getTarget
+                        >> function
+                        | Skill.Enemies ids ->
+                            ids |> Set.contains id
+                        | _ -> false
+                    )
+                    |> Skill.SkillEmit.getFoledSkills gameSetting
+                    |> Actor.Enemy.updateActor
+                )
+        }
+
+
 
 
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
@@ -86,8 +133,10 @@ module Update =
         | TimePasses ->
             let model =
                 model
-                |> updatePlayers (Actor.Player.update)
-                |> updateEnemies (Actor.Enemy.update)
+                |> updateEachPlayer Actor.Player.update
+                |> updateEachEnemy Actor.Enemy.update
+                |> updateSkillList Skill.SkillList.update
+                |> applySkills
 
             model, Cmd.none
 

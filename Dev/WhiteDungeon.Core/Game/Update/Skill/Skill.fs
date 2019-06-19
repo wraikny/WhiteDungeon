@@ -1,5 +1,8 @@
 ﻿namespace WhiteDungeon.Core.Game.Update.Skill
 
+open wraikny.Tart.Helper.Geometry
+open wraikny.Tart.Helper.Extension
+
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Update
@@ -9,23 +12,56 @@ open WhiteDungeon.Core.Game.Model.Skill
 // type Generator = Model -> SkillEmit list
 
 module SkillEmit =
-    let applyToActor (gameSetting : GameSetting) (skill : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
+    let private isCollided (skill : SkillEmit) (actor : Actor.Actor) : bool =
+        skill.target |> function
+        | Friends o
+        | Others o
+        | Area o ->
+            Rect.isCollided
+                (o |> ObjectBase.area)
+                (actor.objectBase |> ObjectBase.area)
+        | _ -> false
+    
+    let private apply (gameSetting : GameSetting) (skill : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
         // TODO
-        skill.kind |> function
-        | Damage calc ->
-            let damage = calc skill.invoker.statusCurrent actor.statusCurrent
+        isCollided skill actor |> function
+        | true ->
+            skill.kind |> function
+            | Damage calc ->
+                let damage =
+                    calc
+                        gameSetting
+                        skill.invokerActor.statusCurrent
+                        actor.statusCurrent
+
+                actor
+                |> Actor.Actor.addHP damage
+        | false ->
             actor
-            |> Actor.Actor.addHP damage
 
-
-
-
-    let applyToActorHolder
+    let getFoledSkills
         (gameSetting)
-        (skill : SkillEmit)
+        (skills : (_ * SkillEmit) list) =
+        let foledSkills =
+            skills
+            |> List.map (snd >> apply gameSetting)
+            |> List.fold (>>) id
+
+        foledSkills
+
+    let applyToActorHolders
+        (gameSetting)
         (updater : (Actor.Actor -> Actor.Actor) -> 'a -> 'a)
-        (actor : 'a) : 'a =
-        actor |> updater (applyToActor gameSetting skill)
+        (skills : (_ * SkillEmit) list)
+        (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
+
+        let foledSkills =
+            getFoledSkills gameSetting skills
+
+        holders
+        |> Map.map(fun _ h -> updater foledSkills h)
+
+
 
 
 module SkillList =
@@ -42,7 +78,32 @@ module SkillList =
                 )
         }
 
-    let popWaitingSkills (skillList : SkillList) =
+    let private decrFrame (skillList : SkillList) : SkillList =
+        let decr emit =
+            if emit.frame = 0u then
+                None
+            else
+                Some {
+                    emit with
+                        frame = emit.frame - 1u
+                }
+
+        let f =
+            Seq.filterMap(fun (id, x) ->
+                decr x |> function
+                | Some x -> Some (id, x)
+                | None -> None
+            ) >> Seq.toList
+
+        { skillList with
+            playerIDEffects = f skillList.playerIDEffects
+            enemyIDEffects = f skillList.enemyIDEffects
+            playerEffects = f skillList.playerEffects
+            enemyEffects = f skillList.enemyEffects
+            areaEffects = f skillList.areaEffects
+        }
+
+    let private popWaitingSkills (skillList : SkillList) : SkillList =
         let rec popWaitings ws pis eis ps es ars =
             function
             | [] -> ws, pis, eis, ps, es, ars
@@ -51,7 +112,7 @@ module SkillList =
                 xs |>
                 if x.delay = 0u then
                     let pis, eis, ps, es, ars =
-                        (x.invokerKind, x.target) |> function
+                        (x.invokerID, x.target) |> function
                         | _, Players _ ->
                             (skill::pis), eis, ps, es, ars
                         | _, Enemies _ ->
@@ -59,11 +120,11 @@ module SkillList =
                         | _, Area _ ->
                             pis, eis, ps, es, (skill::ars)
                         | Player _, Friends _
-                        | Enemy, Others _
+                        | Enemy _, Others _
                             ->
                             pis, eis, (skill::ps), es, ars
-                        | _, Enemies
-                        | Enemy, Friends _
+                        | _, Enemies _
+                        | Enemy _, Friends _
                         | Player _, Others _
                             ->
                             pis, eis, ps, (skill::es), ars
@@ -78,9 +139,14 @@ module SkillList =
         {
             nextID = skillList.nextID
             waitings = waitings
-            playerIDEffects = playerIDs
-            enemyIDEffects = enemyIDs
-            playerEffects = skillList.playerEffects |> List.append players
-            enemyEffects = skillList.enemyEffects |> List.append enemies
-            areaEffects = areas
+            playerIDEffects = playerIDs |> List.append skillList.playerIDEffects
+            enemyIDEffects = enemyIDs |> List.append skillList.enemyIDEffects
+            playerEffects = players |> List.append skillList.playerEffects
+            enemyEffects = enemies |> List.append skillList.enemyEffects
+            areaEffects = areas |> List.append skillList.areaEffects
         }
+
+    let update skillList =
+        skillList
+        |> decrFrame
+        |> popWaitingSkills
