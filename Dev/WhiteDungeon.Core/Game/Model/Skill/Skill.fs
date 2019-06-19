@@ -8,7 +8,7 @@ open WhiteDungeon.Core.Game.Model
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
 //    | StatusMul of ActorStatus
-
+//    | Move of (int * float32 Vec2)
 
 //type Condition =
 //    {
@@ -36,14 +36,14 @@ type Target =
 
 
 type Effect =
-    | AddSkillEmits of SkillEmit list
+    // | AddSkillEmits of SkillEmit list
     // | AddConditions of Condition list
-    | Damage of float32
-    | Move of float32 Vec2
+    | Damage of (ActorStatus -> ActorStatus -> float32)
 
-and SkillEmit =
+type SkillEmit =
     {
-        invoker : Invoker
+        invoker : Actor.Actor
+        invokerKind : Invoker
         target : Target
         delay : uint32
         frame : uint32

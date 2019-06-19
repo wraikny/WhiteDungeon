@@ -12,8 +12,13 @@ module SkillEmit =
     let applyToActor (gameSetting : GameSetting) (skill : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
         // TODO
         skill.kind |> function
-        | Damage damage ->
+        | Damage calc ->
+            let damage = calc skill.invoker.statusCurrent actor.statusCurrent
             actor
+            |> Actor.Actor.addHP damage
+
+
+
 
     let applyToActorHolder
         (gameSetting)
@@ -46,7 +51,7 @@ module SkillList =
                 xs |>
                 if x.delay = 0u then
                     let pis, eis, ps, es, ars =
-                        (x.invoker, x.target) |> function
+                        (x.invokerKind, x.target) |> function
                         | _, Players _ ->
                             (skill::pis), eis, ps, es, ars
                         | _, Enemies _ ->
