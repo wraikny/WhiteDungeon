@@ -36,8 +36,10 @@ type AreaSkill =
     {
         area : ObjectBase
         move : EmitMove list
-
     }
+
+module AreaSkill =
+    let area a = a.area
 
 type Target =
     | Players of PlayerID Set * uint32
@@ -45,6 +47,15 @@ type Target =
     | Friends of AreaSkill
     | Others of AreaSkill
     | Area of AreaSkill
+
+
+module Target =
+    let areaSkill = function
+        | Friends area
+        | Others area
+        | Area area -> Some area
+        | Players _
+        | Enemies _ -> None
 
 
 type Effect =

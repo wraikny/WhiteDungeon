@@ -54,6 +54,15 @@ module Update =
         model
         |> updateSkillList (
             skills
+            |> List.filter(
+                (fun b -> b.target)
+                >> Skill.Target.areaSkill
+                >> Option.map(
+                    (fun a -> a.area)
+                    >> ObjectBase.insideDungeon model.gameSetting model.dungeonModel
+                )
+                >> Option.defaultValue true
+            )
             |> List.map(Skill.SkillEmitBuilder.build)
             |> Skill.SkillList.append
         )
