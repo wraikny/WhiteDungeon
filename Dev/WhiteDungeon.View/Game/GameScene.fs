@@ -45,10 +45,10 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
             [
-                Game.Msg.UpKey    , asd.Keys.Up
-                Game.Msg.DownKey  , asd.Keys.Down
-                Game.Msg.RightKey , asd.Keys.Right
-                Game.Msg.LeftKey  , asd.Keys.Left
+                Game.Msg.UpKey    , asd.Keys.W
+                Game.Msg.DownKey  , asd.Keys.S
+                Game.Msg.RightKey , asd.Keys.D
+                Game.Msg.LeftKey  , asd.Keys.A
                 Game.Msg.DashKey  , asd.Keys.LeftShift
             ]
         |> KeyboardBuilder.build
