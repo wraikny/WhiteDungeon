@@ -4,6 +4,7 @@ open wraikny.Tart.Core
 
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Skill
 
 open WhiteDungeon.Core.Game.Update
 
@@ -50,13 +51,13 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (skills : Skill.SkillEmitBase list) (model : Model) : Model =
+    let appendSkills (skills : Skill.EmitBase list) (model : Model) : Model =
         model
         |> updateSkillList (
             skills
             |> List.filter(
                 (fun b -> b.target)
-                >> Skill.Target.areaSkill
+                >> Skill.Target.area
                 >> Option.map(
                     (fun a -> a.area)
                     >> ObjectBase.insideDungeon model.gameSetting model.dungeonModel
@@ -89,7 +90,7 @@ module Update =
                         snd
                         >> Skill.SkillEmit.target
                         >> function
-                        | Skill.Players (ids, _) ->
+                        | Skill.Skill.Players (ids, _) ->
                             ids |> Set.contains id
                         | _ -> false
                     )
@@ -171,15 +172,16 @@ module Update =
                 player0.actor.objectBase.position
                 + (100.0f .* dir)
 
-            let emit : Skill.SkillEmitBase = {
+            let emit : Skill.Skill.EmitBase = {
                 invokerActor = player0.actor
-                target = Skill.Target.Area {
+                target = Skill.Skill.Target.Area {
                         area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
                         move = seq {
-                            for _ in 1..10 -> Skill.Stay
-                            for _ in 1..60 -> Skill.Move(dir *. 5.0f)
-                            for _ in 1..60 -> Skill.Scale(Vec2.init(3.0f, 3.0f))
+                            for _ in 1..10 -> Skill.Skill.Stay
+                            for _ in 1..60 -> Skill.Skill.Move(dir *. 5.0f)
+                            for _ in 1..60 -> Skill.Skill.Scale(Vec2.init(3.0f, 3.0f))
                         } |> Seq.toList
+                        emits = [||]
                     }
                 
                 

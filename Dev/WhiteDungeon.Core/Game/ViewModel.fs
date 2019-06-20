@@ -18,7 +18,7 @@ type ObjectBaseView = {
 }
 
 module ObjectBaseView =
-    let fromModel (objectBase : Model.ObjectBase) = {
+    let fromModel (objectBase : ObjectBase) = {
         area =
             objectBase
             |> Model.ObjectBase.area
@@ -31,7 +31,7 @@ type ActorView = {
 }
 
 module ActorView =
-    let fromModel (actor : Model.Actor.Actor) = {
+    let fromModel (actor : Actor.Actor) = {
         objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
@@ -42,14 +42,14 @@ type PlayerView = {
 }
 
 module PlayerView =
-    let fromModel (player : Model.Actor.Player) = {
+    let fromModel (player : Actor.Player) = {
         character = player.character
         actorView = player.actor |> ActorView.fromModel
     }
 
     let playersView =
         Map.toList
-        >> List.map(fun (id : Model.PlayerID, player) ->
+        >> List.map(fun (id : PlayerID, player) ->
             (id.Value, fromModel player)
         )
 
@@ -61,11 +61,13 @@ type AreaSkillEmitView = {
 }
 
 module AreaSkillEmitView =
+    open WhiteDungeon.Core.Game.Model.Skill
+
     let fromModel (emit : Model.Skill.SkillEmit) =
         emit.skillEmitBase.target |> function
-        | Model.Skill.Friends { area = o }
-        | Model.Skill.Others { area = o }
-        | Model.Skill.Area { area = o } ->
+        | Skill.Friends { area = o }
+        | Skill.Others { area = o }
+        | Skill.Area { area = o } ->
             Some {
                 baseView =
                     o |> ObjectBaseView.fromModel

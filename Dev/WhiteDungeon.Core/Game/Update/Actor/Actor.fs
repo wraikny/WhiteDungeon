@@ -50,6 +50,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
             gameSetting
             dungeonModel
             (speed .* direction)
+        >> fst
     )
 
 //let calcStatusCurrent (actor : Actor) =

@@ -20,58 +20,78 @@ open WhiteDungeon.Core.Game.Model
 //module Condition =
 //    let priority c = c.priority
 
-
-type EmitMove =
-    | Stay
-    | Move of float32 Vec2
-    | Scale of float32 Vec2
-
-
-type AreaSkill =
-    {
-        area : ObjectBase
-        move : EmitMove list
-    }
-
-module AreaSkill =
-    let area a = a.area
-
-type Target =
-    | Players of PlayerID Set * uint32
-    | Enemies of EnemyID Set * uint32
-    | Friends of AreaSkill
-    | Others of AreaSkill
-    | Area of AreaSkill
-
-
-module Target =
-    let areaSkill = function
-        | Friends area
-        | Others area
-        | Area area -> Some area
-        | Players _
-        | Enemies _ -> None
-
 type Effect =
     // | AddConditions of Condition list
     | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
 
 
-type SkillEmitBase =
-    {
-        invokerActor : Actor.Actor
-        target : Target
-        delay : uint32
-        effects : Effect []
-    }
+[<AutoOpen>]
+module rec Skill =
+    type EmitCore =
+        {
+            target : Target
+            delay : uint32
+            effects : Effect []
+        }
+
+    type EmitMove =
+        | Stay
+        | Move of float32 Vec2
+        | Scale of float32 Vec2
+        | Generate of (ObjectBase -> EmitCore [])
+
+
+    type Area =
+        {
+            area : ObjectBase
+            move : EmitMove list
+            emits : EmitCore []
+        }
+
+    type Target =
+        | Players of PlayerID Set * uint32
+        | Enemies of EnemyID Set * uint32
+        | Friends of Area
+        | Others of Area
+        | Area of Area
+
+
+    type EmitBase =
+        {
+            invokerActor : Actor.Actor
+            target : Target
+            delay : uint32
+            effects : Effect []
+        }
+
+    module EmitCore =
+        let build invoker (x : EmitCore) : EmitBase = {
+            invokerActor = invoker
+            target = x.target
+            delay = x.delay
+            effects = x.effects
+        }
         
 
 type SkillEmit =
     internal {
-        skillEmitBase : SkillEmitBase
+        skillEmitBase : EmitBase
         frame : uint32
         frameFirst : uint32
     }
+
+
+module Area =
+    let area a = a.area
+
+
+module Target =
+    let area = function
+        | Friends area
+        | Others area
+        | Area area -> Some area
+        | Players _
+        | Enemies _ -> None
 
 module SkillEmit =
     let target s = s.skillEmitBase.target
@@ -83,7 +103,7 @@ module SkillEmit =
                     delay = s.skillEmitBase.delay - 1u
         }}
 
-    let build (skillEmitBase : SkillEmitBase) : SkillEmit =
+    let build (skillEmitBase : EmitBase) : SkillEmit =
         let frame = skillEmitBase.target |> function
             | Friends { move = move }
             | Others { move = move }

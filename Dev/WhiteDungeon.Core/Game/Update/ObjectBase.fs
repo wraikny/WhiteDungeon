@@ -80,13 +80,14 @@ let private moveWithBS
 
     let isInside = GameSetting.insideDungeon gameSetting dungeonModel
 
-    let diff =
+    let isCollided =
         objectAreaPoints
         |> Array.map ((+) diff)
         |> isInside
-        |> function
-        | true -> diff
-        | false ->
+
+    let diff =
+        if isCollided then diff
+        else
             f
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
@@ -99,7 +100,7 @@ let private moveWithBS
     
     obj
     |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff)
+    |> setDirection (MoveDirection.fromVector diff), isCollided
 
 let moveXYTogether = moveWithBS bsDiffXYTogether
 

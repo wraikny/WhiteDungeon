@@ -9,36 +9,36 @@ open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Update
 open WhiteDungeon.Core.Game.Model.Skill
 
-
-// type Generator = Model -> SkillEmit list
-
-module EmitMove =
-    let apply gameSetting dungeonModel move (obj : ObjectBase) =
-        move |> function
-        | Stay -> obj
-        | Move diff ->
-            ObjectBase.moveXYTogether gameSetting dungeonModel diff obj
-        | Scale diff ->
-            obj
-            |> ObjectBase.addSize diff
-
-
-module AreaSkill =
-    let move gameSetting dungeonModel areaSkill =
-        areaSkill.move |> function
+module Area =
+    let move gameSetting dungeonModel area =
+        area.move |> function
         | [] -> None
         | x::xs ->
+            let area, emits =
+                let obj = area.area
+                x |> function
+                | Stay -> obj, [||]
+                | Move diff ->
+                    let newObj, isCollided =
+                        obj
+                        |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
+                    newObj, [||]
+                | Scale diff ->
+                    obj
+                    |> ObjectBase.addSize diff, [||]
+                | Generate emits ->
+                    obj, emits obj
+
             Some {
-                area =
-                    areaSkill.area
-                    |> EmitMove.apply gameSetting dungeonModel x
                 move = xs
+                area = area
+                emits = emits
             }
 
 
 module SkillEmit =
     let move gameSetting dungeonModel (emit : SkillEmit) =
-        let applyMove = AreaSkill.move gameSetting dungeonModel
+        let applyMove = Area.move gameSetting dungeonModel
 
         let emitBase = emit.skillEmitBase
 
@@ -116,8 +116,6 @@ module SkillEmit =
 
         holders
         |> Map.map(fun _ h -> updater foledSkills h)
-
-
 
 
 
@@ -212,7 +210,32 @@ module SkillList =
             >> Seq.toList
         )
 
+    let private appendGeneratedEmits skillList : SkillList =
+        let f =
+            Seq.map snd
+            >> Seq.filterMap(fun emit -> maybe{
+                let! area = emit |> SkillEmit.target |> Target.area
+                yield (emit, area)
+            })
+            >> Seq.map(fun (emit, x) ->
+                x.emits
+                |> Seq.map(
+                    emit.skillEmitBase.invokerActor
+                    |> Skill.EmitCore.build
+                    >> SkillEmit.build
+                )
+            )
+            >> Seq.concat
+            >> Seq.toList
+
+        skillList
+        |> append (f skillList.playerEffects)
+        |> append (f skillList.enemyEffects)
+        |> append (f skillList.areaEffects)
+
+
     let update (model : Model) skillList =
         skillList
         |> move model.gameSetting model.dungeonModel
+        |> appendGeneratedEmits
         |> popWaitingSkills
