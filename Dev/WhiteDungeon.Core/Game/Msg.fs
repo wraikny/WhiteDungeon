@@ -56,8 +56,8 @@ module PlayerInput =
                 inputSet |> Set.contains key
             )
             |> Array.map snd
-            |> Array.fold (+) (Vec2.zero())
-            |> VectorClass.normalize
+            |> Array.fold (+) (Vector.zero())
+            |> Vector.normalize
     
         actorMove, direction
 

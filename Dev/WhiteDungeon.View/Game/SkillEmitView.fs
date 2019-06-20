@@ -14,8 +14,8 @@ type SkillEmitView(gameViewSetting) =
     inherit asd.GeometryObject2D()
 
     let rect = new asd.RectangleShape()
-    let mutable lastPosition = Vec2.zero()
-    let mutable lastSize = Vec2.zero()
+    let mutable lastPosition = Vector.zero()
+    let mutable lastSize = Vector.zero()
 
     let mutable lastFrameCurrent = 0u
     let mutable lastFrameFirst = 0u

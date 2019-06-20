@@ -44,7 +44,7 @@ let getMovingDiffWithBinarySearch bsCount isInside (diff : _ Vec2) currentPositi
     let searchDiff =
         (+) currentPosition
         >>
-        Math.binarySearchVec2
+        Math.BinarySearch.vector
             bsCount
             isInside
             currentPosition

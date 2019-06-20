@@ -18,8 +18,8 @@ type PlayerView(gameViewSetting) =
     let gameViewSetting : Setting.GameViewSetting = gameViewSetting
 
 
-    let mutable lastPosition = Vec2.zero()
-    let mutable lastSize = Vec2.zero()
+    let mutable lastPosition = Vector.zero()
+    let mutable lastSize = Vector.zero()
     let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
 

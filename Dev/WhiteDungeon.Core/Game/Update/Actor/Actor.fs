@@ -42,7 +42,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
         | Walk -> actor.statusCurrent.walkSpeed
         | Dash -> actor.statusCurrent.dashSpeed
 
-    let direction = direction |> VectorClass.normalize
+    let direction = direction |> Vector.normalize
 
     actor
     |> updateObjectBase(

@@ -142,7 +142,7 @@ module Update =
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
             
             let model =
-                if direction <> Vec2.zero() then
+                if direction <> Vector.zero() then
                     model
                     |> updatePlayerOf id (
                         Update.Actor.Player.updateActor <|

@@ -18,7 +18,7 @@ type GameCamera() =
     )
 
 
-    let mutable srcPosition = Vec2.zero()
+    let mutable srcPosition = Vector.zero()
 
     member val Zoom = 1.0f with get, set
 

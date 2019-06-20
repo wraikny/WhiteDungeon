@@ -58,7 +58,7 @@ module MoveDirection =
         | BackLeft -> (-1, -1)
         |> Vec2.init
         |> Vec2.map float32
-        |> VectorClass.normalize
+        |> Vector.normalize
 
 
 type ObjectBase = {
@@ -96,6 +96,6 @@ module ObjectBase =
         size = size
         position = position
         lastPosition = position
-        velocity = Vec2.zero()
+        velocity = Vector.zero()
         direction = Front
     }
