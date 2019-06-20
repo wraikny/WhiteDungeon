@@ -20,6 +20,7 @@ module EmitMove =
             ObjectBase.moveXYTogether gameSetting dungeonModel diff obj
         | Scale diff ->
             obj
+            |> ObjectBase.addSize diff
 
 
 module AreaSkill =
