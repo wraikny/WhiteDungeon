@@ -17,7 +17,7 @@ module EmitMove =
         move |> function
         | Stay -> obj
         | Move diff ->
-            ObjectBase.move gameSetting dungeonModel diff obj
+            ObjectBase.moveXYTogether gameSetting dungeonModel diff obj
         | Scale diff ->
             obj
 
