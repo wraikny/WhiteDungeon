@@ -160,6 +160,7 @@ module Update =
                 target = Skill.Target.Area {
                         area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
                         move = seq {
+                            for _ in 1..30 -> Skill.Stay
                             for _ in 1..120 -> Skill.Move(dir * Vec2.init1 5.0f)
                         } |> Seq.toList
                     }
