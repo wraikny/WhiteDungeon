@@ -149,37 +149,36 @@ module SkillList =
         |> mapAreaEffects f
 
     let private popWaitingSkills (skillList : SkillList) : SkillList =
-        let rec popWaitings ws pis eis ps es ars =
+        let rec popWaitings ws (pis, eis, ps, es, ars) =
             function
             | [] -> ws, pis, eis, ps, es, ars
             | skill::xs ->
                 let id, (x : SkillEmit) = skill
                 xs |>
                 if x.delay = 0u then
-                    let pis, eis, ps, es, ars =
-                        (x.invokerID, x.target) |> function
-                        | _, Players _ ->
-                            (skill::pis), eis, ps, es, ars
-                        | _, Enemies _ ->
-                            pis, (skill::eis), ps, es, ars
-                        | _, Area _ ->
-                            pis, eis, ps, es, (skill::ars)
-                        | Player _, Friends _
-                        | Enemy _, Others _
-                            ->
-                            pis, eis, (skill::ps), es, ars
-                        | _, Enemies _
-                        | Enemy _, Friends _
-                        | Player _, Others _
-                            ->
-                            pis, eis, ps, (skill::es), ars
-                    popWaitings ws pis eis ps es ars
+                    (x.invokerID, x.target) |> function
+                    | _, Players _ ->
+                        (skill::pis), eis, ps, es, ars
+                    | _, Enemies _ ->
+                        pis, (skill::eis), ps, es, ars
+                    | _, Area _ ->
+                        pis, eis, ps, es, (skill::ars)
+                    | Player _, Friends _
+                    | Enemy _, Others _
+                        ->
+                        pis, eis, (skill::ps), es, ars
+                    | _, Enemies _
+                    | Enemy _, Friends _
+                    | Player _, Others _
+                        ->
+                        pis, eis, ps, (skill::es), ars
+                    |> popWaitings ws
                         
                 else
-                    popWaitings ((id, {x with delay = x.delay - 1u})::ws) pis eis ps es ars
+                    popWaitings ((id, {x with delay = x.delay - 1u})::ws) <| (pis, eis, ps, es, ars)
 
         let waitings, playerIDs, enemyIDs, players, enemies, areas =
-            popWaitings [] [] [] [] [] [] skillList.waitings
+            popWaitings [] ([], [], [], [], []) skillList.waitings
 
         {
             nextID = skillList.nextID

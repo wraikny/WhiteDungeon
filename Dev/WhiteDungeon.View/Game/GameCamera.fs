@@ -24,6 +24,7 @@ type GameCamera() =
 
     interface IObserver<ViewModel.ViewModel> with
         member this.UpdateFromNotify(viewModel) =
+            // TODO
             let cameraView = viewModel.camera |> List.head
             this.SetSrc(cameraView.position |> Vec2.map int)
 
