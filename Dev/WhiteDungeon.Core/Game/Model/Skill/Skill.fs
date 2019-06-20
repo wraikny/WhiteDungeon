@@ -57,40 +57,40 @@ module Target =
         | Players _
         | Enemies _ -> None
 
-
 type Effect =
-    // | AddSkillEmits of SkillEmit list
     // | AddConditions of Condition list
     | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
-        
-
-type SkillEmit =
-    internal {
-        invokerActor : Actor.Actor
-        invokerID : InvokerID
-        target : Target
-        delay : uint32
-        frame : uint32
-        frameFirst : uint32
-        kind : Effect
-    }
-
-module SkillEmit =
-    let getTarget s = s.target
 
 
-type SkillEmitBuilder =
+type SkillEmitBase =
     {
         invokerActor : Actor.Actor
         invokerID : InvokerID
         target : Target
         delay : uint32
-        kind : Effect
+        effects : Effect []
+    }
+        
+
+type SkillEmit =
+    internal {
+        skillEmitBase : SkillEmitBase
+        frame : uint32
+        frameFirst : uint32
     }
 
-module SkillEmitBuilder =
-    let build (builder : SkillEmitBuilder) : SkillEmit =
-        let frame = builder.target |> function
+module SkillEmit =
+    let target s = s.skillEmitBase.target
+
+    let decrDelay s =
+        { s with
+            skillEmitBase = {
+                s.skillEmitBase with
+                    delay = s.skillEmitBase.delay - 1u
+        }}
+
+    let build (skillEmitBase : SkillEmitBase) : SkillEmit =
+        let frame = skillEmitBase.target |> function
             | Friends { move = move }
             | Others { move = move }
             | Area { move = move } ->
@@ -100,13 +100,9 @@ module SkillEmitBuilder =
                 frame
 
         {
-            invokerActor = builder.invokerActor
-            invokerID = builder.invokerID
-            target = builder.target
-            delay = builder.delay
+            skillEmitBase = skillEmitBase
             frame = frame
             frameFirst = frame
-            kind = builder.kind
         }
 
 

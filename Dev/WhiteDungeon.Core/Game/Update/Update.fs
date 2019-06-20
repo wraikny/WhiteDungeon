@@ -50,7 +50,7 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (skills : Skill.SkillEmitBuilder list) (model : Model) : Model =
+    let appendSkills (skills : Skill.SkillEmitBase list) (model : Model) : Model =
         model
         |> updateSkillList (
             skills
@@ -63,7 +63,7 @@ module Update =
                 )
                 >> Option.defaultValue true
             )
-            |> List.map(Skill.SkillEmitBuilder.build)
+            |> List.map(Skill.SkillEmit.build)
             |> Skill.SkillList.append
         )
 
@@ -87,7 +87,7 @@ module Update =
                     skillList.playerIDEffects
                     |> List.filter(
                         snd
-                        >> Skill.SkillEmit.getTarget
+                        >> Skill.SkillEmit.target
                         >> function
                         | Skill.Players (ids, _) ->
                             ids |> Set.contains id
@@ -111,7 +111,7 @@ module Update =
                     skillList.enemyIDEffects
                     |> List.filter(
                         snd
-                        >> Skill.SkillEmit.getTarget
+                        >> Skill.SkillEmit.target
                         >> function
                         | Skill.Enemies (ids, _) ->
                             ids |> Set.contains id
@@ -171,7 +171,7 @@ module Update =
                 player0.actor.objectBase.position
                 + (100.0f .* dir)
 
-            let emit : Skill.SkillEmitBuilder = {
+            let emit : Skill.SkillEmitBase = {
                 invokerActor = player0.actor
                 invokerID = Skill.InvokerID.Player id
                 target = Skill.Target.Area {
@@ -185,9 +185,11 @@ module Update =
                 
                 
                 delay = 0u
-                kind = Skill.Damage(fun gs atk def ->
-                    0.0f
-                )
+                effects = [|
+                    Skill.Damage(fun gs atk def ->
+                        0.0f
+                    )
+                |]
             }
             let emits = [emit]
 

@@ -40,33 +40,39 @@ module SkillEmit =
     let move gameSetting dungeonModel (emit : SkillEmit) =
         let applyMove = AreaSkill.move gameSetting dungeonModel
 
-        emit.target |> function
+        let emitBase = emit.skillEmitBase
+
+        emitBase.target |> function
         | Friends area ->
             applyMove area
-            |> Option.map(fun area -> { emit with target = Friends area })
+            |> Option.map(fun area -> { emitBase with target = Friends area })
         | Others area ->
             applyMove area
-            |> Option.map(fun area -> { emit with target = Others area })
+            |> Option.map(fun area -> { emitBase with target = Others area })
         | Area area ->
             applyMove area
-            |> Option.map(fun area -> { emit with target = Area area })
+            |> Option.map(fun area -> { emitBase with target = Area area })
         | Players (ids, frame) ->
             if frame = 0u then
                 None
             else
-                Some { emit with target = Players(ids, frame - 1u)}
+                Some { emitBase with target = Players(ids, frame - 1u)}
 
         | Enemies (ids, frame) ->
             if frame = 0u then
                 None
             else
-                Some { emit with target = Enemies(ids, frame - 1u)}
+                Some { emitBase with target = Enemies(ids, frame - 1u)}
 
-        |> Option.map(fun emit -> { emit with frame = emit.frame - 1u})
+        |> Option.map(fun emitBase -> {
+            emit with
+                skillEmitBase = emitBase
+                frame = emit.frame - 1u
+        })
 
 
     let private isCollided (emit : SkillEmit) (actor : Actor.Actor) : bool =
-        emit.target |> function
+        emit.skillEmitBase.target |> function
         | Friends { area = o }
         | Others { area = o }
         | Area { area = o } ->
@@ -77,23 +83,26 @@ module SkillEmit =
     
     let private apply (gameSetting : GameSetting) (emit : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
         // TODO
-        isCollided emit actor |> function
+        isCollided emit actor
+        |> function
         | true ->
-            emit.kind |> function
+            emit.skillEmitBase.effects
+            |> Array.map(function
             | Damage calc ->
                 let damage =
                     calc
                         gameSetting
-                        emit.invokerActor.statusCurrent
+                        emit.skillEmitBase.invokerActor.statusCurrent
                         actor.statusCurrent
 
-                actor
-                |> Actor.Actor.addHP damage
+                Actor.Actor.addHP damage
+            ) |> Array.fold (|>) actor
         | false ->
             actor
 
     let getFoledSkills gameSetting =
-        List.map (snd >> apply gameSetting) >> List.fold (>>) id
+        List.map (snd >> apply gameSetting)
+        >> List.fold (>>) id
 
     let applyToActorHolders
         (gameSetting)
@@ -102,10 +111,13 @@ module SkillEmit =
         (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
 
         let foledSkills =
-            getFoledSkills gameSetting skills
+            skills
+            |> getFoledSkills gameSetting
 
         holders
         |> Map.map(fun _ h -> updater foledSkills h)
+
+
 
 
 
@@ -149,10 +161,11 @@ module SkillList =
             function
             | [] -> ws, pis, eis, ps, es, ars
             | skill::xs ->
-                let id, (x : SkillEmit) = skill
+                let id, (skillEmit : SkillEmit) = skill
+                let seBase = skillEmit.skillEmitBase
                 xs |>
-                if x.delay = 0u then
-                    (x.invokerID, x.target) |> function
+                if seBase.delay = 0u then
+                    (seBase.invokerID, seBase.target) |> function
                     | _, Players _ ->
                         (skill::pis), eis, ps, es, ars
                     | _, Enemies _ ->
@@ -171,7 +184,7 @@ module SkillList =
                     |> popWaitings ws
                         
                 else
-                    popWaitings ((id, {x with delay = x.delay - 1u})::ws) <| (pis, eis, ps, es, ars)
+                    popWaitings ((id, skillEmit |> SkillEmit.decrDelay)::ws) <| (pis, eis, ps, es, ars)
 
         let waitings, playerIDs, enemyIDs, players, enemies, areas =
             popWaitings [] ([], [], [], [], []) skillList.waitings
