@@ -152,7 +152,7 @@ module Update =
 
             let pos =
                 player0.actor.objectBase.position
-                |> (+) (Vec2.init1(100.0f) * dir)
+                + (100.0f .* dir)
 
             let emit : Skill.SkillEmitBuilder = {
                 invokerActor = player0.actor
@@ -161,7 +161,7 @@ module Update =
                         area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
                         move = seq {
                             for _ in 1..30 -> Skill.Stay
-                            for _ in 1..120 -> Skill.Move(dir * Vec2.init1 5.0f)
+                            for _ in 1..120 -> Skill.Move(dir *. 5.0f)
                         } |> Seq.toList
                     }
                 
