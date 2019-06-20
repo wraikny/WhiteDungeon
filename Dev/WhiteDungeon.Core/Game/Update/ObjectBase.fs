@@ -13,9 +13,14 @@ let setPosition position (obj : ObjectBase) = {
         lastPosition = obj.position
 }
 
-
 let addPosition diff (obj : ObjectBase) =
     obj |> setPosition (diff + obj.position)
+
+let setSize size (obj : ObjectBase) =
+    { obj with size = size }
+
+let addSize diff obj =
+    obj |> setSize (obj.size + diff)
 
 let setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
@@ -30,7 +35,7 @@ let move
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
 
-    let objectAreaPoints = [lu; rd; ld; ru]
+    let objectAreaPoints = [|lu; rd; ld; ru|]
 
     let rec serchMaxDiff count diffSum current target =
         if count <= 0 then diffSum
@@ -40,7 +45,7 @@ let move
 
             let existsNextCell =
                 objectAreaPoints
-                |> List.map(fun point ->
+                |> Array.map(fun point ->
                     let nextPosition = point + newDiffSum
                     let nextCell =
                         Model.GameSetting.toDungeonCell
@@ -50,7 +55,7 @@ let move
                     dungeonModel.cells
                     |> Map.containsKey nextCell
                 )
-                |> List.fold (&&) true
+                |> Array.fold (&&) true
 
             if existsNextCell then
                 serchMaxDiff (count - 1) newDiffSum middle target
@@ -66,11 +71,11 @@ let move
             obj.position
 
     let diffX =
-        searchDiff ({ diff with y = 0.0f } : _ Vec2)
+        searchDiff { diff with y = 0.0f }
         |> Vec2.x
 
     let diffY =
-        searchDiff ({ diff with x = 0.0f } : _ Vec2)
+        searchDiff { diff with x = 0.0f }
         |> Vec2.y
     
     obj

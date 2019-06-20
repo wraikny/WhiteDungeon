@@ -24,6 +24,7 @@ open WhiteDungeon.Core.Game.Model
 type EmitMove =
     | Stay
     | Move of float32 Vec2
+    | Scale of float32 Vec2
 
 
 type InvokerID =
@@ -35,6 +36,7 @@ type AreaSkill =
     {
         area : ObjectBase
         move : EmitMove list
+
     }
 
 type Target =
@@ -122,16 +124,3 @@ module SkillList =
             enemyEffects = []
             areaEffects = []
         }
-
-    let private withArea skillList = List.append skillList.areaEffects
-
-    let toPlayers (skillList) =
-        withArea skillList skillList.playerEffects
-
-    let toEnemies (skillList) =
-        withArea skillList skillList.enemyEffects
-
-    let allAreaEffects skillList =
-        skillList.playerEffects
-        |> List.append skillList.enemyEffects
-        |> List.append skillList.areaEffects

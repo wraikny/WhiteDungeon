@@ -18,6 +18,8 @@ module EmitMove =
         | Stay -> obj
         | Move diff ->
             ObjectBase.move gameSetting dungeonModel diff obj
+        | Scale diff ->
+            obj
 
 
 module AreaSkill =
@@ -89,15 +91,8 @@ module SkillEmit =
         | false ->
             actor
 
-    let getFoledSkills
-        (gameSetting)
-        (skills : (_ * SkillEmit) list) =
-        let foledSkills =
-            skills
-            |> List.map (snd >> apply gameSetting)
-            |> List.fold (>>) id
-
-        foledSkills
+    let getFoledSkills gameSetting =
+        List.map (snd >> apply gameSetting) >> List.fold (>>) id
 
     let applyToActorHolders
         (gameSetting)

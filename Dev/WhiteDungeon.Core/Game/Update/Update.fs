@@ -69,7 +69,11 @@ module Update =
                 |> Skill.SkillEmit.applyToActorHolders
                     gameSetting
                     Actor.Player.updateActor
-                    (Skill.SkillList.toPlayers skillList)
+                    skillList.playerEffects
+                |> Skill.SkillEmit.applyToActorHolders
+                    gameSetting
+                    Actor.Player.updateActor
+                    skillList.areaEffects
                 |> Map.map(fun id ->
                     skillList.playerIDEffects
                     |> List.filter(
@@ -87,9 +91,13 @@ module Update =
             enemies =
                 model.enemies
                 |> Skill.SkillEmit.applyToActorHolders
-                    model.gameSetting
+                    gameSetting
                     Actor.Enemy.updateActor
-                    (Skill.SkillList.toEnemies model.skillList)
+                    skillList.enemyEffects
+                |> Skill.SkillEmit.applyToActorHolders
+                    gameSetting
+                    Actor.Enemy.updateActor
+                    skillList.areaEffects
                 |> Map.map(fun id ->
                     skillList.enemyIDEffects
                     |> List.filter(

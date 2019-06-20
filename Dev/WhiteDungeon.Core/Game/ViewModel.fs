@@ -97,6 +97,8 @@ module CameraView =
 type ViewModel = {
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
+    toPlayersSkillEmits : UpdaterViewModel<AreaSkillEmitView>
+    toEnemiesSkillEmits : UpdaterViewModel<AreaSkillEmitView>
     areaSkillEmits : UpdaterViewModel<AreaSkillEmitView>
 }
 
@@ -120,10 +122,21 @@ module ViewModel =
                 |> PlayerView.playersView
         }
 
+        toPlayersSkillEmits = {
+            objects =
+                model.skillList.playerEffects
+                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
+        }
+
+        toEnemiesSkillEmits = {
+            objects =
+                model.skillList.enemyEffects
+                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
+        }
+
         areaSkillEmits = {
             objects =
-                model.skillList
-                |> Model.Skill.SkillList.allAreaEffects
+                model.skillList.areaEffects
                 |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
         }
     }

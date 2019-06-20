@@ -64,7 +64,7 @@ module MoveDirection =
 type ObjectBase = {
     size : float32 Vec2
 
-    /// center down
+    /// center
     position : float32 Vec2
 
     lastPosition : float32 Vec2
@@ -86,7 +86,7 @@ module ObjectBase =
     let direction o = o.direction
 
     let area (o : ObjectBase) : float32 Vec2 Rect =
-        let leftUp = o.position - { o.size with x = o.size.x * 0.5f }
+        let leftUp = o.position - (o.size *. 0.5f)
         {
             position = leftUp
             size = o.size

@@ -43,20 +43,20 @@ module PlayerInput =
         let actorMove =
             if inputSet |> Set.contains PlayerInput.DashKey then Dash else Walk
 
-        let moveDirs = [
+        let moveDirs = [|
             UpKey, Vec2.init(0.0f, -1.0f)
             DownKey, Vec2.init(0.0f, 1.0f)
             RightKey, Vec2.init(1.0f, 0.0f)
             LeftKey, Vec2.init(-1.0f, 0.0f)
-        ]
+        |]
 
         let direction =
             moveDirs
-            |> List.filter(fun (key, _) ->
+            |> Array.filter(fun (key, _) ->
                 inputSet |> Set.contains key
             )
-            |> List.map snd
-            |> List.fold (+) (Vec2.zero())
+            |> Array.map snd
+            |> Array.fold (+) (Vec2.zero())
             |> VectorClass.normalize
     
         actorMove, direction
