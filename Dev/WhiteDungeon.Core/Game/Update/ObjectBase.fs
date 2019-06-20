@@ -40,7 +40,14 @@ let insideDungeon
 
 open WhiteDungeon.Core.Utils
 
-let getMovingDiffWithBinarySearch bsCount isInside (diff : _ Vec2) currentPosition =
+let private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
+    Math.BinarySearch.vector
+        bsCount
+        isInside
+        currentPosition
+        (currentPosition + diff)
+
+let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
     let searchDiff =
         (+) currentPosition
         >>
@@ -59,8 +66,8 @@ let getMovingDiffWithBinarySearch bsCount isInside (diff : _ Vec2) currentPositi
 
     Vec2.init(diffX, diffY)
 
-
-let move
+let private moveWithBS
+    f
     (gameSetting : Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
     (diff) (obj : ObjectBase)
@@ -80,7 +87,7 @@ let move
         |> function
         | true -> diff
         | false ->
-            getMovingDiffWithBinarySearch
+            f
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
                     objectAreaPoints
@@ -93,6 +100,10 @@ let move
     obj
     |> addPosition (diff)
     |> setDirection (MoveDirection.fromVector diff)
+
+let moveXYTogether = moveWithBS bsDiffXYTogether
+
+let moveXYAnother = moveWithBS bsDiffXYAnother
 
 
 let setVelocity velocity (obj : ObjectBase) =

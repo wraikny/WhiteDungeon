@@ -46,7 +46,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 
     actor
     |> updateObjectBase(
-        Update.ObjectBase.move
+        Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
             (speed .* direction)
