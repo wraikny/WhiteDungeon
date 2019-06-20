@@ -165,20 +165,20 @@ module SkillList =
                 let seBase = skillEmit.skillEmitBase
                 xs |>
                 if seBase.delay = 0u then
-                    (seBase.invokerID, seBase.target) |> function
+                    (seBase.invokerActor.id, seBase.target) |> function
                     | _, Players _ ->
                         (skill::pis), eis, ps, es, ars
                     | _, Enemies _ ->
                         pis, (skill::eis), ps, es, ars
                     | _, Area _ ->
                         pis, eis, ps, es, (skill::ars)
-                    | Player _, Friends _
-                    | Enemy _, Others _
+                    | Actor.Player _, Friends _
+                    | Actor.Enemy _, Others _
                         ->
                         pis, eis, (skill::ps), es, ars
                     | _, Enemies _
-                    | Enemy _, Friends _
-                    | Player _, Others _
+                    | Actor.Enemy _, Friends _
+                    | Actor.Player _, Others _
                         ->
                         pis, eis, ps, (skill::es), ars
                     |> popWaitings ws

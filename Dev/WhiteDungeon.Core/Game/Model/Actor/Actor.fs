@@ -4,8 +4,13 @@ open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+type ActorID =
+    | Player of PlayerID
+    | Enemy of EnemyID
+
      
 type Actor = {
+    id : ActorID
     objectBase : ObjectBase
     statusCurrent : ActorStatus
     statusDefault : ActorStatus
@@ -25,7 +30,8 @@ module Actor =
         let maxStatus = actor.statusDefault
         f currentStatus / f maxStatus
 
-    let init size position actorStatus = {
+    let init size position id actorStatus = {
+        id = id
         statusCurrent = actorStatus
         statusDefault = actorStatus
         objectBase = ObjectBase.init size position

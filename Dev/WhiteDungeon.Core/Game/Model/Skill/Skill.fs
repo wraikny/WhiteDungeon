@@ -27,11 +27,6 @@ type EmitMove =
     | Scale of float32 Vec2
 
 
-type InvokerID =
-    | Player of PlayerID
-    | Enemy of EnemyID
-
-
 type AreaSkill =
     {
         area : ObjectBase
@@ -65,7 +60,6 @@ type Effect =
 type SkillEmitBase =
     {
         invokerActor : Actor.Actor
-        invokerID : InvokerID
         target : Target
         delay : uint32
         effects : Effect []

@@ -173,7 +173,6 @@ module Update =
 
             let emit : Skill.SkillEmitBase = {
                 invokerActor = player0.actor
-                invokerID = Skill.InvokerID.Player id
                 target = Skill.Target.Area {
                         area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
                         move = seq {
