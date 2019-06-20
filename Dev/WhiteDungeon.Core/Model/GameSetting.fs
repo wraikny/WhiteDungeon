@@ -20,6 +20,7 @@ type GameSetting = {
     occupationDefaultStatus : Map<Occupation, ActorStatus>
 }
 
+
 module GameSetting =
     let fromDungeonCell (cellSize : float32 Vec2) (cell : int Vec2) : float32 Vec2 =
         let cellf = cell |> Vec2.map float32
@@ -28,3 +29,20 @@ module GameSetting =
     let toDungeonCell (cellSize : float32 Vec2) (coordinate : float32 Vec2) : int Vec2 =
         coordinate / cellSize
         |> Vec2.map (floor >> int)
+
+
+    open wraikny.Tart.Advanced
+
+    let insideDungeon 
+        (gameSetting : GameSetting)
+        (dungeonModel : Dungeon.DungeonModel) =
+        Array.map(fun point ->
+            let cell =
+                toDungeonCell
+                    gameSetting.dungeonCellSize
+                    point
+    
+            dungeonModel.cells
+            |> Map.containsKey cell
+        )
+        >> Array.fold (&&) true

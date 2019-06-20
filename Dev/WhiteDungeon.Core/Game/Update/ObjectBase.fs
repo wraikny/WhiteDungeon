@@ -5,6 +5,7 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 let setPosition position (obj : ObjectBase) = {
@@ -25,27 +26,38 @@ let addSize diff obj =
 let setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
-
 let insideDungeon
-    (gameSetting : Model.GameSetting)
+    (gameSetting : GameSetting)
     (dungeonModel : Dungeon.DungeonModel) obj =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
-
-    let objectAreaPoints = [|lu; rd; ld; ru|]
-
-    objectAreaPoints
-    |> Array.map(fun point ->
-        let cell =
-            Model.GameSetting.toDungeonCell
-                gameSetting.dungeonCellSize
-                point
     
-        dungeonModel.cells
-        |> Map.containsKey cell
-    )
-    |> Array.fold (&&) true
+    GameSetting.insideDungeon
+        gameSetting
+        dungeonModel
+        [|lu; rd; ld; ru|]
+
+open WhiteDungeon.Core.Utils
+
+let getMovingDiffWithBinarySearch bsCount isInside (diff : _ Vec2) currentPosition =
+    let searchDiff =
+        (+) currentPosition
+        >>
+        Math.binarySearchVec2
+            bsCount
+            isInside
+            currentPosition
+
+    let diffX =
+        searchDiff { diff with y = 0.0f }
+        |> Vec2.x
+
+    let diffY =
+        searchDiff { diff with x = 0.0f }
+        |> Vec2.y
+
+    Vec2.init(diffX, diffY)
 
 
 let move
@@ -59,49 +71,27 @@ let move
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 
-    let rec serchMaxDiff count diffSum current target =
-        if count <= 0 then diffSum
-        else
-            let middle = (current + target) /. 2.0f
-            let newDiffSum = diffSum + (middle - current)
+    let isInside = GameSetting.insideDungeon gameSetting dungeonModel
 
-            let existsNextCell =
-                objectAreaPoints
-                |> Array.map(fun point ->
-                    let nextPosition = point + newDiffSum
-                    let nextCell =
-                        Model.GameSetting.toDungeonCell
-                            gameSetting.dungeonCellSize
-                            nextPosition
-                
-                    dungeonModel.cells
-                    |> Map.containsKey nextCell
+    let diff =
+        objectAreaPoints
+        |> Array.map ((+) diff)
+        |> isInside
+        |> function
+        | true -> diff
+        | false ->
+            getMovingDiffWithBinarySearch
+                gameSetting.binarySearchCountMovingOnWall
+                (fun newDiff ->
+                    objectAreaPoints
+                    |> Array.map ((+) newDiff)
+                    |> isInside
                 )
-                |> Array.fold (&&) true
-
-            if existsNextCell then
-                serchMaxDiff (count - 1) newDiffSum middle target
-            else
-                serchMaxDiff (count - 1) diffSum current middle
-
-    let searchDiff =
-        ((+) obj.position)
-        >>
-        serchMaxDiff
-            gameSetting.binarySearchCountMovingOnWall
-            (Vec2.init(0.0f, 0.0f))
-            obj.position
-
-    let diffX =
-        searchDiff { diff with y = 0.0f }
-        |> Vec2.x
-
-    let diffY =
-        searchDiff { diff with x = 0.0f }
-        |> Vec2.y
+                diff
+                obj.position
     
     obj
-    |> addPosition (Vec2.init(diffX, diffY))
+    |> addPosition (diff)
     |> setDirection (MoveDirection.fromVector diff)
 
 

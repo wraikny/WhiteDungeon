@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="Utils\Math.fs" />
     <Compile Include="Model\Alias.fs" />
     <Compile Include="Model\GameObject.fs" />
     <Compile Include="Model\GameSetting.fs" />
