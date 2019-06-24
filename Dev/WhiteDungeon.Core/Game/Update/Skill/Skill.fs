@@ -17,15 +17,15 @@ module Area =
             let area, emits =
                 let obj = area.area
                 x |> function
-                | Stay -> obj, [||]
+                | Stay -> obj, Array.empty
                 | Move diff ->
                     let newObj, isCollided =
                         obj
                         |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
-                    newObj, [||]
+                    newObj, Array.empty
                 | Scale diff ->
                     obj
-                    |> ObjectBase.addSize diff, [||]
+                    |> ObjectBase.addSize diff, Array.empty
                 | Generate emits ->
                     obj, emits obj
 
