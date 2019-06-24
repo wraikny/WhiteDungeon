@@ -172,7 +172,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         #else
         this.PushControllerInput() |> function
         | true ->
-            messenger.PushMsg(Msg.TimePasses)
+            messenger.Enqueue(Msg.TimePasses)
         | false ->
             ()
         #endif
