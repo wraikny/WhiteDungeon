@@ -175,7 +175,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
                     MessageText = "Loading Dungeon"
                 )
             
-            messenger.PushMsg(QuickPlay.Msg.GenerateDungeon)
+            messenger.Enqueue(QuickPlay.Msg.GenerateDungeon)
         )
 
         let selecter = new Button.ControllerButtonSelecter( titleButton.Button )

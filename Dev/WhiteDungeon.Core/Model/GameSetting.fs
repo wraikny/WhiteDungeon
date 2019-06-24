@@ -32,6 +32,7 @@ module GameSetting =
 
 
     open wraikny.Tart.Advanced
+    open wraikny.Tart.Helper.Collections
 
     let insideDungeon 
         (gameSetting : GameSetting)
@@ -43,6 +44,6 @@ module GameSetting =
                     point
     
             dungeonModel.cells
-            |> Map.containsKey cell
+            |> HashMap.containsKey cell
         )
         >> Array.fold (&&) true

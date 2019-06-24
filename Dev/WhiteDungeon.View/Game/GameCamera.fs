@@ -23,7 +23,7 @@ type GameCamera() =
     member val Zoom = 1.0f with get, set
 
     interface IObserver<ViewModel.ViewModel> with
-        member this.UpdateFromNotify(viewModel) =
+        member this.Update(viewModel) =
             // TODO
             let cameraView = viewModel.camera |> List.head
             this.SetSrc(cameraView.position |> Vec2.map int)

@@ -140,12 +140,12 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
-        notifier.AddObserver(dungeonCamera)
+        notifier.Add(dungeonCamera)
         // notifier.AddObserver(minimapCamera)
-        notifier.AddObserver(playerCamera)
-        notifier.AddObserver(playersUpdater)
-        notifier.AddObserver(areaSkillEmitsUpdater)
-        notifier.AddObserver(skillEffectsCamera)
+        notifier.Add(playerCamera)
+        notifier.Add(playersUpdater)
+        notifier.Add(areaSkillEmitsUpdater)
+        notifier.Add(skillEffectsCamera)
 
         messenger.SetPort(port)
         messenger.StartAsync() |> ignore
@@ -161,14 +161,14 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         #if DEBUG
         this.PushControllerInput() |> function
         | true ->
-            messenger.PushMsg(Msg.TimePasses)
+            messenger.Enqueue(Msg.TimePasses)
         | false ->
             if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
-                messenger.PushMsg(Msg.TimePasses)
+                messenger.Enqueue(Msg.TimePasses)
             ()
         if asd.Engine.Keyboard.GetKeyState(asd.Keys.Space) = asd.ButtonState.Push then
-            messenger.PushMsg(Msg.AppendSkillEmits)
-            messenger.PushMsg(Msg.TimePasses)
+            messenger.Enqueue(Msg.AppendSkillEmits)
+            messenger.Enqueue(Msg.TimePasses)
         #else
         this.PushControllerInput() |> function
         | true ->
@@ -193,7 +193,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
             | [] -> false
             | inputs ->
                 Msg.PlayerInputs (id, inputs |> Set.ofList)
-                |> messenger.PushMsg
+                |> messenger.Enqueue
 
                 true
         )

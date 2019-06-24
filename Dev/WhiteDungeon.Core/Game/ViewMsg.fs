@@ -6,6 +6,7 @@ open WhiteDungeon.Core.Game
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
+open wraikny.Tart.Helper.Collections
 
 type DungeonView = {
     largeRooms : float32 Vec2 Rect list
@@ -15,7 +16,7 @@ type DungeonView = {
 
 module DungeonView =
     let private roomsToList cellSize =
-        Map.toList
+        HashMap.toList
         >> List.map (snd >> fun (space : Dungeon.Space) ->
             space.rect
             |> Rect.map (GameSetting.fromDungeonCell cellSize)

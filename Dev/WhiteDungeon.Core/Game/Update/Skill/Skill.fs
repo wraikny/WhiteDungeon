@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Game.Update.Skill
 
 open wraikny.Tart.Helper.Geometry
-open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Monad
 
 open WhiteDungeon.Core.Model

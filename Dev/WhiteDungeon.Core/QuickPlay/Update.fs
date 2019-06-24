@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.Core.QuickPlay.Update
 
 open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
@@ -101,7 +101,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | GeneratedDungeonModel dungeonModel ->
             let largeRooms =
                 dungeonModel.largeRooms
-                |> Map.toList
+                |> HashMap.toList
 
             let largeRoomsCount =
                 largeRooms

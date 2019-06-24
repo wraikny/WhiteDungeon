@@ -6,7 +6,7 @@ open WhiteDungeon.Core.Game
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
-open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Game.Model
