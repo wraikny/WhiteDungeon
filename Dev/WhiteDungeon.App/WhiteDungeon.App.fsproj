@@ -58,26 +58,6 @@
       <Link>Altseed_core.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\Lib\MilleFeuille.Core.dll">
-      <Link>MilleFeuille.Core.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\MilleFeuille.Fs.dll">
-      <Link>MilleFeuille.Fs.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Advanced.dll">
-      <Link>Tart.Advanced.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Core.dll">
-      <Link>Tart.Core.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lib\Tart.Helper.dll">
-      <Link>Tart.Helper.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Altseed">
@@ -85,9 +65,6 @@
     </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MilleFeuille.Core">
-      <HintPath>..\Lib\MilleFeuille.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -97,11 +74,33 @@
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Tart.Helper">
-      <HintPath>..\Lib\Tart.Helper.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.Core.csproj">
+      <Name>Mille-Feuille.Core</Name>
+      <Project>{73984409-a0fe-476e-99f2-61be570a752f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Mille-Feuille\Dev\Mille-Feuille.Fs\Mille-Feuille.Fs.fsproj">
+      <Name>Mille-Feuille.Fs</Name>
+      <Project>{f0694096-423d-4328-ab20-cef9052b2f31}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Advanced\Tart.Advanced.fsproj">
+      <Name>Tart.Advanced</Name>
+      <Project>{ce58dc38-831b-4bd5-87cb-bf861687a3bf}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Core\Tart.Core.fsproj">
+      <Name>Tart.Core</Name>
+      <Project>{8c6e9ecf-5f33-47a3-ae3f-b9a77bd4f544}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Helper\Tart.Helper.fsproj">
+      <Name>Tart.Helper</Name>
+      <Project>{bf0abcce-5659-43b8-a783-6dd55180aacc}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\WhiteDungeon.Core\WhiteDungeon.Core.fsproj">
       <Name>WhiteDungeon.Core</Name>
       <Project>{c7cd8b28-7d56-4bfa-a613-28e535426da9}</Project>

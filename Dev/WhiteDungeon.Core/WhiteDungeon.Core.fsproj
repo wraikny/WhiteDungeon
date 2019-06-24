@@ -82,15 +82,23 @@
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Tart.Advanced">
-      <HintPath>..\Lib\Tart.Advanced.dll</HintPath>
-    </Reference>
-    <Reference Include="Tart.Core">
-      <HintPath>..\Lib\Tart.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Tart.Helper">
-      <HintPath>..\Lib\Tart.Helper.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Advanced\Tart.Advanced.fsproj">
+      <Name>Tart.Advanced</Name>
+      <Project>{ce58dc38-831b-4bd5-87cb-bf861687a3bf}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Core\Tart.Core.fsproj">
+      <Name>Tart.Core</Name>
+      <Project>{8c6e9ecf-5f33-47a3-ae3f-b9a77bd4f544}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Helper\Tart.Helper.fsproj">
+      <Name>Tart.Helper</Name>
+      <Project>{bf0abcce-5659-43b8-a783-6dd55180aacc}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
