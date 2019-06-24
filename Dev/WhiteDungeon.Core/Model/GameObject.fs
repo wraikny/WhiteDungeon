@@ -32,29 +32,29 @@ type ActorStatus = {
 
 
 module ActorStatus =
-    let level a = a.level
+    let inline level a = a.level
 
-    let hp a = a.hp
+    let inline hp a = a.hp
 
-    let walkSpeed a = a.walkSpeed
+    let inline walkSpeed a = a.walkSpeed
 
-    let dashSpeed a = a.dashSpeed
+    let inline dashSpeed a = a.dashSpeed
 
-    let zero() = {
+    let zero = {
         level = 0
         hp = 0.0f
         walkSpeed = 0.0f
         dashSpeed = 0.0f
     }
 
-    let min a b = {
+    let inline min a b = {
         level = min a.level b.level
         hp = min a.hp b.hp
         walkSpeed = min a.walkSpeed b.walkSpeed
         dashSpeed = min a.dashSpeed b.dashSpeed
     }
 
-    let max a b = {
+    let inline max a b = {
         level = max a.level b.level
         hp = max a.hp b.hp
         walkSpeed = max a.walkSpeed b.walkSpeed

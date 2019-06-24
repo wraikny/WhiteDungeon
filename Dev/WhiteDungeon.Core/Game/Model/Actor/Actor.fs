@@ -19,18 +19,18 @@ type Actor = {
 }
 
 module Actor =
-    let statusCurrent (actor : Actor) = actor.statusCurrent
+    let inline statusCurrent (actor : Actor) = actor.statusCurrent
 
-    let statusDefault (actor : Actor) = actor.statusDefault
+    let inline statusDefault (actor : Actor) = actor.statusDefault
 
-    let objectBase (actor : Actor) = actor.objectBase
+    let inline objectBase (actor : Actor) = actor.objectBase
 
     let inline stateRate (f : ActorStatus -> ^a) (actor : Actor) =
         let currentStatus = actor.statusCurrent
         let maxStatus = actor.statusDefault
         f currentStatus / f maxStatus
 
-    let init size position id actorStatus = {
+    let inline init size position id actorStatus = {
         id = id
         statusCurrent = actorStatus
         statusDefault = actorStatus

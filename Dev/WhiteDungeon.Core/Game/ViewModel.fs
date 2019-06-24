@@ -18,7 +18,7 @@ type ObjectBaseView = {
 }
 
 module ObjectBaseView =
-    let fromModel (objectBase : ObjectBase) = {
+    let inline fromModel (objectBase : ObjectBase) = {
         area =
             objectBase
             |> Model.ObjectBase.area
@@ -31,7 +31,7 @@ type ActorView = {
 }
 
 module ActorView =
-    let fromModel (actor : Actor.Actor) = {
+    let inline fromModel (actor : Actor.Actor) = {
         objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
@@ -42,7 +42,7 @@ type PlayerView = {
 }
 
 module PlayerView =
-    let fromModel (player : Actor.Player) = {
+    let inline fromModel (player : Actor.Player) = {
         character = player.character
         actorView = player.actor |> ActorView.fromModel
     }
@@ -83,11 +83,11 @@ type CameraView = {
 }
 
 module CameraView =
-    let init position = {
+    let inline init position = {
         position = position
     }
 
-    let fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
+    let inline fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
         players
         |> Map.toList
         |> List.sortBy (fun (id, _) -> id.Value)
@@ -106,10 +106,10 @@ type ViewModel = {
 
 
 module ViewModel =
-    let selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
+    let inline selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
         viewModel.players
 
-    let selectAreaSkillEmits (viewModel : ViewModel) : UpdaterViewModel<AreaSkillEmitView> =
+    let inline selectAreaSkillEmits (viewModel : ViewModel) : UpdaterViewModel<AreaSkillEmitView> =
         viewModel.areaSkillEmits
 
     let view (model : Model) : ViewModel = {

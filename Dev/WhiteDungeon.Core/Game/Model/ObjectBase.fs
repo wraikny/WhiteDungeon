@@ -75,24 +75,23 @@ type ObjectBase = {
 }
 
 module ObjectBase =
-    let size o = o.size
+    let inline size o = o.size
     
-    let position o = o.position
+    let inline position o = o.position
 
-    let lastPosition o = o.lastPosition
+    let inline lastPosition o = o.lastPosition
 
-    let velocity o = o.velocity
+    let inline velocity o = o.velocity
 
-    let direction o = o.direction
+    let inline direction o = o.direction
 
-    let area (o : ObjectBase) : float32 Vec2 Rect =
-        let leftUp = o.position - (o.size *. 0.5f)
+    let inline area (o : ObjectBase) : float32 Rect2 =
         {
-            position = leftUp
+            position = o.position - (o.size *. 0.5f)
             size = o.size
         }
 
-    let init size position = {
+    let inline init size position = {
         size = size
         position = position
         lastPosition = position

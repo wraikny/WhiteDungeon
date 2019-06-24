@@ -2,28 +2,29 @@
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Math.Utils
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
-let setPosition position (obj : ObjectBase) = {
+let inline setPosition position (obj : ObjectBase) = {
     obj with
         position = position
         lastPosition = obj.position
 }
 
-let addPosition diff (obj : ObjectBase) =
+let inline addPosition diff (obj : ObjectBase) =
     obj |> setPosition (diff + obj.position)
 
-let setSize size (obj : ObjectBase) =
+let inline setSize size (obj : ObjectBase) =
     { obj with size = size }
 
-let addSize diff obj =
+let inline addSize diff obj =
     obj |> setSize (obj.size + diff)
 
-let setDirection (direction) (obj : ObjectBase) =
+let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
 let insideDungeon
@@ -40,8 +41,8 @@ let insideDungeon
 
 open WhiteDungeon.Core.Utils
 
-let private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
-    Math.BinarySearch.vector
+let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
+    BinarySearch.vector
         bsCount
         isInside
         currentPosition
@@ -51,7 +52,7 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
     let searchDiff =
         (+) currentPosition
         >>
-        Math.BinarySearch.vector
+        BinarySearch.vector
             bsCount
             isInside
             currentPosition
@@ -107,9 +108,9 @@ let moveXYTogether = moveWithBS bsDiffXYTogether
 let moveXYAnother = moveWithBS bsDiffXYAnother
 
 
-let setVelocity velocity (obj : ObjectBase) =
+let inline setVelocity velocity (obj : ObjectBase) =
     { obj with velocity = velocity }
 
-let update (obj : ObjectBase) =
+let inline update (obj : ObjectBase) =
     obj
     |> addPosition obj.velocity

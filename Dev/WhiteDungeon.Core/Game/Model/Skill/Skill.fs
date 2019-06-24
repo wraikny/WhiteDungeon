@@ -65,7 +65,7 @@ module rec Skill =
         }
 
     module EmitCore =
-        let build invoker (x : EmitCore) : EmitBase = {
+        let inline build invoker (x : EmitCore) : EmitBase = {
             invokerActor = invoker
             target = x.target
             delay = x.delay
@@ -82,7 +82,7 @@ type SkillEmit =
 
 
 module Area =
-    let area a = a.area
+    let inline area a = a.area
 
 
 module Target =
@@ -135,7 +135,7 @@ type SkillList =
     }
 
 module SkillList =
-    let init() =
+    let inline init() =
         {
             nextID = 0u
             waitings = []

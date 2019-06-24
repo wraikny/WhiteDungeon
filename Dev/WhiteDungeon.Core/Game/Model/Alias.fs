@@ -2,8 +2,8 @@
 
 [<Struct>]
 type PlayerID = PlayerID of id : uint32 with
-    member this.Value = this |> function | PlayerID x -> x
+    member inline this.Value = this |> function | PlayerID x -> x
 
 [<Struct>]
 type EnemyID = EnemyID of id : uint32 with
-    member this.Value = this |> function | EnemyID x -> x
+    member inline this.Value = this |> function | EnemyID x -> x

@@ -134,22 +134,23 @@ module SkillList =
                 )
         }
 
-    let skillEmitFuncToEffectsList f = List.map (fun (id, x) -> (id, f x))
+    //let inline skillEmitFuncToEffectsList f =
+    //    List.map (fun (id, x) -> (id, f x))
 
-    let private mapIDEffects f skillList =
+    let inline private mapIDEffects f skillList =
         { skillList with
             playerIDEffects = f skillList.playerIDEffects
             enemyIDEffects = f skillList.enemyIDEffects
         }
 
-    let private mapAreaEffects f skillList =
+    let inline private mapAreaEffects f skillList =
         { skillList with
             playerEffects = f skillList.playerEffects
             enemyEffects = f skillList.enemyEffects
             areaEffects = f skillList.areaEffects
         }
 
-    let private map f skillList =
+    let inline private map f skillList =
         skillList
         |> mapIDEffects f
         |> mapAreaEffects f

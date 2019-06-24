@@ -24,7 +24,7 @@ type Model = {
 }
 
 module Model =
-    let init dungeonBuilder gameSetting = {
+    let inline init dungeonBuilder gameSetting = {
         mode = Default
 
         playerCount = 1

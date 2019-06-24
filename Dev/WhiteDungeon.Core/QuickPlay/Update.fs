@@ -114,7 +114,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
             let fromCell =
                 model.gameSetting.dungeonCellSize
-                |> Model.GameSetting.fromDungeonCell
+                |> Dungeon.DungeonModel.cellToCoordinate
 
             let targetPosition =
                 targetRoom.rect

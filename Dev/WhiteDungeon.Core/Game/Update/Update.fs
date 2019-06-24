@@ -10,17 +10,17 @@ open WhiteDungeon.Core.Game.Update
 
 
 module Update =
-    let incrCount (model : Model) : Model =
+    let inline incrCount (model : Model) : Model =
         { model with count = model.count + 1u }
 
-    let setPlayers players model =
+    let inline setPlayers players model =
         { model with players = players }
 
-    let updatePlayers f (model : Model) : Model =
+    let inline updatePlayers f (model : Model) : Model =
         { model with players = f model.players }
 
 
-    let updateEachPlayer f (model : Model) : Model =
+    let inline updateEachPlayer f (model : Model) : Model =
         model
         |> setPlayers(
             model.players
@@ -37,7 +37,7 @@ module Update =
         )
         |> Option.defaultValue model
 
-    let updateEachEnemy f (model : Model) : Model = {
+    let inline updateEachEnemy f (model : Model) : Model = {
         model with
             enemies =
                 model.enemies
@@ -47,7 +47,7 @@ module Update =
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
 
-    let updateSkillList f (model : Model) : Model =
+    let inline updateSkillList f (model : Model) : Model =
         { model with skillList = f model.skillList }
 
 

@@ -15,14 +15,14 @@ type DungeonView = {
 }
 
 module DungeonView =
-    let private roomsToList cellSize =
+    let inline private roomsToList cellSize =
         HashMap.toList
         >> List.map (snd >> fun (space : Dungeon.Space) ->
             space.rect
-            |> Rect.map (GameSetting.fromDungeonCell cellSize)
+            |> Rect.map (Dungeon.DungeonModel.cellToCoordinate cellSize)
         )
 
-    let fromModel (model : Model.Model) = {
+    let inline fromModel (model : Model.Model) = {
         largeRooms =
             model.dungeonModel.largeRooms
             |> roomsToList model.gameSetting.dungeonCellSize

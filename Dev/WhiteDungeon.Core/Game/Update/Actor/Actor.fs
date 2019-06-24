@@ -4,19 +4,19 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
-let setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
+let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
     { actor with objectBase = objectBase }
 
 
-let updateObjectBase f (actor : Actor) =
+let inline updateObjectBase f (actor : Actor) =
     actor
     |> setObjectBase (f actor.objectBase)
 
 
-let setActorStatusCurrent status actor : Actor =
+let inline setActorStatusCurrent status actor : Actor =
     { actor with statusCurrent = status }
 
-let updateActorStatusCurrent f actor : Actor =
+let inline updateActorStatusCurrent f actor : Actor =
     { actor with statusCurrent = f actor.statusCurrent }
 
 
@@ -117,6 +117,6 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 //        actor
 //        |> setConditions conditions
 
-let update actor : Actor =
+let inline update actor : Actor =
     actor
     //|> updateConditions

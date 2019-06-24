@@ -12,15 +12,15 @@ type Player = {
 }
 
 module Player =
-    let actor (player : Player) = player.actor
+    let inline actor (player : Player) = player.actor
 
-    let id (player : Player) = player.id
+    let inline id (player : Player) = player.id
 
-    let character (player : Player) = player.character
+    let inline character (player : Player) = player.character
 
-    let objectBase (player : Player) = player.actor.objectBase
+    let inline objectBase (player : Player) = player.actor.objectBase
 
-    let init size position actorStatus id character = {
+    let inline init size position actorStatus id character = {
         actor = Actor.Actor.init size position (Actor.Player id) actorStatus
         id = id
         character = character
@@ -30,11 +30,11 @@ module Player =
 open wraikny.Tart.Helper.Math
 
 
-module PlayerBuilder =
-    let build size position id actorStatus (character : Character) =
-        Player.init
-            size
-            position
-            actorStatus
-            id
-            character
+//module PlayerBuilder =
+//    let inline build size position id actorStatus (character : Character) =
+//        Player.init
+//            size
+//            position
+//            actorStatus
+//            id
+//            character
