@@ -4,10 +4,11 @@ open wraikny
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
+open wraikny.MilleFeuille.Fs.Math
+open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.View
-open WhiteDungeon.View.Utils.Math
 open WhiteDungeon.View.Utils.Color
 
 type SkillEmitView(gameViewSetting) =

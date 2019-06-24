@@ -7,7 +7,8 @@ open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.View
-open WhiteDungeon.View.Utils.Math
+open wraikny.MilleFeuille.Fs.Math
+open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.View.Utils.Color
 
 
