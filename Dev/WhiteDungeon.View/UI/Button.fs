@@ -198,7 +198,7 @@ module ButtonRectangle =
 
         button
 
-    let create text font position size =
+    let inline create text font position size =
         new SelectButtonRectangle(
             text + "_Button" 
             , size
