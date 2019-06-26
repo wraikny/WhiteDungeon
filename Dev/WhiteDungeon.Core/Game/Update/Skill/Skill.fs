@@ -73,6 +73,7 @@ module AreaSkill =
                 Some { areaSkill with emits = emits areaSkill }
 
 
+
     let isCollided (areaSkill : AreaSkill) (actor : Actor.Actor) : bool =
         Rect.isCollided
             (actor.objectBase |> ObjectBase.area)
@@ -168,8 +169,7 @@ module SkillList =
             >> Seq.filterMap(fun (id, x) -> maybe {
                 let! x = f x
                 yield (id, x)
-            }
-            )
+            })
             >> Map.ofSeq
 
         { skillList with
@@ -203,15 +203,15 @@ module SkillList =
         let append a b =
             seq {
                 for x in a -> x
-                for x in b -> x
+                for x in b |> Map.toSeq -> x
             } |> Map.ofSeq
 
         {
             nextID = skillList.nextID
             waitings = waitings |> Map.ofSeq
-            areaPlayer = append areaPlayer (Map.toSeq skillList.areaPlayer)
-            areaEnemy = append areaEnemy (Map.toSeq skillList.areaEnemy)
-            areaAll = append areaAll (Map.toSeq skillList.areaAll)
+            areaPlayer = append areaPlayer skillList.areaPlayer
+            areaEnemy = append areaEnemy skillList.areaEnemy
+            areaAll = append areaAll skillList.areaAll
         }
 
     let private checkCollision (players : Map<_, Actor.Player> ) (enemies : Map<_, Actor.Enemy>) (skillList : SkillList) =
