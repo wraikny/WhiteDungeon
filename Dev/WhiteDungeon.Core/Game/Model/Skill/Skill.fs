@@ -20,107 +20,87 @@ open WhiteDungeon.Core.Game.Model
 //module Condition =
 //    let priority c = c.priority
 
+
 type Effect =
     // | AddConditions of Condition list
     | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
 
 
-[<AutoOpen>]
-module rec Skill =
-    type EmitCore =
-        {
-            target : Target
-            delay : uint32
-            effects : Effect []
-        }
+type SkillBase = {
+    invokerActor : Actor.Actor
 
-    type EmitMove =
-        | Stay
-        | Move of float32 Vec2
-        | Scale of float32 Vec2
-        | Generate of (ObjectBase -> EmitCore [])
+    delay : uint32
+    effects : Effect []
+}
 
 
-    type Area =
-        {
-            removeWhenHitWall : bool
-            removeWhenHitActor : bool
-            area : ObjectBase
-            move : EmitMove list
-            emits : EmitCore []
-            collidedActors : Set<Actor.ActorID>
-        }
+type 'ID IDSkill when 'ID : comparison = {
+    skillBase : SkillBase
 
-    type Target =
-        | Players of PlayerID Set * uint32
-        | Enemies of EnemyID Set * uint32
-        | Friends of Area
-        | Others of Area
-        | Area of Area
+    targetIDs : 'ID Set
+
+    frame : uint32
+}
 
 
-    type EmitBase =
-        {
-            invokerActor : Actor.Actor
-            target : Target
-            delay : uint32
-            effects : Effect []
-        }
+type SkillBaseBuilder = {
+    delay : uint32
+    effects : Effect []
+}
 
-    module EmitCore =
-        let inline build invoker (x : EmitCore) : EmitBase = {
-            invokerActor = invoker
-            target = x.target
-            delay = x.delay
-            effects = x.effects
-        }
-        
+
+type IDSkillBuilder = {
+    skillBase : SkillBaseBuilder
+    
+    targetIDs : Actor.ActorID Set
+    frame : uint32
+}
+
+
+type AreaTarget =
+    | Players
+    | Enemies
+    | All
+
+type EmitMove =
+    | Stay
+    | Move of float32 Vec2
+    | Scale of float32 Vec2
+    | Generate of (AreaSkill -> AreaSkillBuilder [])
+
+
+and AreaSkill = {
+    skillBase : SkillBase
+    objectBase : ObjectBase
+
+    target : AreaTarget
+    removeWhenHitWall : bool
+    removeWhenHitActor : bool
+
+    move : EmitMove list
+
+    emits : AreaSkillBuilder []
+    collidedActors : Set<Actor.ActorID>
+
+    frame : uint32
+    frameFirst : uint32
+}
+
+and AreaSkillBuilder = {
+    skillBase : SkillBaseBuilder
+
+    removeWhenHitWall : bool
+    removeWhenHitActor : bool
+    
+    area : ObjectBase
+    move : EmitMove list
+}
+
 
 type SkillEmit =
-    internal {
-        skillEmitBase : EmitBase
-        frame : uint32
-        frameFirst : uint32
-    }
-
-
-module Area =
-    let inline area a = a.area
-
-
-module Target =
-    let area = function
-        | Friends area
-        | Others area
-        | Area area -> Some area
-        | Players _
-        | Enemies _ -> None
-
-module SkillEmit =
-    let target s = s.skillEmitBase.target
-
-    let decrDelay s =
-        { s with
-            skillEmitBase = {
-                s.skillEmitBase with
-                    delay = s.skillEmitBase.delay - 1u
-        }}
-
-    let build (skillEmitBase : EmitBase) : SkillEmit =
-        let frame = skillEmitBase.target |> function
-            | Friends { move = move }
-            | Others { move = move }
-            | Area { move = move } ->
-                move |> List.length |> uint32
-            | Players (_, frame)
-            | Enemies (_, frame) ->
-                frame
-
-        {
-            skillEmitBase = skillEmitBase
-            frame = frame
-            frameFirst = frame
-        }
+    // | IDPlayer of PlayerID IDSkill
+    // | IDEnemy of EnemyID IDSkill
+    | Area of AreaSkill
 
 
 type SkillID = uint32
@@ -129,22 +109,23 @@ type SkillID = uint32
 type SkillList =
     {
         nextID : SkillID
-        waitings : (SkillID * SkillEmit) list
-        playerIDEffects : (SkillID * SkillEmit) list
-        enemyIDEffects : (SkillID * SkillEmit) list
-        playerEffects : (SkillID * SkillEmit) list
-        enemyEffects : (SkillID * SkillEmit) list
-        areaEffects : (SkillID * SkillEmit) list
+        waitings : Map<SkillID, SkillEmit>
+        //idPlayer : Map<SkillID,PlayerID IDSkill>
+        //idEnemy : Map<SkillID, EnemyID IDSkill>
+        areaPlayer : Map<SkillID, AreaSkill>
+        areaEnemy : Map<SkillID, AreaSkill>
+        areaAll : Map<SkillID, AreaSkill>
     }
 
 module SkillList =
     let inline init() =
+        let m = Map.empty
         {
             nextID = 0u
-            waitings = []
-            playerIDEffects = []
-            enemyIDEffects = []
-            playerEffects = []
-            enemyEffects = []
-            areaEffects = []
+            waitings = Map.empty
+            //idPlayer = Map.empty
+            //idEnemy = Map.empty
+            areaPlayer = m
+            areaEnemy = m
+            areaAll = m
         }
