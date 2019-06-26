@@ -48,6 +48,7 @@ module rec Skill =
             area : ObjectBase
             move : EmitMove list
             emits : EmitCore []
+            collidedActors : Set<Actor.ActorID>
         }
 
     type Target =

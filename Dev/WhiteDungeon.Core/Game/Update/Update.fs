@@ -75,15 +75,14 @@ module Update =
 
         { model with
             players =
+                let f =
+                    Skill.SkillEmit.applyToActorHolders
+                        gameSetting
+                        Actor.Player.updateActor
+
                 model.players
-                |> Skill.SkillEmit.applyToActorHolders
-                    gameSetting
-                    Actor.Player.updateActor
-                    skillList.playerEffects
-                |> Skill.SkillEmit.applyToActorHolders
-                    gameSetting
-                    Actor.Player.updateActor
-                    skillList.areaEffects
+                |> f skillList.playerEffects
+                |> f skillList.areaEffects
                 |> Map.map(fun id ->
                     skillList.playerIDEffects
                     |> List.filter(
@@ -99,15 +98,14 @@ module Update =
                 )
 
             enemies =
+                let f =
+                    Skill.SkillEmit.applyToActorHolders
+                        gameSetting
+                        Actor.Enemy.updateActor
+
                 model.enemies
-                |> Skill.SkillEmit.applyToActorHolders
-                    gameSetting
-                    Actor.Enemy.updateActor
-                    skillList.enemyEffects
-                |> Skill.SkillEmit.applyToActorHolders
-                    gameSetting
-                    Actor.Enemy.updateActor
-                    skillList.areaEffects
+                |> f skillList.enemyEffects
+                |> f skillList.areaEffects
                 |> Map.map(fun id ->
                     skillList.enemyIDEffects
                     |> List.filter(
@@ -184,6 +182,7 @@ module Update =
                             for _ in 1..60 -> Skill.Skill.Scale(Vec2.init(3.0f, 3.0f))
                         } |> Seq.toList
                         emits = [||]
+                        collidedActors = Set.empty
                     }
                 
                 

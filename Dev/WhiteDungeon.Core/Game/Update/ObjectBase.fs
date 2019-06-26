@@ -85,10 +85,10 @@ let private moveWithBS
         objectAreaPoints
         |> Array.map ((+) diff)
         |> isInside
+        |> not
 
     let diff =
-        if isCollided then diff
-        else
+        if isCollided then
             f
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
@@ -98,6 +98,8 @@ let private moveWithBS
                 )
                 diff
                 obj.position
+        else
+            diff
     
     obj
     |> addPosition (diff)

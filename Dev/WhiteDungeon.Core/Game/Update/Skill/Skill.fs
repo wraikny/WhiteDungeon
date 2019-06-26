@@ -25,6 +25,7 @@ module Area =
                 let newObj, isCollided =
                     obj
                     |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
+
                 if area.removeWhenHitWall && isCollided then
                     None
                 else
@@ -44,6 +45,18 @@ module Area =
 
 
 module SkillEmit =
+    let mapArea f (emit : SkillEmit) =
+        let target =
+            emit.skillEmitBase.target |> function
+            | Friends area ->
+                Friends(f area)
+            | Others area ->
+                Others(f area)
+            | Area area ->
+                Area(f area)
+            | x -> x
+        { emit with skillEmitBase = { emit.skillEmitBase with target = target } }
+
     let move gameSetting dungeonModel (emit : SkillEmit) =
         let applyMove = Area.move gameSetting dungeonModel
 
@@ -87,10 +100,41 @@ module SkillEmit =
                 (o |> ObjectBase.area)
                 (actor.objectBase |> ObjectBase.area)
         | _ -> false
+
+
+    let checkCollision (actors : #seq<Actor.Actor>) (emit : SkillEmit) : SkillEmit =
+        emit.skillEmitBase.target |> function
+        | Friends _
+        | Others _
+        | Area _ ->
+            emit
+            |> mapArea(fun area ->
+                { area with
+                    collidedActors =
+                        actors
+                        |> Seq.filter(isCollided emit)
+                        |> Seq.map(fun a -> a.id)
+                        |> Set.ofSeq
+                }
+            )
+        | _ ->
+            emit
+
+    let private collidedActors (emit : SkillEmit) =
+        emit.skillEmitBase.target |> function
+        | Friends { collidedActors = ids }
+        | Others { collidedActors = ids }
+        | Area { collidedActors = ids } ->
+            ids
+        | _ ->
+            Set.empty
+
     
     let private apply (gameSetting : GameSetting) (emit : SkillEmit) (actor : Actor.Actor) : Actor.Actor =
         // TODO
-        isCollided emit actor
+        emit
+        |> collidedActors
+        |> Set.contains actor.id
         |> function
         | true ->
             emit.skillEmitBase.effects
@@ -201,6 +245,30 @@ module SkillList =
             playerEffects = players |> List.append skillList.playerEffects
             enemyEffects = enemies |> List.append skillList.enemyEffects
             areaEffects = areas |> List.append skillList.areaEffects
+        }
+
+
+    let private checkCollision (model : Model) (skillList : SkillList) =
+        let playerActors =
+            model.players
+            |> Map.toSeq
+            |> Seq.map (snd >> fun x -> x.actor)
+
+        let enemiesActor =
+            model.enemies
+            |> Map.toSeq
+            |> Seq.map (snd >> fun x -> x.actor)
+
+        { skillList with
+            playerEffects =
+                skillList.playerEffects
+                |> List.map(fun (id, e) -> id, e |> SkillEmit.checkCollision playerActors)
+            enemyEffects =
+                skillList.enemyEffects
+                |> List.map(fun (id, e) -> id, e |> SkillEmit.checkCollision enemiesActor)
+            areaEffects =
+                skillList.areaEffects
+                |> List.map(fun (id, e) -> id, e |> SkillEmit.checkCollision (Seq.append playerActors enemiesActor))
         }
 
     
