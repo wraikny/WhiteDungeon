@@ -141,6 +141,42 @@ module SkillList =
                 |> Map.map(fun _ s -> f s)
         }
 
+    open System.Collections.Generic
+
+    let private popWaitingSkills (skillList : SkillList) : SkillList =
+        let waitings = new List<SkillID * SkillEmit>()
+        let areaPlayer = new List<SkillID * AreaSkill>()
+        let areaEnemy = new List<SkillID * AreaSkill>()
+        let areaAll = new List<SkillID * AreaSkill>()
+
+        for (id, emit) in skillList.waitings |> Map.toSeq do
+            if emit |> SkillEmit.delay = 0u then
+                emit |> function
+                | Skill.Area area ->
+                    area.target |> function
+                    | Players ->
+                        areaPlayer.Add(id, area)
+                    | Enemies ->
+                        areaEnemy.Add(id, area)
+                    | All ->
+                        areaAll.Add(id, area)
+            else
+                waitings.Add(id, emit)
+
+        let append a b =
+            seq {
+                for x in a -> x
+                for x in b -> x
+            } |> Map.ofSeq
+
+        {
+            nextID = skillList.nextID
+            waitings = waitings |> Map.ofSeq
+            areaPlayer = append areaPlayer (Map.toSeq skillList.areaPlayer)
+            areaEnemy = append areaEnemy (Map.toSeq skillList.areaEnemy)
+            areaAll = append areaAll (Map.toSeq skillList.areaAll)
+        }
+
 
 
 (*

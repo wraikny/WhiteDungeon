@@ -102,6 +102,14 @@ type SkillEmit =
     // | IDEnemy of EnemyID IDSkill
     | Area of AreaSkill
 
+module SkillEmit =
+    let inline skillBase s =
+        s |> function
+        | Area a -> a.skillBase
+
+    let inline delay s =
+        s |> skillBase |> fun s -> s.delay
+
 
 type SkillID = uint32
 
