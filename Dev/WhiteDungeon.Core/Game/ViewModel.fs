@@ -63,19 +63,16 @@ type AreaSkillEmitView = {
 module AreaSkillEmitView =
     open WhiteDungeon.Core.Game.Model.Skill
 
-    let fromModel (emit : Model.Skill.SkillEmit) =
-        emit.skillEmitBase.target |> function
-        | Skill.Friends { area = o }
-        | Skill.Others { area = o }
-        | Skill.Area { area = o } ->
-            Some {
-                baseView =
-                    o |> ObjectBaseView.fromModel
-                frameCurrent = emit.frame
-                frameFirst = emit.frameFirst
-            }
-        | _ -> None
-        |> Option.get
+    let inline fromModel (areaSkill : Model.Skill.AreaSkill) =
+        {
+            baseView = ObjectBaseView.fromModel areaSkill.objectBase
+            frameCurrent = areaSkill.frame
+            frameFirst = areaSkill.frameFirst
+        }
+
+    let fromModels : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
+        Map.toList
+        >> List.map (fun (id, a) -> (id, fromModel a))
 
 
 type CameraView = {
@@ -99,18 +96,15 @@ module CameraView =
 type ViewModel = {
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
-    toPlayersSkillEmits : UpdaterViewModel<AreaSkillEmitView>
-    toEnemiesSkillEmits : UpdaterViewModel<AreaSkillEmitView>
-    areaSkillEmits : UpdaterViewModel<AreaSkillEmitView>
+    areaPlayer : UpdaterViewModel<AreaSkillEmitView>
+    areaEnemy : UpdaterViewModel<AreaSkillEmitView>
+    areaAll : UpdaterViewModel<AreaSkillEmitView>
 }
 
 
 module ViewModel =
     let inline selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
         viewModel.players
-
-    let inline selectAreaSkillEmits (viewModel : ViewModel) : UpdaterViewModel<AreaSkillEmitView> =
-        viewModel.areaSkillEmits
 
     let view (model : Model) : ViewModel = {
         camera =
@@ -124,21 +118,21 @@ module ViewModel =
                 |> PlayerView.playersView
         }
 
-        toPlayersSkillEmits = {
+        areaPlayer = {
             objects =
-                model.skillList.playerEffects
-                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
+                model.skillList.areaPlayer
+                |> AreaSkillEmitView.fromModels
         }
 
-        toEnemiesSkillEmits = {
+        areaEnemy = {
             objects =
-                model.skillList.enemyEffects
-                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
+                model.skillList.areaEnemy
+                |> AreaSkillEmitView.fromModels
         }
 
-        areaSkillEmits = {
+        areaAll = {
             objects =
-                model.skillList.areaEffects
-                |> List.map (fun (id, e) -> (id, AreaSkillEmitView.fromModel e))
+                model.skillList.areaAll
+                |> AreaSkillEmitView.fromModels
         }
     }

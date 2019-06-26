@@ -67,23 +67,23 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
             selectActor = ViewModel.ViewModel.selectPlayers
         }
 
-    let playersSkillEmitsUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "playersSkillEmitsUpdater" {
+    let skillAreaPlayerUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
+        ActorsUpdaterBuilder.build "skillAreaPlayerUpdater" {
             initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.toPlayersSkillEmits
+            selectActor = fun vm -> vm.areaPlayer
         }
 
-    let enemiesSkillEmitsUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "enemiesSkillEmitsUpdater" {
+    let skillAreaEnemyUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
+        ActorsUpdaterBuilder.build "skillAreaEnemyUpdater" {
             initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.toEnemiesSkillEmits
+            selectActor = fun vm -> vm.areaEnemy
         }
 
 
-    let areaSkillEmitsUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "areaSkillEmitsUpdater" {
+    let skillAreaAllUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
+        ActorsUpdaterBuilder.build "skillAreaAllUpdater" {
             initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.areaSkillEmits
+            selectActor = fun vm -> vm.areaAll
         }
 
     let dungeonCamera = new GameCamera()
@@ -132,20 +132,26 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         playerLayer.AddObject(playerCamera)
 
         [|
-            playersSkillEmitsUpdater
-            enemiesSkillEmitsUpdater
-            areaSkillEmitsUpdater
+            skillAreaPlayerUpdater
+            skillAreaEnemyUpdater
+            skillAreaAllUpdater
         |]
-        |> Array.iter(fun u -> skillEffectsLayer.AddComponent(u, u.Name))
+        |> Seq.iter(fun u -> skillEffectsLayer.AddComponent(u, u.Name))
             
 
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
         notifier.Add(dungeonCamera)
         // notifier.AddObserver(minimapCamera)
+
+        // player
         notifier.Add(playerCamera)
         notifier.Add(playersUpdater)
-        notifier.Add(areaSkillEmitsUpdater)
+
+        // Skill
+        notifier.Add(skillAreaPlayerUpdater)
+        notifier.Add(skillAreaEnemyUpdater)
+        notifier.Add(skillAreaAllUpdater)
         notifier.Add(skillEffectsCamera)
 
         messenger.SetPort(port)
