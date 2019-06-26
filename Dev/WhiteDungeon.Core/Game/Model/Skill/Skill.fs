@@ -43,6 +43,8 @@ module rec Skill =
 
     type Area =
         {
+            removeWhenHitWall : bool
+            removeWhenHitActor : bool
             area : ObjectBase
             move : EmitMove list
             emits : EmitCore []

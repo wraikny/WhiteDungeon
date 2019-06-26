@@ -14,26 +14,33 @@ module Area =
         area.move |> function
         | [] -> None
         | x::xs ->
-            let area, emits =
-                let obj = area.area
-                x |> function
-                | Stay -> obj, Array.empty
-                | Move diff ->
-                    let newObj, isCollided =
-                        obj
-                        |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
-                    newObj, Array.empty
-                | Scale diff ->
-                    obj
-                    |> ObjectBase.addSize diff, Array.empty
-                | Generate emits ->
-                    obj, emits obj
+            let area = { area with move = xs }
 
-            Some {
-                move = xs
-                area = area
-                emits = emits
-            }
+            
+            let obj = area.area
+            x |> function
+            | Stay ->
+                Some area
+            | Move diff ->
+                let newObj, isCollided =
+                    obj
+                    |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
+                if area.removeWhenHitWall && isCollided then
+                    None
+                else
+                    Some {
+                        area with
+                            area = newObj
+                            emits = [||]
+                    }
+            | Scale diff ->
+                Some {
+                    area with
+                        area = ObjectBase.addSize diff obj
+                        emits = [||]
+                }
+            | Generate emits ->
+                Some { area with emits = emits obj }
 
 
 module SkillEmit =
@@ -110,12 +117,10 @@ module SkillEmit =
         (skills : (_ * SkillEmit) list)
         (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
 
-        let foledSkills =
-            skills
-            |> getFoledSkills gameSetting
+        let foledSkills = getFoledSkills gameSetting skills
 
         holders
-        |> Map.map(fun _ h -> updater foledSkills h)
+        |> Map.map (fun _ h -> updater foledSkills h)
 
 
 

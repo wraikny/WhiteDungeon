@@ -175,6 +175,8 @@ module Update =
             let emit : Skill.Skill.EmitBase = {
                 invokerActor = player0.actor
                 target = Skill.Skill.Target.Area {
+                        removeWhenHitActor = false
+                        removeWhenHitWall = true
                         area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
                         move = seq {
                             for _ in 1..10 -> Skill.Skill.Stay
