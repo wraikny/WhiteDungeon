@@ -48,6 +48,14 @@ type SkillBaseBuilder = {
     effects : Effect []
 }
 
+module SkillBaseBuilder =
+    let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
+        {
+            invokerActor = invoker
+            delay = builder.delay
+            effects = builder.effects
+        }
+
 
 type IDSkillBuilder = {
     skillBase : SkillBaseBuilder
@@ -88,13 +96,37 @@ and AreaSkill = {
 
 and AreaSkillBuilder = {
     skillBase : SkillBaseBuilder
+    objectBase : ObjectBase
 
+    target : AreaTarget
     removeWhenHitWall : bool
     removeWhenHitActor : bool
     
-    area : ObjectBase
     move : EmitMove list
 }
+
+module AreaSkillBuilder =
+    let build (invoker) (builder : AreaSkillBuilder) : AreaSkill =
+        let frame = builder.move |> List.length |> uint32
+        {
+            skillBase =
+                builder.skillBase
+                |> SkillBaseBuilder.build invoker
+            objectBase = builder.objectBase
+
+            target = builder.target
+
+            removeWhenHitActor = builder.removeWhenHitActor
+            removeWhenHitWall = builder.removeWhenHitWall
+
+            move = builder.move
+
+            emits = Array.empty
+            collidedActors = Set.empty
+
+            frame = frame
+            frameFirst = frame
+        }
 
 
 type SkillEmit =
@@ -109,6 +141,18 @@ module SkillEmit =
 
     let inline delay s =
         s |> skillBase |> fun s -> s.delay
+
+
+type SkillEmitBuilder =
+    | AreaBuilder of AreaSkillBuilder
+
+
+module SkillEmitBuilder =
+    let build invoker (builder) : SkillEmit =
+        builder |> function
+        | AreaBuilder area ->
+            AreaSkillBuilder.build invoker area
+            |> Area
 
 
 type SkillID = uint32

@@ -51,20 +51,11 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (skills : Skill.EmitBase list) (model : Model) : Model =
+    let appendSkills (skills : seq<Actor.Actor * Skill.SkillEmitBuilder>) (model : Model) : Model =
         model
         |> updateSkillList (
             skills
-            |> List.filter(
-                (fun b -> b.target)
-                >> Skill.Target.area
-                >> Option.map(
-                    (fun a -> a.area)
-                    >> ObjectBase.insideDungeon model.gameSetting model.dungeonModel
-                )
-                >> Option.defaultValue true
-            )
-            |> List.map(Skill.SkillEmit.build)
+            |> Seq.map(fun (a, b) -> Skill.SkillEmitBuilder.build a b)
             |> Skill.SkillList.append
         )
 
@@ -76,49 +67,23 @@ module Update =
         { model with
             players =
                 let f =
-                    Skill.SkillEmit.applyToActorHolders
+                    Skill.AreaSkill.applyToActorHolders
                         gameSetting
                         Actor.Player.updateActor
 
                 model.players
-                |> f skillList.playerEffects
-                |> f skillList.areaEffects
-                |> Map.map(fun id ->
-                    skillList.playerIDEffects
-                    |> List.filter(
-                        snd
-                        >> Skill.SkillEmit.target
-                        >> function
-                        | Skill.Skill.Players (ids, _) ->
-                            ids |> Set.contains id
-                        | _ -> false
-                    )
-                    |> Skill.SkillEmit.getFoledSkills gameSetting
-                    |> Actor.Player.updateActor
-                )
+                |> f skillList.areaPlayer
+                |> f skillList.areaAll
 
             enemies =
                 let f =
-                    Skill.SkillEmit.applyToActorHolders
+                    Skill.AreaSkill.applyToActorHolders
                         gameSetting
                         Actor.Enemy.updateActor
 
                 model.enemies
-                |> f skillList.enemyEffects
-                |> f skillList.areaEffects
-                |> Map.map(fun id ->
-                    skillList.enemyIDEffects
-                    |> List.filter(
-                        snd
-                        >> Skill.SkillEmit.target
-                        >> function
-                        | Skill.Enemies (ids, _) ->
-                            ids |> Set.contains id
-                        | _ -> false
-                    )
-                    |> Skill.SkillEmit.getFoledSkills gameSetting
-                    |> Actor.Enemy.updateActor
-                )
+                |> f skillList.areaEnemy
+                |> f skillList.areaAll
         }
 
 
@@ -170,30 +135,55 @@ module Update =
                 player0.actor.objectBase.position
                 + (100.0f .* dir)
 
-            let emit : Skill.Skill.EmitBase = {
-                invokerActor = player0.actor
-                target = Skill.Skill.Target.Area {
-                        removeWhenHitActor = false
-                        removeWhenHitWall = true
-                        area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
-                        move = seq {
-                            for _ in 1..10 -> Skill.Skill.Stay
-                            for _ in 1..60 -> Skill.Skill.Move(dir *. 5.0f)
-                            for _ in 1..60 -> Skill.Skill.Scale(Vec2.init(3.0f, 3.0f))
-                        } |> Seq.toList
-                        emits = [||]
-                        collidedActors = Set.empty
-                    }
+            //let emit : Skill.Skill.EmitBase = {
+            //    invokerActor = player0.actor
+            //    target = Skill.Skill.Target.Area {
+            //            removeWhenHitActor = false
+            //            removeWhenHitWall = true
+            //            area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
+            //            move = seq {
+            //                for _ in 1..10 -> Skill.Skill.Stay
+            //                for _ in 1..60 -> Skill.Skill.Move(dir *. 5.0f)
+            //                for _ in 1..60 -> Skill.Skill.Scale(Vec2.init(3.0f, 3.0f))
+            //            } |> Seq.toList
+            //            emits = [||]
+            //            collidedActors = Set.empty
+            //        }
                 
                 
-                delay = 0u
-                effects = [|
-                    Skill.Damage(fun gs atk def ->
-                        0.0f
-                    )
-                |]
-            }
-            let emits = [emit]
+            //    delay = 0u
+            //    effects = [|
+            //        Skill.Damage(fun gs atk def ->
+            //            0.0f
+            //        )
+            //    |]
+            //}
+            let emit : Skill.SkillEmitBuilder =
+                {
+                    skillBase =
+                        {
+                            delay = 0u
+                            effects = [|
+                                Skill.Damage(fun gs atk def ->
+                                    0.0f
+                                )
+                            |]
+                        }
+                    objectBase = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
+
+                    target = Skill.AreaTarget.Enemies
+
+                    removeWhenHitWall = true
+                    removeWhenHitActor = true
+
+                    move = seq {
+                        for _ in 1..10 -> Skill.Stay
+                        for _ in 1..60 -> Skill.Move(dir *. 5.0f)
+                        for _ in 1..60 -> Skill.Scale(Vec2.init(3.0f, 3.0f))
+                    } |> Seq.toList
+                } |> Skill.AreaBuilder
+
+            let emits = [player0.actor, emit]
 
             model |> appendSkills emits, Cmd.none
 
