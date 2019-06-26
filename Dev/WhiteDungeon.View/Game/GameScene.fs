@@ -39,7 +39,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
     let port = {
         new Port<_, ViewMsg.ViewMsg>(messenger) with
-        override __.OnUpdate(msg) = ()
+        override __.OnPopMsg(msg) = ()
     }
 
     let gameKeybaord =

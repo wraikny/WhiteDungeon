@@ -137,7 +137,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
     let port = {
         new Port<_, _>(messenger) with
-        override __.OnUpdate(msg) =
+        override __.OnPopMsg(msg) =
             msg |> function
             | QuickPlay.ChangeToGame(gameModel) ->
                 this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
