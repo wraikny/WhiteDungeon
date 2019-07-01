@@ -89,7 +89,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     (fun () ->
                         model.dungeonBuilder
                         |> Dungeon.DungeonBuilder.generate
-                        |> Result<_, Basic.Never>.Ok
+                        |> Result<_, Never>.Ok
                     )
                     |> Task.init
                     |> Task.perform GeneratedDungeonModel
