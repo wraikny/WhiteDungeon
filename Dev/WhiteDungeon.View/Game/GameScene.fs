@@ -141,18 +141,18 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
-        notifier.Add(dungeonCamera)
+        (notifier :> IObservable<_>).Add(dungeonCamera) |> ignore
         // notifier.AddObserver(minimapCamera)
 
         // player
-        notifier.Add(playerCamera)
-        notifier.Add(playersUpdater)
+        (notifier :> IObservable<_>).Add(playerCamera) |> ignore
+        (notifier :> IObservable<_>).Add(playersUpdater) |> ignore
 
         // Skill
-        notifier.Add(skillAreaPlayerUpdater)
-        notifier.Add(skillAreaEnemyUpdater)
-        notifier.Add(skillAreaAllUpdater)
-        notifier.Add(skillEffectsCamera)
+        (notifier :> IObservable<_>).Add(skillAreaPlayerUpdater) |> ignore
+        (notifier :> IObservable<_>).Add(skillAreaEnemyUpdater) |> ignore
+        (notifier :> IObservable<_>).Add(skillAreaAllUpdater) |> ignore
+        (notifier :> IObservable<_>).Add(skillEffectsCamera) |> ignore
 
         messenger.SetPort(port)
         messenger.StartAsync() |> ignore
