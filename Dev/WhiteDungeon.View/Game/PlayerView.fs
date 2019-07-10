@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
@@ -24,7 +25,7 @@ type PlayerView(gameViewSetting) =
     let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
 
-    interface IUpdatee<Game.ViewModel.PlayerView> with
+    interface IObserver<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.actorView.objectBaseView
 

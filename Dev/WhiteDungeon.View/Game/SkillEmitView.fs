@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Fs.Math
@@ -28,7 +29,7 @@ type SkillEmitView(gameViewSetting) =
         this.Color <- lastColor |> Vec4.toColor
 
 
-    interface IUpdatee<Game.ViewModel.AreaSkillEmitView> with
+    interface IObserver<Game.ViewModel.AreaSkillEmitView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.baseView
             
