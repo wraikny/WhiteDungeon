@@ -86,13 +86,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     Random.generate SetRandomRoomIndex generator
                     
                 let task =
-                    (fun () ->
-                        model.dungeonBuilder
-                        |> Dungeon.DungeonBuilder.generate
-                        |> Result<_, Never>.Ok
-                    )
-                    |> Task.init
-                    |> Task.perform GeneratedDungeonModel
+                    async {
+                        return
+                            model.dungeonBuilder
+                            |> Dungeon.DungeonBuilder.generate }
+                    |> Async.perform GeneratedDungeonModel
 
                 model, Cmd.batch[rand; task]
             else
