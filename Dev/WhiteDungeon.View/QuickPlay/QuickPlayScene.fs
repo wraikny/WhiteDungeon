@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.View.Preparation
+﻿namespace WhiteDungeon.View.QuickPlay
 
 open wraikny
 open wraikny.Tart.Helper.Math
@@ -7,15 +7,16 @@ open wraikny.Tart.Advanced
 
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input.Controller
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Core.Object
 open wraikny.MilleFeuille.Core.Input
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
+open WhiteDungeon.View.Utils.Color
 
-type PreparationScene(viewSetting, createTitleScene) =
+
+type QuickPlayScene(viewSetting, createTitleScene) as this =
     inherit Scene()
 
     let createTitleScene : ViewSetting -> asd.Scene = createTitleScene
@@ -26,27 +27,31 @@ type PreparationScene(viewSetting, createTitleScene) =
         dungeonCellSize = Vec2.init(200.0f, 200.0f)
         minPlayerCount = 1
         maxPlayerCount = 1
+        binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init(100.0f, 100.0f)
+        occupationDefaultStatus = [
+            Model.Hunter, ({
+                level = 1
+                hp = 100.0f
+                walkSpeed = 4.0f
+                dashSpeed = 8.0f
+            } : Model.ActorStatus)
+        ] |> Map.ofList
     }
 
-    let savedData : Model.SavedData = {
-        charactersList = [
-            ({
-                id = Model.CharacterID 0
-                name = "rainy"
-                currentOccupation = Model.Sword
-                occupations = [
-                    Model.Sword, ({
-                        level = 1
-                        hp = 100
-                        walkSpeed = 4.0f
-                        dashSpeed = 8.0f
-                    } : Model.ActorStatus)
-                ] |> Map.ofList
-            } : Model.Character)
-        ]
-        |> List.map(fun (c : Model.Character) -> c.id, c)
-        |> Map.ofList
+    let gameViewSetting : Setting.GameViewSetting = {
+        occupationImages = [
+            Model.Hunter, ({
+                front = "Image/Debug/down.png"
+                frontRight = "Image/Debug/rightdown.png"
+                frontLeft = "Image/Debug/leftdown.png"
+                back = "Image/Debug/up.png"
+                backRight = "Image/Debug/rightup.png"
+                backLeft = "Image/Debug/leftup.png"
+                right = "Image/Debug/right.png"
+                left = "Image/Debug/left.png"
+            } : Setting.ActorImages)
+        ] |> Map.ofList
     }
 
     let dungeonBuilder : Dungeon.DungeonBuilder = {
@@ -65,29 +70,32 @@ type PreparationScene(viewSetting, createTitleScene) =
     }
 
     let viewSetting = viewSetting
-    let updater = new Tart.Updater()
     
-    let messenger : IMessenger<Main.Msg, Main.ViewModel> =
-        let pModel =
-            Preparation.Model.init
+    let messenger : IMessenger<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel> =
+        let model =
+            QuickPlay.Model.init
                 dungeonBuilder
                 gameSetting
-                savedData
 
-        let pModel =
-            { pModel with
+        let model =
+            { model with
                 playerCount = 1
                 players = [
-                    0u, Some <| Model.CharacterID 0
+                    0u, ("Player1", Some Model.Occupation.Hunter)
                 ]
                 |> Map.ofList
             }
 
-        Main.createMessenger (0, updater) pModel
+        Messenger.buildMessenger
+            { seed = 0 }
+            {
+                init = model, Cmd.none
+                view = QuickPlay.ViewModel.view
+                update = QuickPlay.Update.update
+            }
 
 
-    let notifier =
-        new Notifier<Main.Msg, Main.ViewMsg, Main.ViewModel>(messenger)
+    // let notifier = new Notifier<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel>(messenger)
 
     let keyboard = UI.Keybaord.createUIKeyboard()
 
@@ -127,23 +135,14 @@ type PreparationScene(viewSetting, createTitleScene) =
     //    |> Map.toList
     //    |> List.map snd
 
-    let gameKeybaord =
-        KeyboardBuilder.init()
-        |> KeyboardBuilder.bindKeysList
-            [
-                Game.Msg.UpKey    , asd.Keys.Up
-                Game.Msg.DownKey  , asd.Keys.Down
-                Game.Msg.RightKey , asd.Keys.Right
-                Game.Msg.LeftKey  , asd.Keys.Left
-                Game.Msg.DashKey  , asd.Keys.LeftShift
-            ]
-        |> KeyboardBuilder.build
-        :> Controller.IController<Game.Msg.PlayerInput>
-        
-
-    let controllers = [
-        Game.Model.Actor.PlayerID 0u, gameKeybaord
-    ]
+    let port = {
+        new Port<_, _>(messenger) with
+        override __.OnPopMsg(msg) =
+            msg |> function
+            | QuickPlay.ChangeToGame(gameModel) ->
+                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
+                |> ignore
+    }
     
 
     override this.OnRegistered() =
@@ -169,26 +168,26 @@ type PreparationScene(viewSetting, createTitleScene) =
         )
 
         startButton.Button.add_OnReleasedEvent (fun _ ->
-            messenger.PushMsg(Main.Msg.ToGame)
+            uiLayer.Dispose()
+            this.AddLayer <|
+                new UI.MessageLayer(
+                    viewSetting,
+                    MessageText = "Loading Dungeon"
+                )
+            
+            messenger.Enqueue(QuickPlay.Msg.GenerateDungeon)
         )
 
-
         let selecter = new Button.ControllerButtonSelecter( titleButton.Button )
-        
+
         selecter.AddController(keyboard) |> ignore
         
         uiLayer.AddComponent(selecter, "Selecter")
 
-        updater.UpdatePreparation <- fun msg ->
-            msg |> function
-            | Preparation.ChangeToGame ->
-                this.ChangeScene(new Game.GameScene(viewSetting, notifier, updater, controllers))
-                |> ignore
-                
-
+        messenger.SetPort(port)
         messenger.StartAsync() |> ignore
 
 
     override this.OnUpdated() =
-        notifier.Update()
-        updater.Update()
+        // notifier.Pull() |> ignore
+        port.Update()

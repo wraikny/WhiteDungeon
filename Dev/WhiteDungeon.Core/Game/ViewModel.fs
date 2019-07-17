@@ -6,18 +6,23 @@ open WhiteDungeon.Core.Game
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
+open wraikny.Tart.Helper.Collections
+open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Core.View
+open WhiteDungeon.Core.Game.Model
 
 
 type ObjectBaseView = {
-    area : float32 Rect
+    area : float32 Vec2 Rect
+    direction : MoveDirection
 }
 
 module ObjectBaseView =
-    let fromModel (objectBase : Model.ObjectBase) = {
+    let inline fromModel (objectBase : ObjectBase) = {
         area =
             objectBase
             |> Model.ObjectBase.area
+        direction = objectBase.direction
     }
 
 
@@ -26,7 +31,7 @@ type ActorView = {
 }
 
 module ActorView =
-    let fromModel (actor : Model.Actor.Actor) = {
+    let inline fromModel (actor : Actor.Actor) = {
         objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
@@ -37,16 +42,37 @@ type PlayerView = {
 }
 
 module PlayerView =
-    let fromModel (player : Model.Actor.Player) = {
+    let inline fromModel (player : Actor.Player) = {
         character = player.character
         actorView = player.actor |> ActorView.fromModel
     }
 
     let playersView =
-        List.map(fun (id : Model.Actor.PlayerID, player) ->
+        Map.toList
+        >> List.map(fun (id : PlayerID, player) ->
             (id.Value, fromModel player)
         )
-        >> Map.ofList
+
+
+type AreaSkillEmitView = {
+   baseView : ObjectBaseView
+   frameCurrent : uint32
+   frameFirst : uint32
+}
+
+module AreaSkillEmitView =
+    open WhiteDungeon.Core.Game.Model.Skill
+
+    let inline fromModel (areaSkill : Model.Skill.AreaSkill) =
+        {
+            baseView = ObjectBaseView.fromModel areaSkill.objectBase
+            frameCurrent = areaSkill.frame
+            frameFirst = areaSkill.frameFirst
+        }
+
+    let fromModels : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
+        Map.toList
+        >> List.map (fun (id, a) -> (id, fromModel a))
 
 
 type CameraView = {
@@ -54,12 +80,13 @@ type CameraView = {
 }
 
 module CameraView =
-    let init position = {
+    let inline init position = {
         position = position
     }
 
-    let fromPlayers (players : (Model.Actor.PlayerID * Model.Actor.Player) list) =
+    let inline fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
         players
+        |> Map.toList
         |> List.sortBy (fun (id, _) -> id.Value)
         |> List.map (fun (_, p) -> p.actor.objectBase.position)
         |> List.map init
@@ -69,13 +96,14 @@ module CameraView =
 type ViewModel = {
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
+    areaPlayer : UpdaterViewModel<AreaSkillEmitView>
+    areaEnemy : UpdaterViewModel<AreaSkillEmitView>
+    areaAll : UpdaterViewModel<AreaSkillEmitView>
 }
 
 
-open WhiteDungeon.Core.Game.Model
-
 module ViewModel =
-    let selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
+    let inline selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
         viewModel.players
 
     let view (model : Model) : ViewModel = {
@@ -84,10 +112,27 @@ module ViewModel =
             |> CameraView.fromPlayers
 
         players = {
-            nextID = model.nextPlayerID
             objects =
                 model
                 |> Model.players
                 |> PlayerView.playersView
+        }
+
+        areaPlayer = {
+            objects =
+                model.skillList.areaPlayer
+                |> AreaSkillEmitView.fromModels
+        }
+
+        areaEnemy = {
+            objects =
+                model.skillList.areaEnemy
+                |> AreaSkillEmitView.fromModels
+        }
+
+        areaAll = {
+            objects =
+                model.skillList.areaAll
+                |> AreaSkillEmitView.fromModels
         }
     }

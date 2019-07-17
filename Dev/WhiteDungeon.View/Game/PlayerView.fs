@@ -2,44 +2,84 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
+open WhiteDungeon.Core.Game
 open WhiteDungeon.View
-open WhiteDungeon.View.Utils.Math
+open wraikny.MilleFeuille.Fs.Math
+open wraikny.MilleFeuille.Fs.Geometry
+open WhiteDungeon.View.Utils.Color
 
 
-type PlayerView() =
-    inherit asd.GeometryObject2D(
-        Color = ColorPalette.sumire
-    )
+type PlayerView(gameViewSetting) =
+    // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
+    inherit asd.TextureObject2D()
 
-    let mutable lastSize = Vec2.zero()
-    let mutable lastPosition = Vec2.zero()
+    let gameViewSetting : Setting.GameViewSetting = gameViewSetting
 
-    let rect = new asd.RectangleShape()
 
-    interface IObjectUpdatee<Game.ViewModel.PlayerView> with
+    let mutable lastPosition = Vector.zero()
+    let mutable lastSize = Vector.zero()
+    let mutable lastDirection = Model.MoveDirection.Front
+    let mutable lastOccupation = None
+
+    interface IObserver<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.actorView.objectBaseView
 
             let area = objectBase.area
 
-            if area.position <> lastPosition then
-                this.SetPosition(area.position)
+            this.SetPosition(area.position)
 
-            if area.size <> lastSize then
-                this.SetSize(area.size)
+            this.SetSize(area.size)
+
+            this.SetDirection(viewModel.actorView.objectBaseView.direction)
+
+            this.SetOccupation(viewModel.character.currentOccupation)
 
 
-    override this.OnAdded() =
-        this.Shape <- rect
+    //override this.OnAdded() =
+    //    this.Shape <- rect
         
 
     member this.SetPosition(pos) =
-        lastPosition <- pos
-        this.Position <- Vec2.toVector2DF pos
+        if pos <> lastPosition then
+            lastPosition <- pos
+            this.Position <- Vec2.toVector2DF pos
 
     member this.SetSize(size) =
-        let size = Vec2.toVector2DF size
-        rect.DrawingArea <- new asd.RectF(new asd.Vector2DF(0.0f, 0.0f), size)
+        if size <> lastSize then
+            lastSize <- size
+            this.SetScale()
+
+    member this.SetDirection(dir) =
+        if dir <> lastDirection then
+            lastDirection <- dir
+
+            this.SetTexture()
+
+    member this.SetOccupation(occupation) =
+        if Some occupation <> lastOccupation then
+            lastOccupation <- Some occupation
+
+            this.SetTexture()
+
+    member this.SetTexture() =
+        lastOccupation |> function
+        | None -> ()
+        | Some occupation ->
+            let path =
+                gameViewSetting.occupationImages
+                |> Map.find occupation
+                |> Setting.ActorImages.fromDirection lastDirection
+
+            this.Texture <- asd.Engine.Graphics.CreateTexture2D(path)
+
+            this.SetScale()
+
+    member this.SetScale() =
+        if this.Texture <> null then
+            let texSize = this.Texture.Size
+            this.Scale <- (lastSize |> Vec2.toVector2DF) / texSize.To2DF()

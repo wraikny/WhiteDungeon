@@ -15,10 +15,3 @@ type ViewSetting = {
     button2 : asd.Vector2DF
     button3 : asd.Vector2DF
 }
-
-module ColorPalette =
-    let ume = new asd.Color(234uy, 173uy, 189uy)
-
-    let sumire = new asd.Color(85uy, 69uy, 98uy)
-
-    let sakura = new asd.Color(250uy, 219uy, 224uy)

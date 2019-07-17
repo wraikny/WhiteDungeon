@@ -6,36 +6,39 @@ open WhiteDungeon.Core.Game
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
+open wraikny.Tart.Helper.Collections
 
 type DungeonView = {
-    largeRooms : float32 Rect list
-    smallRooms : float32 Rect list
-    corridors : float32 Rect list
+    largeRooms : float32 Vec2 Rect list
+    smallRooms : float32 Vec2 Rect list
+    corridors : float32 Vec2 Rect list
 }
 
 module DungeonView =
-    let private roomsToList cellSize =
-        Map.toList
+    let inline private roomsToList cellSize =
+        HashMap.toList
         >> List.map (snd >> fun (space : Dungeon.Space) ->
             space.rect
-            |> Rect.map (GameSetting.fromDungeonCell cellSize)
+            |> Rect.map (Dungeon.DungeonModel.cellToCoordinate cellSize)
         )
 
-    let fromModel (gameSetting : GameSetting) (dungeonModel : Dungeon.DungeonModel) = {
+    let inline fromModel (model : Model.Model) = {
         largeRooms =
-            dungeonModel.largeRooms
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.largeRooms
+            |> roomsToList model.gameSetting.dungeonCellSize
             
         smallRooms =
-            dungeonModel.smallRooms
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.smallRooms
+            |> roomsToList model.gameSetting.dungeonCellSize
 
         corridors =
-            dungeonModel.corridors
-            |> roomsToList gameSetting.dungeonCellSize
+            model.dungeonModel.corridors
+            |> roomsToList model.gameSetting.dungeonCellSize
     }
 
+open WhiteDungeon.Core.Game.Model
 
-[<Struct>]
+
 type ViewMsg =
     | GenerateDungeonView of DungeonView
+    | AppendSkills of Skill.SkillEmit list

@@ -170,6 +170,7 @@ type SelectButtonRectangle(name, size, font) =
 
 
 open WhiteDungeon.View
+open WhiteDungeon.View.Utils.Color
 
 
 module ButtonRectangle =
@@ -197,7 +198,7 @@ module ButtonRectangle =
 
         button
 
-    let create text font position size =
+    let inline create text font position size =
         new SelectButtonRectangle(
             text + "_Button" 
             , size

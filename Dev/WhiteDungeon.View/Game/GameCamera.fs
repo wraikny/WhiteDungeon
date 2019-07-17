@@ -2,12 +2,12 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper
+open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
-open WhiteDungeon.Core
-open WhiteDungeon.View.Utils.Math
+open WhiteDungeon.Core.Game
+open wraikny.MilleFeuille.Fs.Math
 
 type GameCamera() =
     inherit asd.CameraObject2D(
@@ -18,18 +18,15 @@ type GameCamera() =
     )
 
 
-    let mutable srcPosition = Vec2.zero()
+    let mutable srcPosition = Vector.zero()
 
     member val Zoom = 1.0f with get, set
 
-    interface IObserver<Main.ViewModel> with
-        member this.UpdateFromNotify(viewModel) =
-            viewModel |> function
-            | Main.ViewModel.GameViewModel viewModel ->
-                let cameraView = viewModel.camera |> List.head
-                this.SetSrc(cameraView.position |> Vec2.map int)
-
-            | _ -> ()
+    interface IObserver<ViewModel.ViewModel> with
+        member this.Update(viewModel) =
+            // TODO
+            let cameraView = viewModel.camera |> List.head
+            this.SetSrc(cameraView.position |> Vec2.map int)
 
 
     member this.SetSrc(srcPos) =

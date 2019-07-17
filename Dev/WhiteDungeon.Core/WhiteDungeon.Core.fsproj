@@ -40,29 +40,56 @@
   <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
     <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
+    <Compile Include="Utils\Math.fs" />
+    <Compile Include="Model\Alias.fs" />
+    <Compile Include="Model\GameObject.fs" />
     <Compile Include="Model\GameSetting.fs" />
-    <Compile Include="Model\Character.fs" />
     <Compile Include="Model\SavedData.fs" />
+    <Compile Include="Game\Model\Alias.fs" />
     <Compile Include="Game\Model\ObjectBase.fs" />
     <Compile Include="Game\Model\Actor\Actor.fs" />
     <Compile Include="Game\Model\Actor\Player.fs" />
+    <Compile Include="Game\Model\Actor\Enemy.fs" />
+    <Compile Include="Game\Model\Skill\Skill.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />
     <Compile Include="Game\Update\ObjectBase.fs" />
     <Compile Include="Game\Update\Actor\Actor.fs" />
     <Compile Include="Game\Update\Actor\Player.fs" />
+    <Compile Include="Game\Update\Actor\Enemy.fs" />
+    <Compile Include="Game\Update\Skill\Skill.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
-    <Compile Include="Preparation\Model.fs" />
-    <Compile Include="Preparation\Msg.fs" />
-    <Compile Include="Preparation\Update.fs" />
-    <Compile Include="Preparation\View.fs" />
-    <Compile Include="Main.fs" />
+    <Compile Include="QuickPlay\Model.fs" />
+    <Compile Include="QuickPlay\Msg.fs" />
+    <Compile Include="QuickPlay\Update.fs" />
+    <Compile Include="QuickPlay\View.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
@@ -73,18 +100,26 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Tart.Advanced">
-      <HintPath>..\Lib\Tart.Advanced.dll</HintPath>
-    </Reference>
-    <Reference Include="Tart.Core">
-      <HintPath>..\Lib\Tart.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Tart.Helper">
-      <HintPath>..\Lib\Tart.Helper.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Advanced\Tart.Advanced.fsproj">
+      <Name>Tart.Advanced</Name>
+      <Project>{ce58dc38-831b-4bd5-87cb-bf861687a3bf}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Core\Tart.Core.fsproj">
+      <Name>Tart.Core</Name>
+      <Project>{8c6e9ecf-5f33-47a3-ae3f-b9a77bd4f544}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Helper\Tart.Helper.fsproj">
+      <Name>Tart.Helper</Name>
+      <Project>{bf0abcce-5659-43b8-a783-6dd55180aacc}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
