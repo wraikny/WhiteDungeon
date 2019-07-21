@@ -5,6 +5,8 @@ open wraikny.Tart.Helper.Geometry
 
 open WhiteDungeon.Core.Model
 
+open FSharpPlus
+
 [<Struct>]
 type MoveDirection =
     | Front
@@ -57,7 +59,7 @@ module MoveDirection =
         | BackRight -> (1, -1)
         | BackLeft -> (-1, -1)
         |> Vec2.init
-        |> Vec2.map float32
+        |>> float32
         |> Vector.normalize
 
 

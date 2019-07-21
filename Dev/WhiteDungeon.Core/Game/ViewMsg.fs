@@ -8,6 +8,8 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open wraikny.Tart.Helper.Collections
 
+open FSharpPlus
+
 type DungeonView = {
     largeRooms : float32 Vec2 Rect list
     smallRooms : float32 Vec2 Rect list
@@ -17,9 +19,9 @@ type DungeonView = {
 module DungeonView =
     let inline private roomsToList cellSize =
         HashMap.toList
-        >> List.map (snd >> fun (space : Dungeon.Space) ->
+        >> map (snd >> fun (space : Dungeon.Space) ->
             space.rect
-            |> Rect.map (Dungeon.DungeonModel.cellToCoordinate cellSize)
+            |>> Dungeon.DungeonModel.cellToCoordinate cellSize
         )
 
     let inline fromModel (model : Model.Model) = {

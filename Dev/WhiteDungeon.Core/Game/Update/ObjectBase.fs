@@ -9,6 +9,8 @@ open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+open FSharpPlus
+
 let inline setPosition position (obj : ObjectBase) = {
     obj with
         position = position
@@ -83,7 +85,7 @@ let private moveWithBS
 
     let isCollided =
         objectAreaPoints
-        |> Array.map ((+) diff)
+        |>> ((+) diff)
         |> isInside
         |> not
 
@@ -93,7 +95,7 @@ let private moveWithBS
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
                     objectAreaPoints
-                    |> Array.map ((+) newDiff)
+                    |>> ((+) newDiff)
                     |> isInside
                 )
                 diff

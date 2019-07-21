@@ -9,6 +9,8 @@ open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core.Game
 open wraikny.MilleFeuille.Fs.Math
 
+open FSharpPlus
+
 type GameCamera() =
     inherit asd.CameraObject2D(
         Dst = new asd.RectI(
@@ -25,8 +27,8 @@ type GameCamera() =
     interface IObserver<ViewModel.ViewModel> with
         member this.Update(viewModel) =
             // TODO
-            let cameraView = viewModel.camera |> List.head
-            this.SetSrc(cameraView.position |> Vec2.map int)
+            let cameraView = viewModel.camera |> head
+            this.SetSrc(cameraView.position |>> int)
 
 
     member this.SetSrc(srcPos) =

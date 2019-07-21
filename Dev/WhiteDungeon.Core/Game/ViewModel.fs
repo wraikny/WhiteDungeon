@@ -7,9 +7,10 @@ open WhiteDungeon.Core.Game
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Game.Model
+
+open FSharpPlus
 
 
 type ObjectBaseView = {
@@ -49,7 +50,7 @@ module PlayerView =
 
     let playersView =
         Map.toList
-        >> List.map(fun (id : PlayerID, player) ->
+        >> map(fun (id : PlayerID, player) ->
             (id.Value, fromModel player)
         )
 
@@ -72,7 +73,7 @@ module AreaSkillEmitView =
 
     let fromModels : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
         Map.toList
-        >> List.map (fun (id, a) -> (id, fromModel a))
+        >> map (fun (id, a) -> (id, fromModel a))
 
 
 type CameraView = {
@@ -87,9 +88,8 @@ module CameraView =
     let inline fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
         players
         |> Map.toList
-        |> List.sortBy (fun (id, _) -> id.Value)
-        |> List.map (fun (_, p) -> p.actor.objectBase.position)
-        |> List.map init
+        |> sortBy (fun (id, _) -> id.Value)
+        |>> ((fun (_, p) -> p.actor.objectBase.position) >> init)
 
 
 

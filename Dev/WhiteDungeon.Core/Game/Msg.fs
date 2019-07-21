@@ -5,6 +5,8 @@ open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 
+open FSharpPlus
+
 
 [<Struct>]
 type ActorMove =
@@ -52,11 +54,11 @@ module PlayerInput =
 
         let direction =
             moveDirs
-            |> Array.filter(fun (key, _) ->
+            |> filter (fun (key, _) ->
                 inputSet |> Set.contains key
             )
-            |> Array.map snd
-            |> Array.fold (+) (Vector.zero())
+            |>> snd
+            |> fold (+) (Vector.zero())
             |> Vector.normalize
     
         actorMove, direction

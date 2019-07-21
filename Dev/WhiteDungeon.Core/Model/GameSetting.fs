@@ -2,6 +2,8 @@
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
+
+open FSharpPlus
 // open WhiteDungeon.Core.Model
 
 //type Calcs =
@@ -37,4 +39,4 @@ module GameSetting =
             dungeonModel.cells
             |> HashMap.containsKey cell
         )
-        >> Array.fold (&&) true
+        >> fold (&&) true

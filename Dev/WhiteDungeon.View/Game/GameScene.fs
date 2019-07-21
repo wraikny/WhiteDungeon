@@ -18,6 +18,8 @@ open WhiteDungeon.View.Utils.Color
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 
+open FSharpPlus
+
 
 [<Class>]
 type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
@@ -136,7 +138,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
             skillAreaEnemyUpdater
             skillAreaAllUpdater
         |]
-        |> Seq.iter(fun u -> skillEffectsLayer.AddComponent(u, u.Name))
+        |> iter(fun u -> skillEffectsLayer.AddComponent(u, u.Name))
             
 
         skillEffectsLayer.AddObject(skillEffectsCamera)
@@ -188,15 +190,15 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
     member this.PushControllerInput() : bool =
         controllers
-        |> Array.map(fun (id, controller) ->
+        |>> fun (id, controller) ->
             let getStateIs (state : asd.ButtonState) key =
                 controller.GetState(key)
                 |> Option.ofNullable
-                |> Option.map ((=) state)
+                |>> ((=) state)
                 |> Option.defaultValue false
 
             Msg.PlayerInput.inputs
-            |> List.filter (getStateIs asd.ButtonState.Hold)
+            |> filter (getStateIs asd.ButtonState.Hold)
             |> function
             | [] -> false
             | inputs ->
@@ -204,8 +206,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
                 |> messenger.Enqueue
 
                 true
-        )
-        |> Array.fold (||) false
+        |> fold (||) false
 
 
     member this.AddDungeonView(gameModel : Model.Model) =

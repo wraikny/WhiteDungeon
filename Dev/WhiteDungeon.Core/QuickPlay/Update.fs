@@ -2,7 +2,6 @@
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Monad
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
@@ -11,6 +10,8 @@ open wraikny.Tart.Advanced
 
 open WhiteDungeon.Core
 
+open FSharpPlus
+open wraikny.Tart.Helper.Extension
 
 let incrPlayer (model : Model) : Model * Cmd<Msg, _> =
     let playerCount =
@@ -75,9 +76,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             let allPlayersSelectedChatacer =
                 model.players
                 |> Map.toList
-                |> List.take model.playerCount
-                |> List.map(snd)
-                |> List.exists(fun id -> snd id = None)
+                |> take model.playerCount
+                |>> snd
+                |> exists(snd >> (=) None)
                 |> not
 
             if allPlayersSelectedChatacer then
@@ -116,7 +117,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
             let targetPosition =
                 targetRoom.rect
-                |> Rect.map fromCell
+                |>> fromCell
                 |> Rect.centerPosition
             
             // TODO
@@ -124,8 +125,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 model.players
                 |> Map.toList
                 |> List.indexed
-                |> Seq.filterMap(fun (index, (id, (name, occupation))) ->
-                    maybe {
+                |> filterMap(fun (index, (id, (name, occupation))) ->
+                    monad {
                         let! occupation = occupation
                         let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
                         let character : Model.Character = {

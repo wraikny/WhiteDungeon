@@ -8,6 +8,8 @@ open WhiteDungeon.Core.Game.Model.Skill
 
 open WhiteDungeon.Core.Game.Update
 
+open FSharpPlus
+
 
 module Update =
     let inline incrCount (model : Model) : Model =
@@ -22,16 +24,13 @@ module Update =
 
     let inline updateEachPlayer f (model : Model) : Model =
         model
-        |> setPlayers(
-            model.players
-            |> Map.map(fun _ x -> f x)
-        )
+        |> setPlayers(f <!> model.players)
 
 
     let updatePlayerOf id f (model : Model) =
         model.players
         |> Map.tryFind id
-        |> Option.map (fun player ->
+        |>> (fun player ->
             model
             |> updatePlayers (Map.add id (f player))
         )
@@ -41,7 +40,7 @@ module Update =
         model with
             enemies =
                 model.enemies
-                |> Map.map(fun _ x -> f x)
+                |>> f
     }
 
     open wraikny.Tart.Helper.Math
@@ -55,7 +54,7 @@ module Update =
         model
         |> updateSkillList (
             skills
-            |> Seq.map(fun (a, b) -> Skill.SkillEmitBuilder.build a b)
+            |>> fun (a, b) -> Skill.SkillEmitBuilder.build a b
             |> Skill.SkillList.append
         )
 
@@ -180,7 +179,7 @@ module Update =
                         for _ in 1..10 -> Skill.Stay
                         for _ in 1..60 -> Skill.Move(dir *. 5.0f)
                         for _ in 1..60 -> Skill.Scale(Vec2.init(3.0f, 3.0f))
-                    } |> Seq.toList
+                    } |> toList
                 } |> Skill.AreaBuilder
 
             let emits = [player0.actor, emit]
