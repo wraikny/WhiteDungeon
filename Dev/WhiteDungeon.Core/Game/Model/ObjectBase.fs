@@ -6,7 +6,6 @@ open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
 
 open FSharpPlus
-open FSharpPlus.Math.Applicative
 
 [<Struct>]
 type MoveDirection =

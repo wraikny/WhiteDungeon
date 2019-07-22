@@ -5,7 +5,6 @@ open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
-open FSharpPlus.Math.Applicative
 
 let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
     { actor with objectBase = objectBase }
