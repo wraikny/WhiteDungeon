@@ -34,7 +34,7 @@ let insideDungeon
     (dungeonModel : Dungeon.DungeonModel) obj =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
     
     GameSetting.insideDungeon
         gameSetting
@@ -43,18 +43,18 @@ let insideDungeon
 
 open WhiteDungeon.Core.Utils
 
-let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
-    BinarySearch.vector
+let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
+    BinarySearch.binarySearch
         bsCount
         isInside
         currentPosition
         (currentPosition + diff)
 
-let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
+let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     let searchDiff =
         (+) currentPosition
         >>
-        BinarySearch.vector
+        BinarySearch.binarySearch
             bsCount
             isInside
             currentPosition
@@ -67,7 +67,7 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
         searchDiff { diff with x = 0.0f }
         |> Vec2.y
 
-    Vec2.init(diffX, diffY)
+    Vec2.init diffX diffY
 
 let private moveWithBS
     f
@@ -77,7 +77,7 @@ let private moveWithBS
     =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 

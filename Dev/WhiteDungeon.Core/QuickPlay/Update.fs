@@ -143,7 +143,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         let player =
                             Game.Model.Actor.Player.init
                                 size
-                                (targetPosition - (Vec2.init(float32 index, 0.0f) * size))
+                                (targetPosition - (Vec2.init (float32 index) 0.0f) * size)
                                 status
                                 (Game.Model.PlayerID id)
                                 character

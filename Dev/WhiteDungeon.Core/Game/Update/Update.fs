@@ -9,7 +9,7 @@ open WhiteDungeon.Core.Game.Model.Skill
 open WhiteDungeon.Core.Game.Update
 
 open FSharpPlus
-
+open FSharpPlus.Math.Applicative
 
 module Update =
     let inline incrCount (model : Model) : Model =
@@ -105,7 +105,7 @@ module Update =
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
             
             let model =
-                if direction <> Vector.zero() then
+                if direction <> zero then
                     model
                     |> updatePlayerOf id (
                         Update.Actor.Player.updateActor <|
@@ -132,7 +132,7 @@ module Update =
 
             let pos =
                 player0.actor.objectBase.position
-                + (100.0f .* dir)
+                + (100.0f *. dir)
 
             //let emit : Skill.Skill.EmitBase = {
             //    invokerActor = player0.actor
@@ -168,7 +168,7 @@ module Update =
                                 )
                             |]
                         }
-                    objectBase = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
+                    objectBase = ObjectBase.init (one .* 100.0f) pos
 
                     target = Skill.AreaTarget.Enemies
 
@@ -177,8 +177,8 @@ module Update =
 
                     move = seq {
                         for _ in 1..10 -> Skill.Stay
-                        for _ in 1..60 -> Skill.Move(dir *. 5.0f)
-                        for _ in 1..60 -> Skill.Scale(Vec2.init(3.0f, 3.0f))
+                        for _ in 1..60 -> Skill.Move(dir .* 5.0f)
+                        for _ in 1..60 -> Skill.Scale(one .* 5.0f)
                     } |> toList
                 } |> Skill.AreaBuilder
 

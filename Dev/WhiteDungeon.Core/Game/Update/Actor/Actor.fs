@@ -4,6 +4,9 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
+open FSharpPlus
+open FSharpPlus.Math.Applicative
+
 let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
     { actor with objectBase = objectBase }
 
@@ -49,7 +52,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
         Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
-            (speed .* direction)
+            (speed *. direction)
         >> fst
     )
 

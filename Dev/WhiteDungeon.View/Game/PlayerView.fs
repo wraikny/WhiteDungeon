@@ -12,6 +12,8 @@ open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.View.Utils.Color
 
+open FSharpPlus
+
 
 type PlayerView(gameViewSetting) =
     // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
@@ -20,8 +22,8 @@ type PlayerView(gameViewSetting) =
     let gameViewSetting : Setting.GameViewSetting = gameViewSetting
 
 
-    let mutable lastPosition = Vector.zero()
-    let mutable lastSize = Vector.zero()
+    let mutable lastPosition = zero
+    let mutable lastSize = zero
     let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
 

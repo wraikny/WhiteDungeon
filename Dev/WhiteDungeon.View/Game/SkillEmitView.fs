@@ -12,17 +12,19 @@ open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
+open FSharpPlus
+
 type SkillEmitView(gameViewSetting) =
     inherit asd.GeometryObject2D()
 
     let rect = new asd.RectangleShape()
-    let mutable lastPosition = Vector.zero()
-    let mutable lastSize = Vector.zero()
+    let mutable lastPosition = zero
+    let mutable lastSize = zero
 
     let mutable lastFrameCurrent = 0u
     let mutable lastFrameFirst = 0u
 
-    let mutable lastColor = Vec4.init(255uy, 0uy, 0uy, 255uy)
+    let mutable lastColor = Vec4.init 255uy 0uy 0uy 255uy
 
     override this.OnAdded() =
         this.Shape <- rect

@@ -24,11 +24,11 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     let viewSetting = viewSetting
 
     let gameSetting : Model.GameSetting = {
-        dungeonCellSize = Vec2.init(200.0f, 200.0f)
+        dungeonCellSize = Vec2.init 200.0f 200.0f
         minPlayerCount = 1
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
-        characterSize = Vec2.init(100.0f, 100.0f)
+        characterSize = Vec2.init 100.0f 100.0f
         occupationDefaultStatus = [
             Model.Hunter, ({
                 level = 1
