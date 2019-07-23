@@ -27,7 +27,7 @@ type PlayerView(gameViewSetting) =
     let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
 
-    interface IObserver<Game.ViewModel.PlayerView> with
+    interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.actorView.objectBaseView
 

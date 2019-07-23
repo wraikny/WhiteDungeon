@@ -98,6 +98,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 model, Cmd.none
 
         | GeneratedDungeonModel dungeonModel ->
+        
             let largeRooms =
                 dungeonModel.largeRooms
                 |> HashMap.toList

@@ -9,6 +9,8 @@ open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core.Game
 open wraikny.MilleFeuille.Fs.Math
 
+open System
+
 open FSharpPlus
 
 type GameCamera() =
@@ -24,11 +26,14 @@ type GameCamera() =
 
     member val Zoom = 1.0f with get, set
 
-    interface IObserver<ViewModel.ViewModel> with
-        member this.Update(viewModel) =
+    interface IObserver<ViewModel.CameraView list> with
+        member this.OnNext(cameras) =
             // TODO
-            let cameraView = viewModel.camera |> head
+            let cameraView = cameras |> head
             this.SetSrc(cameraView.position |>> int)
+
+        member __.OnError(e) = raise e
+        member __.OnCompleted() = printfn "GameCamera Completed"
 
 
     member this.SetSrc(srcPos) =

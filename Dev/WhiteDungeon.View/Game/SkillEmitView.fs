@@ -31,7 +31,7 @@ type SkillEmitView(gameViewSetting) =
         this.Color <- lastColor |> Vec4.toColor
 
 
-    interface IObserver<Game.ViewModel.AreaSkillEmitView> with
+    interface IUpdatee<Game.ViewModel.AreaSkillEmitView> with
         member this.Update(viewModel) =
             let objectBase = viewModel.baseView
             

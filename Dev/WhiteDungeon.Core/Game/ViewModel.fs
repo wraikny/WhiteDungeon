@@ -103,36 +103,31 @@ type ViewModel = {
 
 
 module ViewModel =
-    let inline selectPlayers (viewModel : ViewModel) : UpdaterViewModel<PlayerView> =
-        viewModel.players
+    let inline getCameras v = v.camera
+    let inline getPlayers v = v.players
+    let inline getSkillAreaPlayer v = v.areaPlayer
+    let inline getSkillAreaEnemy v = v.areaEnemy
+    let inline getSkillAreaAll v = v.areaAll
 
     let view (model : Model) : ViewModel = {
         camera =
             model.players
             |> CameraView.fromPlayers
 
-        players = {
-            objects =
-                model
-                |> Model.players
-                |> PlayerView.playersView
-        }
+        players =
+            model
+            |> Model.players
+            |> PlayerView.playersView
 
-        areaPlayer = {
-            objects =
-                model.skillList.areaPlayer
-                |> AreaSkillEmitView.fromModels
-        }
+        areaPlayer =
+            model.skillList.areaPlayer
+            |> AreaSkillEmitView.fromModels
 
-        areaEnemy = {
-            objects =
-                model.skillList.areaEnemy
-                |> AreaSkillEmitView.fromModels
-        }
+        areaEnemy =
+            model.skillList.areaEnemy
+            |> AreaSkillEmitView.fromModels
 
-        areaAll = {
-            objects =
-                model.skillList.areaAll
-                |> AreaSkillEmitView.fromModels
-        }
+        areaAll =
+            model.skillList.areaAll
+            |> AreaSkillEmitView.fromModels
     }

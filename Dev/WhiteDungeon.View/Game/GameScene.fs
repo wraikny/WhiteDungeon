@@ -20,6 +20,11 @@ open wraikny.MilleFeuille.Fs.Geometry
 
 open FSharpPlus
 
+open System
+open System.Linq
+open System.Reactive
+open System.Reactive.Linq
+
 
 [<Class>]
 type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
@@ -63,30 +68,42 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
     |]
 
 
-    let playersUpdater : ActorsUpdater<ViewModel.ViewModel, PlayerView, ViewModel.PlayerView> =
-        ActorsUpdaterBuilder.build "PlayersUpdater" {
-            initActor = fun () -> new PlayerView(gameViewSetting)
-            selectActor = ViewModel.ViewModel.selectPlayers
-        }
+    let playersUpdater =
+        new ActorsUpdater<_, _>(
+            "PlayersUpdater", {
+                create = fun () -> new PlayerView(gameViewSetting)
+                onError = raise
+                onCompleted = fun () -> printfn "Completed PlayersUpdater"
+            }
+        )
 
-    let skillAreaPlayerUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "skillAreaPlayerUpdater" {
-            initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.areaPlayer
-        }
+    let skillAreaPlayerUpdater =
+        new ActorsUpdater<_, _>(
+            "SkillAreaPlayerUpdater", {
+                    create = fun () -> new SkillEmitView(gameViewSetting)
+                    onError = raise
+                    onCompleted = fun () -> printfn "Completed SkillAreaPlayerUpdater"
+                }
+            )
 
-    let skillAreaEnemyUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "skillAreaEnemyUpdater" {
-            initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.areaEnemy
-        }
+    let skillAreaEnemyUpdater =
+        new ActorsUpdater<_, _>(
+            "SkillAreaEnemyUpdater", {
+                create = fun () -> new SkillEmitView(gameViewSetting)
+                onError = raise
+                onCompleted = fun () -> printfn "Completed SkillAreaEnemyUpdater"
+            }
+        )
 
 
-    let skillAreaAllUpdater : ActorsUpdater<ViewModel.ViewModel, SkillEmitView, ViewModel.AreaSkillEmitView> =
-        ActorsUpdaterBuilder.build "skillAreaAllUpdater" {
-            initActor = fun () -> new SkillEmitView(gameViewSetting)
-            selectActor = fun vm -> vm.areaAll
-        }
+    let skillAreaAllUpdater =
+        new ActorsUpdater<_, _>(
+            "SkillAreaAllUpdater", {
+                create = fun () -> new SkillEmitView(gameViewSetting)
+                onError = raise
+                onCompleted = fun () -> printfn "Completed SkillAreaAllUpdater"
+            }
+        )
 
     let dungeonCamera = new GameCamera()
     //let minimapCamera =
@@ -143,19 +160,42 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
-        let notifier = notifier :> IObservable<_>
-        notifier.Add(dungeonCamera) |> ignore
-        // notifier.AddObserver(minimapCamera)
+
+        // Cameras
+        [
+            dungeonCamera
+            playerCamera
+            skillEffectsCamera
+        ]
+        |>> fun o ->
+            notifier
+                .Select(fun v -> ViewModel.ViewModel.getCameras v)
+                .Subscribe o
+        |> ignore
 
         // player
-        notifier.Add(playerCamera) |> ignore
-        notifier.Add(playersUpdater) |> ignore
+        notifier
+            .Select(fun v -> ViewModel.ViewModel.getPlayers v)
+            .Subscribe playersUpdater
+        |> ignore
 
         // Skill
-        notifier.Add(skillAreaPlayerUpdater) |> ignore
-        notifier.Add(skillAreaEnemyUpdater) |> ignore
-        notifier.Add(skillAreaAllUpdater) |> ignore
-        notifier.Add(skillEffectsCamera) |> ignore
+        notifier
+            .Select(fun v -> ViewModel.ViewModel.getSkillAreaPlayer v)
+            .Subscribe skillAreaPlayerUpdater
+        |> ignore
+
+        [
+            ViewModel.ViewModel.getSkillAreaPlayer, skillAreaPlayerUpdater
+            ViewModel.ViewModel.getSkillAreaEnemy, skillAreaEnemyUpdater
+            ViewModel.ViewModel.getSkillAreaAll, skillAreaAllUpdater
+        ]
+        |>> (fun (s, o) ->
+            notifier
+                .Select(fun v -> s v)
+                .Subscribe(o)
+        )
+        |> ignore
 
         messenger.SetPort(port)
         messenger.StartAsync() |> ignore

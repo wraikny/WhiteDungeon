@@ -21,8 +21,6 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
     let createTitleScene : ViewSetting -> asd.Scene = createTitleScene
 
-    let viewSetting = viewSetting
-
     let gameSetting : Model.GameSetting = {
         dungeonCellSize = Vec2.init 200.0f 200.0f
         minPlayerCount = 1
