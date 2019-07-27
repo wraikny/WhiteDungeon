@@ -1,9 +1,9 @@
 ﻿namespace WhiteDungeon.View.Title
 
 open wraikny
-open wraikny.MilleFeuille.Core.Object
+open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input.Controller
+open wraikny.MilleFeuille.Fs.Input
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
@@ -81,7 +81,7 @@ type TitleScene(viewSetting) =
 
         uiLayer.AddObject(gameButton)
 
-        let selecter = new Button.ControllerButtonSelecter(gameButton.Button)
+        let selecter = new ControllerButtonSelecter(gameButton.Button)
         
         selecter.AddController(keyboard) |> ignore
         

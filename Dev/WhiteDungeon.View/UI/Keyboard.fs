@@ -1,18 +1,18 @@
 ﻿namespace WhiteDungeon.View.UI
 
 open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input.Controller
+open wraikny.MilleFeuille.Fs.Input
 
 module Keybaord =
     let inline createUIKeyboard() =
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
             [|
-                Button.ControllerSelect.Up    , asd.Keys.W
-                Button.ControllerSelect.Down  , asd.Keys.S
-                Button.ControllerSelect.Right , asd.Keys.D
-                Button.ControllerSelect.Left  , asd.Keys.A
-                Button.ControllerSelect.Select, asd.Keys.Space
-                Button.ControllerSelect.Cancel, asd.Keys.Escape
+                ControllerSelect.Up    , asd.Keys.W
+                ControllerSelect.Down  , asd.Keys.S
+                ControllerSelect.Right , asd.Keys.D
+                ControllerSelect.Left  , asd.Keys.A
+                ControllerSelect.Select, asd.Keys.Space
+                ControllerSelect.Cancel, asd.Keys.Escape
             |]
         |> KeyboardBuilder.build

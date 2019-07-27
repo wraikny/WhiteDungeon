@@ -5,10 +5,9 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
 
-open wraikny.MilleFeuille.Core.Object
+open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Core.Object
+open wraikny.MilleFeuille.Fs
 open wraikny.MilleFeuille.Core.Input
 
 open WhiteDungeon.Core
@@ -152,8 +151,8 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         uiLayer.AddObject(startButton)
 
         titleButton.Button
-            .Chain(characterButton.Button, Button.ButtonDirection.Down)
-            .Chain(startButton.Button, Button.ButtonDirection.Down)
+            .Chain(characterButton.Button, ButtonDirection.Down)
+            .Chain(startButton.Button, ButtonDirection.Down)
             |> ignore
 
         titleButton.Button.add_OnReleasedEvent (fun _ ->
@@ -176,7 +175,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             messenger.Enqueue(QuickPlay.Msg.GenerateDungeon)
         )
 
-        let selecter = new Button.ControllerButtonSelecter( titleButton.Button )
+        let selecter = new ControllerButtonSelecter( titleButton.Button )
 
         selecter.AddController(keyboard) |> ignore
         

@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.View.UI
 
-open wraikny.MilleFeuille.Core.UI.Button
+open wraikny.MilleFeuille.Core.UI
 
 
 [<AbstractClass>]

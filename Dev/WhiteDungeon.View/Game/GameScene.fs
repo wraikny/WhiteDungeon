@@ -6,9 +6,9 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Core.Object
+open wraikny.MilleFeuille.Fs.Input
+open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Core.Input
-open wraikny.MilleFeuille.Fs.Input.Controller
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
@@ -60,7 +60,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
                 Game.Msg.DashKey  , asd.Keys.LeftShift
             ]
         |> KeyboardBuilder.build
-        :> Controller.IController<Game.Msg.PlayerInput>
+        :> IController<Game.Msg.PlayerInput>
         
 
     let controllers = [|
