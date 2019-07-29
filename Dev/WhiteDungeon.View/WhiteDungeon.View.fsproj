@@ -139,6 +139,21 @@
       <Project>{bf0abcce-5659-43b8-a783-6dd55180aacc}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj">
+      <Name>Tart.Advanced</Name>
+      <Project>{9cb5e16a-f983-4d20-8973-8674cbc01fe6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Core\Tart.Core.fsproj">
+      <Name>Tart.Core</Name>
+      <Project>{a2abe01d-ba74-477b-ba18-bccd0176af27}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj">
+      <Name>Tart.Helper</Name>
+      <Project>{933d2137-dab6-449c-830e-1b5ce882de19}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\WhiteDungeon.Core\WhiteDungeon.Core.fsproj">
       <Name>WhiteDungeon.Core</Name>
       <Project>{c7cd8b28-7d56-4bfa-a613-28e535426da9}</Project>
