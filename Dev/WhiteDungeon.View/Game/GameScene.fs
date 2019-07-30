@@ -42,12 +42,9 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
                 update = Update.Update.update
             }
 
-    let notifier = new Notifier<_, _, _>(messenger)
-
-    let port = {
-        new Port<_, ViewMsg.ViewMsg>(messenger) with
-        override __.OnPopMsg(msg) = ()
-    }
+    let port _ = ()
+    do
+        messenger.ViewMsg.Subscribe(port) |> ignore
 
     let gameKeybaord =
         KeyboardBuilder.init()
@@ -168,19 +165,19 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
             skillEffectsCamera
         ]
         |>> fun o ->
-            notifier
+            messenger.ViewModel
                 .Select(fun v -> ViewModel.ViewModel.getCameras v)
                 .Subscribe o
         |> ignore
 
         // player
-        notifier
+        messenger.ViewModel
             .Select(fun v -> ViewModel.ViewModel.getPlayers v)
             .Subscribe playersUpdater
         |> ignore
 
         // Skill
-        notifier
+        messenger.ViewModel
             .Select(fun v -> ViewModel.ViewModel.getSkillAreaPlayer v)
             .Subscribe skillAreaPlayerUpdater
         |> ignore
@@ -191,13 +188,13 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
             ViewModel.ViewModel.getSkillAreaAll, skillAreaAllUpdater
         ]
         |>> (fun (s, o) ->
-            notifier
+            messenger.ViewModel
                 .Select(fun v -> s v)
                 .Subscribe(o)
         )
         |> ignore
 
-        messenger.SetPort(port)
+
         messenger.StartAsync() |> ignore
 
     override this.OnDispose() =
@@ -205,8 +202,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
 
 
     override this.OnUpdated() =
-        port.Update()
-        notifier.Pull() |> ignore
+        messenger.NotifyView()
 
         #if DEBUG
         this.PushControllerInput() |> function

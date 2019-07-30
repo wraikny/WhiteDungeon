@@ -132,14 +132,11 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     //    |> Map.toList
     //    |> List.map snd
 
-    let port = {
-        new Port<_, _>(messenger) with
-        override __.OnPopMsg(msg) =
-            msg |> function
-            | QuickPlay.ChangeToGame(gameModel) ->
-                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
-                |> ignore
-    }
+    let port msg =
+        msg |> function
+        | QuickPlay.ChangeToGame(gameModel) ->
+            this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
+            |> ignore
     
 
     override this.OnRegistered() =
@@ -181,10 +178,8 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         
         uiLayer.AddComponent(selecter, "Selecter")
 
-        messenger.SetPort(port)
         messenger.StartAsync() |> ignore
 
 
     override this.OnUpdated() =
-        // notifier.Pull() |> ignore
-        port.Update()
+        messenger.NotifyView()
