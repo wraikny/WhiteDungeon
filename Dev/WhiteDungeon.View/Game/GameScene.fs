@@ -64,45 +64,52 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
         Game.Model.PlayerID 0u, gameKeybaord
     |]
 
+    let backLayer =
+        let color = new asd.Color(255uy, 255uy, 255uy)
+        new UI.BackGroundLayer(color)
 
-    let playersUpdater =
-        new ActorsUpdater<_, _>(
-            "PlayersUpdater", {
-                create = fun () -> new PlayerView(gameViewSetting)
-                onError = raise
-                onCompleted = fun () -> printfn "Completed PlayersUpdater"
-            }
-        )
+    let dungeonLayer = new asd.Layer2D()
 
-    let skillAreaPlayerUpdater =
-        new ActorsUpdater<_, _>(
-            "SkillAreaPlayerUpdater", {
-                    create = fun () -> new SkillEmitView(gameViewSetting)
+    let playerLayer = new asd.Layer2D()
+
+    let skillEffectsLayer = new asd.Layer2D()
+
+    let uiLayer = new asd.Layer2D()
+
+    do
+        // Players
+        messenger.ViewModel
+            .Select(fun v -> ViewModel.ViewModel.getPlayers v)
+            .Subscribe(
+            new ActorsUpdater<_, _>(
+                playerLayer, {
+                    create = fun () -> new PlayerView(gameViewSetting)
                     onError = raise
-                    onCompleted = fun () -> printfn "Completed SkillAreaPlayerUpdater"
+                    onCompleted = fun () -> printfn "Completed PlayersUpdater"
                 }
-            )
+            ))
+        |> ignore
 
-    let skillAreaEnemyUpdater =
-        new ActorsUpdater<_, _>(
-            "SkillAreaEnemyUpdater", {
-                create = fun () -> new SkillEmitView(gameViewSetting)
-                onError = raise
-                onCompleted = fun () -> printfn "Completed SkillAreaEnemyUpdater"
-            }
-        )
-
-
-    let skillAreaAllUpdater =
-        new ActorsUpdater<_, _>(
-            "SkillAreaAllUpdater", {
-                create = fun () -> new SkillEmitView(gameViewSetting)
-                onError = raise
-                onCompleted = fun () -> printfn "Completed SkillAreaAllUpdater"
-            }
-        )
+        // SkillEffects
+        [
+            ViewModel.ViewModel.getSkillAreaPlayer
+            ViewModel.ViewModel.getSkillAreaEnemy
+            ViewModel.ViewModel.getSkillAreaAll
+        ]
+        |>> fun s ->
+            messenger.ViewModel
+                .Select(fun v -> s v)
+                .Subscribe(
+                    new ActorsUpdater<_, _>(skillEffectsLayer, {
+                            create = fun () -> new SkillEmitView(gameViewSetting)
+                            onError = raise
+                            onCompleted = fun () -> printfn "Completed %A" s
+                    }))
+        |> ignore
 
     let dungeonCamera = new GameCamera()
+    let playerCamera = new GameCamera()
+    let skillEffectsCamera = new GameCamera()
     //let minimapCamera =
     //    new GameCamera(
     //        Zoom = 3.0f
@@ -116,49 +123,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
     //            )
     //        )
     //    )
-
-    let playerCamera = new GameCamera()
-
-    let skillEffectsCamera = new GameCamera()
-
-    let backLayer =
-        let color = new asd.Color(255uy, 255uy, 255uy)
-        new UI.BackGroundLayer(color)
-
-    let dungeonLayer = new asd.Layer2D()
-
-    let playerLayer = new asd.Layer2D()
-
-    let skillEffectsLayer = new asd.Layer2D()
-
-    let uiLayer = new asd.Layer2D()
-
-    override this.OnRegistered() =
-        this.AddLayer(backLayer)
-        this.AddLayer(dungeonLayer)
-        this.AddLayer(playerLayer)
-        this.AddLayer(skillEffectsLayer)
-        this.AddLayer(uiLayer)
-
-        this.AddDungeonView(gameModel)
-
-        dungeonLayer.AddObject(dungeonCamera)
-        // dungeonLayer.AddObject(minimapCamera)
-        playerLayer.AddComponent(playersUpdater, playersUpdater.Name)
-        playerLayer.AddObject(playerCamera)
-
-        [|
-            skillAreaPlayerUpdater
-            skillAreaEnemyUpdater
-            skillAreaAllUpdater
-        |]
-        |> iter(fun u -> skillEffectsLayer.AddComponent(u, u.Name))
-            
-
-        skillEffectsLayer.AddObject(skillEffectsCamera)
-
-
-        // Cameras
+    do
         [
             dungeonCamera
             playerCamera
@@ -170,30 +135,21 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
                 .Subscribe o
         |> ignore
 
-        // player
-        messenger.ViewModel
-            .Select(fun v -> ViewModel.ViewModel.getPlayers v)
-            .Subscribe playersUpdater
-        |> ignore
 
-        // Skill
-        messenger.ViewModel
-            .Select(fun v -> ViewModel.ViewModel.getSkillAreaPlayer v)
-            .Subscribe skillAreaPlayerUpdater
-        |> ignore
 
-        [
-            ViewModel.ViewModel.getSkillAreaPlayer, skillAreaPlayerUpdater
-            ViewModel.ViewModel.getSkillAreaEnemy, skillAreaEnemyUpdater
-            ViewModel.ViewModel.getSkillAreaAll, skillAreaAllUpdater
-        ]
-        |>> (fun (s, o) ->
-            messenger.ViewModel
-                .Select(fun v -> s v)
-                .Subscribe(o)
-        )
-        |> ignore
+    override this.OnRegistered() =
+        this.AddLayer(backLayer)
+        this.AddLayer(dungeonLayer)
+        this.AddLayer(playerLayer)
+        this.AddLayer(skillEffectsLayer)
+        this.AddLayer(uiLayer)
 
+        this.AddDungeonView(gameModel)
+
+        dungeonLayer.AddObject(dungeonCamera)
+        playerLayer.AddObject(playerCamera)
+        // dungeonLayer.AddObject(minimapCamera)
+        skillEffectsLayer.AddObject(skillEffectsCamera)
 
         messenger.StartAsync() |> ignore
 

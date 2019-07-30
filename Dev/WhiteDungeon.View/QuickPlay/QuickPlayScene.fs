@@ -69,10 +69,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     let viewSetting = viewSetting
     
     let messenger : IMessenger<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel> =
-        let model =
-            QuickPlay.Model.init
-                dungeonBuilder
-                gameSetting
+        let model = QuickPlay.Model.init dungeonBuilder gameSetting
 
         let model =
             { model with
@@ -83,13 +80,11 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
                 |> Map.ofList
             }
 
-        Messenger.buildMessenger
-            { seed = 0 }
-            {
-                init = model, Cmd.none
-                view = QuickPlay.ViewModel.view
-                update = QuickPlay.Update.update
-            }
+        Messenger.buildMessenger { seed = 0 } {
+            init = model, Cmd.none
+            view = QuickPlay.ViewModel.view
+            update = QuickPlay.Update.update
+        }
 
 
     // let notifier = new Notifier<QuickPlay.Msg, QuickPlay.ViewMsg, QuickPlay.ViewModel>(messenger)
@@ -132,11 +127,14 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
     //    |> Map.toList
     //    |> List.map snd
 
-    let port msg =
-        msg |> function
-        | QuickPlay.ChangeToGame(gameModel) ->
-            this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
-            |> ignore
+    do
+        messenger.ViewMsg
+            .Subscribe(function
+            | QuickPlay.ChangeToGame(gameModel) ->
+                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
+                |> ignore
+            )
+        |> ignore
     
 
     override this.OnRegistered() =
