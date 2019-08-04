@@ -1,4 +1,7 @@
-﻿namespace WhiteDungeon.View.Setting
+﻿namespace WhiteDungeon.View
+
+open wraikny.Tart.Helper
+open wraikny.Tart.Helper.Math
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
@@ -30,4 +33,28 @@ module ActorImages =
 
 type GameViewSetting = {
     occupationImages : Map<Occupation, ActorImages>
+}
+
+open wraikny.MilleFeuille.Fs.UI
+
+type MenuSceneSetting = {
+    backColor : byte Vec3
+    frameColor : byte Vec4
+    buttonColor : ButtonColor
+    
+#if !DEBUG
+    titleFont : string
+    buttonFont : string
+    textFont : string
+#endif
+}
+
+
+type AppSetting = {
+    windowSize : int Vec2
+
+    menuSceneSetting : MenuSceneSetting
+
+    gameViewSetting : GameViewSetting
+    gameSetting : GameSetting
 }

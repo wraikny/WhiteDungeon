@@ -31,7 +31,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
     inherit Scene()
 
     let viewSetting : ViewSetting = viewSetting
-    let gameViewSetting : Setting.GameViewSetting = gameViewSetting
+    let gameViewSetting : GameViewSetting = gameViewSetting
 
     let messenger : IMessenger<_, _, _> =
         Messenger.build

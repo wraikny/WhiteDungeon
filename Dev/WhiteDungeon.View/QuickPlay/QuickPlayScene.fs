@@ -36,7 +36,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         ] |> Map.ofList
     }
 
-    let gameViewSetting : Setting.GameViewSetting = {
+    let gameViewSetting : GameViewSetting = {
         occupationImages = [
             Model.Hunter, ({
                 front = "Image/Debug/down.png"
@@ -47,7 +47,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
                 backLeft = "Image/Debug/leftup.png"
                 right = "Image/Debug/right.png"
                 left = "Image/Debug/left.png"
-            } : Setting.ActorImages)
+            } : ActorImages)
         ] |> Map.ofList
     }
 

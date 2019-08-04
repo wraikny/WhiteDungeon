@@ -19,7 +19,7 @@ type PlayerView(gameViewSetting) =
     // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
     inherit asd.TextureObject2D()
 
-    let gameViewSetting : Setting.GameViewSetting = gameViewSetting
+    let gameViewSetting : GameViewSetting = gameViewSetting
 
 
     let mutable lastPosition = zero
@@ -75,7 +75,7 @@ type PlayerView(gameViewSetting) =
             let path =
                 gameViewSetting.occupationImages
                 |> Map.find occupation
-                |> Setting.ActorImages.fromDirection lastDirection
+                |> ActorImages.fromDirection lastDirection
 
             this.Texture <- asd.Engine.Graphics.CreateTexture2D(path)
 
