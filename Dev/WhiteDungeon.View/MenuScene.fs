@@ -24,6 +24,7 @@ module MenuScene =
     type CreditMode =
         | CreditProject
         | CreditLibs
+        | CreditBGM
 
 
     type UIMode =
@@ -73,6 +74,7 @@ module MenuScene =
             Button("もどる", SetUI Title)
             Button("制作", SetUI <| Credit CreditProject)
             Button("ライブラリ", SetUI <| Credit CreditLibs)
+            Button("BGM", SetUI <| Credit CreditBGM)
         ]
 
     let creditUIProj = [
@@ -89,11 +91,22 @@ module MenuScene =
         Separator
         WebsiteButton("FSharp.Core", "https://github.com/dotnet/fsharp")
         WebsiteButton("FSharpPlus", "https://github.com/fsprojects/FSharpPlus")
+        WebsiteButton("Altseed", "http://altseed.github.io/")
         WebsiteButton("Tart", "https://github.com/wraikny/Tart")
-        WebsiteButton("Altseed", "https://github.com/altseed/altseed")
         WebsiteButton("Mille Feuille", "https://github.com/wraikny/Mille-Feuille")
         Separator
     ]
+
+    let creditUIBGM = [
+        HeaderText "BGM"
+        Separator
+        Text "てすと"
+        Text "あああああ"
+        Text "あああああ"
+        Separator
+    ]
+
+    // https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ @LepusPluvia
 
 
     let view (model : Model) : Msg ViewModel =
@@ -104,6 +117,8 @@ module MenuScene =
             Window2(creditUISide, creditUIProj)
         | Credit CreditLibs ->
             Window2(creditUISide, creditUILibs)
+        | Credit CreditBGM ->
+            Window2(creditUISide, creditUIBGM)
         | _ ->
             Window1 []
 
