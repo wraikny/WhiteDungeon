@@ -30,8 +30,8 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             Model.Hunter, ({
                 level = 1
                 hp = 100.0f
-                walkSpeed = 4.0f
-                dashSpeed = 8.0f
+                walkSpeed = 10.0f
+                dashSpeed = 20.0f
             } : Model.ActorStatus)
         ] |> Map.ofList
     }
@@ -80,7 +80,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
                 |> Map.ofList
             }
 
-        Messenger.buildMessenger { seed = 0 } {
+        Messenger.build { seed = 0 } {
             init = model, Cmd.none
             view = QuickPlay.ViewModel.view
             update = QuickPlay.Update.update
@@ -164,7 +164,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             this.AddLayer <|
                 new UI.MessageLayer(
                     viewSetting,
-                    MessageText = "Loading Dungeon"
+                    MessageText = "Generating Dungeon"
                 )
             
             messenger.Enqueue(QuickPlay.Msg.GenerateDungeon)

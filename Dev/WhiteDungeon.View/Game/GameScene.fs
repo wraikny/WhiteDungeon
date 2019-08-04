@@ -34,7 +34,7 @@ type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
     let gameViewSetting : Setting.GameViewSetting = gameViewSetting
 
     let messenger : IMessenger<_, _, _> =
-        Messenger.buildMessenger
+        Messenger.build
             { seed = 0 }
             {
                 init = gameModel, Cmd.viewMsg [ViewMsg.GenerateDungeonView (ViewMsg.DungeonView.fromModel gameModel)]

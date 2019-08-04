@@ -21,28 +21,58 @@ type GameCamera() =
         )
     )
 
+    
+    let mutable targetPosition = ValueNone
+    let mutable currentPosition = ValueNone
 
-    let mutable srcPosition = zero
+    member val Zoom = 0.4f with get, set
+    member val Speed = 0.4f with get, set
 
-    member val Zoom = 1.0f with get, set
+    override this.OnUpdate() =
+        targetPosition
+        |> ValueOption.iter(fun targetPosition ->
+            currentPosition |> function
+            | ValueNone ->
+                this.SetSrc(targetPosition)
+                currentPosition <- ValueSome targetPosition
+
+            | ValueSome currentPosition' ->
+                let dir = targetPosition - currentPosition'
+                let length = Vector.length dir
+
+                let update(diff) =
+                    let nextPosition = currentPosition' + diff
+                    currentPosition <- ValueSome nextPosition
+                    this.SetSrc(nextPosition)
+                    
+                length |> function
+                | 0.0f -> ()
+                | x when x <= 1.0f ->
+                    currentPosition <- ValueSome targetPosition
+                    this.SetSrc(targetPosition)
+                | _ ->
+                    let diff = (Vector.normalize dir) .* this.Speed .* length
+                    let nextPosition = currentPosition' + diff
+                    currentPosition <- ValueSome nextPosition
+                    this.SetSrc(nextPosition)
+        )
 
     interface IObserver<ViewModel.CameraView list> with
         member this.OnNext(cameras) =
             // TODO
             let cameraView = cameras |> head
-            this.SetSrc(cameraView.position |>> int)
+            targetPosition <- ValueSome cameraView.position
 
         member __.OnError(e) = raise e
         member __.OnCompleted() = printfn "GameCamera Completed"
 
 
-    member this.SetSrc(srcPos) =
-        srcPosition <- srcPos
+    member this.SetSrc(srcPos : float32 Vec2) =
 
         let size = asd.Engine.WindowSize.To2DF() / this.Zoom
         let size = size.To2DI()
 
         this.Src <- new asd.RectI(
-            (Vec2.toVector2DI srcPos) - size / 2
+            (Vec2.toVector2DI (int <!> srcPos)) - size / 2
             , size
         )
