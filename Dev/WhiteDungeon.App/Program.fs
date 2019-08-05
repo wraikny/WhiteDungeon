@@ -84,7 +84,7 @@ let appSetting : View.AppSetting = {
                 level = 1
                 hp = 100.0f
                 walkSpeed = 10.0f
-                dashSpeed = 20.0f
+                dashSpeed = 15.0f
             } : Model.ActorStatus)
         #endif
         ] |> Map.ofList

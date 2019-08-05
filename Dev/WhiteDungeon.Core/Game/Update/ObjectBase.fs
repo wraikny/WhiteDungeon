@@ -73,7 +73,7 @@ let private moveWithBS
     f
     (gameSetting : Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
-    (diff) (obj : ObjectBase)
+    (diff0) (obj : ObjectBase)
     =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
@@ -85,7 +85,7 @@ let private moveWithBS
 
     let isCollided =
         objectAreaPoints
-        |>> ((+) diff)
+        |>> ((+) diff0)
         |> isInside
         |> not
 
@@ -98,14 +98,14 @@ let private moveWithBS
                     |>> ((+) newDiff)
                     |> isInside
                 )
-                diff
+                diff0
                 obj.position
         else
-            diff
+            diff0
     
     obj
     |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff), isCollided
+    |> setDirection (MoveDirection.fromVector diff0), isCollided
 
 let moveXYTogether = moveWithBS bsDiffXYTogether
 

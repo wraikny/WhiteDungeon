@@ -48,7 +48,7 @@ type MainScene(setting : AppSetting) =
         )
 
     let titleFont = createFont 80 ColorPalette.black
-    let headerFont = createFont 60 ColorPalette.black
+    let headerFont = createFont 50 ColorPalette.black
     #endif
 
     let createDynamicFont size color =
@@ -144,7 +144,7 @@ type MainScene(setting : AppSetting) =
         )
 
     let messenger =
-        Messenger.build { seed = 0 } {
+        Messenger.build { seed = Random().Next() } {
             init = initModel setting.gameSetting, Cmd.none
             update = update
             view = view

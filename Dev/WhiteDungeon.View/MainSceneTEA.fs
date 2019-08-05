@@ -85,7 +85,10 @@ let initModel (gameSetting : GameSetting) = {
     occupationListToggle = false
 
     playerName = "Player1"
-    selectOccupation = DebugOccupation
+    selectOccupation =
+        #if DEBUG
+        DebugOccupation
+        #endif
 
     dungeonBuilder = {
         seed = 0
@@ -236,17 +239,13 @@ let titleUI = [
 ]
 
 
-let selectUISide (_ : Model) =
-    seq {
-        yield! [
-            Button("もどる", SetUI Title)
-            Button("キャラクター", SetUI <| Select CharacterSelect)
-            Button("迷宮", SetUI <| Select DungeonSelect)
-        ]
+let selectUISide (_ : Model) = [
+    Button("もどる", SetUI Title)
+    Button("キャラクター", SetUI <| Select CharacterSelect)
+    Button("迷宮", SetUI <| Select DungeonSelect)
+    Button("始める", SetUI <| Select CheckSettiing)
+]
 
-        yield Button("始める", SetUI <| Select CheckSettiing)
-
-    } |> Seq.toList
 
 let playerView (model : Model) =
     let x = model.selectOccupation
@@ -261,10 +260,8 @@ let playerView (model : Model) =
 
 let selectUIChara (model : Model) : Msg MenuItem list =
     seq {
-        yield! [
-            HeaderText("キャラクター")
-            Separator
-        ]
+        yield HeaderText("キャラクター")
+        yield Separator
 
         if model.occupationListToggle then
             yield!
@@ -275,7 +272,6 @@ let selectUIChara (model : Model) : Msg MenuItem list =
                 )
 
             yield! [
-                Space 60.0f
                 Separator
                 Button("閉じる", OccupationListToggle false)
                 Separator
@@ -304,21 +300,21 @@ let dungeonView (model : Model) =
 
 
 let selectUIDungeon (model : Model) =
-    let db = model.dungeonBuilder
-    [
-        [
-            HeaderText "迷宮"
-            Separator
-        ]
-        dungeonView model
-        [
-            Separator
-            Button("サイズ1", SetDungeonParameters(100, 4, 8, 30.0f, 2))
-            Button("サイズ2", SetDungeonParameters(200, 6, 12, 60.0f, 2))
-            Button("サイズ3", SetDungeonParameters(300, 8, 16, 100.0f, 3))
-            Separator
-        ]
-    ] |> List.concat
+    seq {
+        yield HeaderText("迷宮")
+        yield Separator
+
+        yield! (dungeonView model)
+        for i in 1..3 ->
+            Button(sprintf "サイズ%d" i,
+                SetDungeonParameters(
+                    100 * i,
+                    2 * (i + 1),
+                    4 * (i + 1),
+                    33.3f * float32 i, 1 + i ))
+        yield Separator
+    }
+    |> Seq.toList
 
 
 let selectUICheck (model : Model) =
