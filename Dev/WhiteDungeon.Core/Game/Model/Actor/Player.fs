@@ -21,7 +21,7 @@ module Player =
     let inline objectBase (player : Player) = player.actor.objectBase
 
     let inline init size position actorStatus id character = {
-        actor = Actor.Actor.init size position (Actor.Player id) actorStatus
+        actor = Actor.Actor.init size position (Actor.OfPlayerID id) actorStatus
         id = id
         character = character
     }

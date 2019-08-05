@@ -4,130 +4,6 @@ open wraikny.Tart.Core
 open FSharpPlus
 
 
-module MenuScene =
-    type 'Msg MenuItem =
-        | TitleText of string
-        | HeaderText of string
-        | Text of string
-        | Button of string * 'Msg
-        | WebsiteButton of string * string
-        | InputField of int * string * (string -> 'Msg)
-        | Separator
-        | Space of float32
-
-
-    type 'Msg ViewModel =
-        | Window1 of 'Msg MenuItem list
-        | Window2 of 'Msg MenuItem list * 'Msg MenuItem list
-
-
-    type CreditMode =
-        | CreditProject
-        | CreditLibs
-        | CreditBGM
-
-
-    type UIMode =
-        | Title
-        | CharacterSelect
-        | Credit of CreditMode
-
-
-    type Msg =
-        | SetUI of UIMode
-
-
-    type ViewMsg = unit
-    
-    
-    type Model = {
-        uiMode : UIMode
-    }
-
-    let initModel = {
-        uiMode = Title
-    }
-
-
-    let setUI ui model = { model with uiMode = ui }
-
-
-    let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
-        msg |> function
-        | SetUI uiMode ->
-            model |> setUI uiMode, Cmd.none
-    
-
-    let titleUI = [
-            Space 50.0f
-            TitleText "九十九のラビリンス"
-            Text "C96体験版"
-            Text "Lepus Pluvia"
-            Separator
-            Button("始める", SetUI CharacterSelect)
-            Button("クレジット", SetUI <| Credit CreditProject)
-            Separator
-            Space 50.0f
-        ]
-
-    let creditUISide = [
-            Button("もどる", SetUI Title)
-            Button("制作", SetUI <| Credit CreditProject)
-            Button("ライブラリ", SetUI <| Credit CreditLibs)
-            Button("BGM", SetUI <| Credit CreditBGM)
-        ]
-
-    let creditUIProj = [
-        HeaderText "制作"
-        Separator
-        Text("Lepus Pluvia")
-        WebsiteButton("Website", "http://LepusPluvia.com")
-        WebsiteButton("Twitter", "http://twitter.com/LepusPluvia")
-        Separator
-    ]
-
-    let creditUILibs = [
-        HeaderText "ライブラリ"
-        Separator
-        WebsiteButton("FSharp.Core", "https://github.com/dotnet/fsharp")
-        WebsiteButton("FSharpPlus", "https://github.com/fsprojects/FSharpPlus")
-        WebsiteButton("Altseed", "http://altseed.github.io/")
-        WebsiteButton("Tart", "https://github.com/wraikny/Tart")
-        WebsiteButton("Mille Feuille", "https://github.com/wraikny/Mille-Feuille")
-        Separator
-    ]
-
-    let creditUIBGM = [
-        HeaderText "BGM"
-        Separator
-        Text "てすと"
-        Text "あああああ"
-        Text "あああああ"
-        Separator
-    ]
-
-    // https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ @LepusPluvia
-
-
-    let view (model : Model) : Msg ViewModel =
-        model.uiMode |> function
-        | Title ->
-            Window1 titleUI
-        | Credit CreditProject ->
-            Window2(creditUISide, creditUIProj)
-        | Credit CreditLibs ->
-            Window2(creditUISide, creditUILibs)
-        | Credit CreditBGM ->
-            Window2(creditUISide, creditUIBGM)
-        | _ ->
-            Window1 []
-
-    type WindowKind =
-        | W1
-        | W2
-
-
-
 open System
 
 open wraikny.Tart.Helper
@@ -141,10 +17,11 @@ open wraikny.MilleFeuille.Fs
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
+open WhiteDungeon.View.MainSceneTEA
 open WhiteDungeon.View.Utils.Color
 
 
-type MenuScene(setting : AppSetting) =
+type MainScene(setting : AppSetting) =
     inherit Scene()
 
     let menuSetting = setting.menuSceneSetting
@@ -172,10 +49,18 @@ type MenuScene(setting : AppSetting) =
 
     let titleFont = createFont 80 ColorPalette.black
     let headerFont = createFont 60 ColorPalette.black
-    let textFont = createFont 40 ColorPalette.black
-
-    let buttonFont = createFont 40 ColorPalette.sakura
     #endif
+
+    let createDynamicFont size color =
+        asd.Engine.Graphics.CreateDynamicFont(
+            menuSetting.inputFont,
+            size, color,
+            0, asd.Color()
+        )
+
+    let textFont = createDynamicFont 30 ColorPalette.black
+
+    let buttonFont = createDynamicFont 30 ColorPalette.sakura
 
     let inputFont =
         asd.Engine.Graphics.CreateDynamicFont(
@@ -221,7 +106,7 @@ type MenuScene(setting : AppSetting) =
         )
 
 
-    let window2Height = float32 setting.windowSize.y * 0.8f
+    let window2Height = float32 setting.windowSize.y * menuSetting.window2HeightRate
 
     let window2Margin = windowSize.x * menuSetting.window2MarginRate / 2.0f
     let window2Width a = windowSize.x * (menuSetting.windowWidthWRate * a / 3.0f) - window2Margin
@@ -260,64 +145,90 @@ type MenuScene(setting : AppSetting) =
 
     let messenger =
         Messenger.build { seed = 0 } {
-            init = MenuScene.initModel, Cmd.none
-            update = MenuScene.update
-            view = MenuScene.view
+            init = initModel setting.gameSetting, Cmd.none
+            update = update
+            view = view
         }
 
     let viewConverter item =
         item |> function
-        | MenuScene.TitleText text ->
+        | TitleText text ->
             UI.TextWith(text, titleFont)
-        | MenuScene.HeaderText text ->
+        | HeaderText text ->
             UI.TextWith(text, headerFont)
-        | MenuScene.Text text ->
+        | Text text ->
             UI.Text(text)
-        | MenuScene.Button(text, msg) ->
+        | Button(text, msg) ->
             UI.Button(text, fun() -> messenger.Enqueue(msg))
-        | MenuScene.WebsiteButton(text, url) ->
+        | WebsiteButton(text, url) ->
             UI.Button(text, fun() ->
                 Diagnostics.Process.Start(url) |> ignore
             )
-        | MenuScene.InputField(maxLength, placeHolder, msg) ->
-            UI.InputField(maxLength, placeHolder, fun s -> messenger.Enqueue(msg s))
-        | MenuScene.Separator ->
+        | InputField(maxLength, placeHolder, current, msg) ->
+            let text = if current = "" then None else Some current
+            UI.InputField(maxLength, placeHolder, text, fun s -> messenger.Enqueue(msg s))
+        | Separator ->
             UI.Rect(5.0f, 0.8f)
-        | MenuScene.Space x ->
+        | Space x ->
             UI.Space x
+
+    let mutable lastWindow = WindowKind.W1
+
+    let callbackAfterClosed (callBack : unit -> unit) =
+        lastWindow |> function
+        | W1 ->
+            uiWindowMain.Toggle(false, fun() ->
+                callBack()
+            )
+        | W2 ->
+            sideWindow.Toggle(false)
+            uiWindow2.Toggle(false, fun() ->
+                callBack()
+            )
     do
         messenger.Msg.Add(printfn "Msg: %A")
         messenger.ViewMsg.Add(printfn "Msg: %A")
 
-        let mutable lastWindow = MenuScene.WindowKind.W1
-
         messenger.ViewModel.Add(fun viewModel ->
             viewModel |> function
-            | MenuScene.Window1 items ->
+            | Window1 items ->
                 uiWindowMain.UIContents <- (map viewConverter items)
 
-                if lastWindow = MenuScene.WindowKind.W2 then
-                    lastWindow <- MenuScene.W1
 
-                    sideWindow.Toggle(false)
-                    uiWindow2.Toggle(false, fun () ->
+                if lastWindow = WindowKind.W2 then
+                    callbackAfterClosed(fun () ->
                         uiWindowMain.Toggle(true)
                     )
-            | MenuScene.Window2 (items1, items2) ->
+
+                lastWindow <- W1
+            | Window2 (items1, items2) ->
                 sideWindow.UIContents <- (map viewConverter items1)
                 uiWindow2.UIContents <- (map viewConverter items2)
 
-                if lastWindow = MenuScene.WindowKind.W1 then
-                    lastWindow <- MenuScene.W2
 
-                    uiWindowMain.Toggle(false, fun() ->
+                if lastWindow = WindowKind.W1 then
+                    callbackAfterClosed(fun() ->
                         sideWindow.Toggle(true)
                         uiWindow2.Toggle(true)
                     )
+
+                lastWindow <- W2
         )
 
 
     override this.OnRegistered() =
+        messenger.ViewMsg.Add(function
+            | CloseGame ->
+                callbackAfterClosed(asd.Engine.Close)
+            | StartGame gameModel ->
+                callbackAfterClosed(fun() ->
+                    let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting)
+                    this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
+                    |> ignore
+                )
+                printfn "%A" gameModel
+        )
+
         this.AddLayer(backLayer)
         this.AddLayer(uiLayer)
 
@@ -328,7 +239,7 @@ type MenuScene(setting : AppSetting) =
         uiLayer.AddObject(uiWindow2)
         uiLayer.AddObject(sideWindow)
 
-        uiWindowMain.UIContents <- viewConverter <!> MenuScene.titleUI
+        uiWindowMain.UIContents <- viewConverter <!> titleUI
         uiWindowMain.Toggle(true)
 
         messenger.StartAsync()

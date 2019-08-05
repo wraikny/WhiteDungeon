@@ -27,7 +27,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 100.0f
         occupationDefaultStatus = [
-            Model.Hunter, ({
+            Model.DebugOccupation, ({
                 level = 1
                 hp = 100.0f
                 walkSpeed = 10.0f
@@ -38,7 +38,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
 
     let gameViewSetting : GameViewSetting = {
         occupationImages = [
-            Model.Hunter, ({
+            Model.DebugOccupation, ({
                 front = "Image/Debug/down.png"
                 frontRight = "Image/Debug/rightdown.png"
                 frontLeft = "Image/Debug/leftdown.png"
@@ -75,7 +75,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
             { model with
                 playerCount = 1
                 players = [
-                    0u, ("Player1", Some Model.Occupation.Hunter)
+                    0u, ("Player1", Some Model.Occupation.DebugOccupation)
                 ]
                 |> Map.ofList
             }
@@ -131,7 +131,7 @@ type QuickPlayScene(viewSetting, createTitleScene) as this =
         messenger.ViewMsg
             .Subscribe(function
             | QuickPlay.ChangeToGame(gameModel) ->
-                this.ChangeScene(new Game.GameScene(gameModel, viewSetting, gameViewSetting))
+                this.ChangeScene(new Game.GameScene(gameModel, gameViewSetting))
                 |> ignore
             )
         |> ignore

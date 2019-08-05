@@ -40,15 +40,16 @@ let appSetting : View.AppSetting = {
             backColor = white
             frameColor = Vec4.init ume.x ume.y ume.z 200uy
             buttonColor = createButtonColor sumire 1.0f 0.8f 0.6f
-            inputColor = createButtonColor white 1.0f 0.8f 0.6f
-            inputFocusColor = createButtonColor black 0.8f 0.8f 0.8f
+            inputColor = createButtonColor sakura 1.0f 0.8f 0.6f
+            inputFocusColor = createButtonColor sakura 0.8f 0.8f 0.8f
 
             inputFont = "Font/mplus-1c-light.ttf"
-            inputFontSize = 40
+            inputFontSize = 30
             inputFontColor = black
 
             windowWidthWRate = 0.8f
             window2MarginRate = 0.02f
+            window2HeightRate = 0.9f
 
             #if !DEBUG
             #endif
@@ -56,7 +57,8 @@ let appSetting : View.AppSetting = {
 
     gameViewSetting = {
         occupationImages = [
-            Model.Hunter, ({
+        #if DEBUG
+            Model.DebugOccupation, ({
                 front = "Image/Debug/down.png"
                 frontRight = "Image/Debug/rightdown.png"
                 frontLeft = "Image/Debug/leftdown.png"
@@ -66,6 +68,7 @@ let appSetting : View.AppSetting = {
                 right = "Image/Debug/right.png"
                 left = "Image/Debug/left.png"
             } : ActorImages)
+        #endif
         ] |> Map.ofList
     }
 
@@ -76,12 +79,14 @@ let appSetting : View.AppSetting = {
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 100.0f
         occupationDefaultStatus = [
-            Model.Hunter, ({
+        #if DEBUG
+            Model.DebugOccupation, ({
                 level = 1
                 hp = 100.0f
                 walkSpeed = 10.0f
                 dashSpeed = 20.0f
             } : Model.ActorStatus)
+        #endif
         ] |> Map.ofList
     }
 }
@@ -113,7 +118,7 @@ let main _ =
 
     //let scene = new View.Title.TitleScene(viewSetting)
 
-    let scene = new MenuScene(appSetting)
+    let scene = new MainScene(appSetting)
 
     asd.Engine.ChangeScene(scene)
 

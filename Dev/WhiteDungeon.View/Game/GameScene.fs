@@ -27,11 +27,8 @@ open System.Reactive.Linq
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, viewSetting, gameViewSetting) =
+type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
     inherit Scene()
-
-    let viewSetting : ViewSetting = viewSetting
-    let gameViewSetting : GameViewSetting = gameViewSetting
 
     let messenger : IMessenger<_, _, _> =
         Messenger.build

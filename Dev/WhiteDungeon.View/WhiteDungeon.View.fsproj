@@ -81,6 +81,7 @@
     <Compile Include="Game\GameScene.fs" />
     <Compile Include="QuickPlay\QuickPlayScene.fs" />
     <Compile Include="Title\TitleScene.fs" />
+    <Compile Include="MainSceneTEA.fs" />
     <Compile Include="MainScene.fs" />
   </ItemGroup>
   <ItemGroup>

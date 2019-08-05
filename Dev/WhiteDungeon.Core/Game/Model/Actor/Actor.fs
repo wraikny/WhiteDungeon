@@ -5,8 +5,8 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 type ActorID =
-    | Player of PlayerID
-    | Enemy of EnemyID
+    | OfPlayerID of PlayerID
+    | OfEnemyID of EnemyID
 
      
 type Actor = {

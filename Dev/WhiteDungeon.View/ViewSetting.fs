@@ -53,7 +53,7 @@ type GameViewSetting = {
 
 open wraikny.MilleFeuille.Fs.UI
 
-type MenuSceneSetting = {
+type MainSceneSetting = {
     backColor : byte Vec3
     frameColor : byte Vec4
     buttonColor : ButtonColor
@@ -66,6 +66,7 @@ type MenuSceneSetting = {
 
     windowWidthWRate : float32
     window2MarginRate : float32
+    window2HeightRate : float32
     
 #if !DEBUG
     titleFont : string
@@ -78,7 +79,7 @@ type MenuSceneSetting = {
 type AppSetting = {
     windowSize : int Vec2
 
-    menuSceneSetting : MenuSceneSetting
+    menuSceneSetting : MainSceneSetting
 
     gameViewSetting : GameViewSetting
     gameSetting : GameSetting
