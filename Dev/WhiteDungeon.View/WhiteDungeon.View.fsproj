@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" 
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -74,13 +73,10 @@
     <Compile Include="UI\BackGround.fs" />
     <Compile Include="UI\Button.fs" />
     <Compile Include="UI\Keyboard.fs" />
-    <Compile Include="UI\MessageLayer.fs" />
     <Compile Include="Game\PlayerView.fs" />
     <Compile Include="Game\SkillEmitView.fs" />
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\GameScene.fs" />
-    <Compile Include="QuickPlay\QuickPlayScene.fs" />
-    <Compile Include="Title\TitleScene.fs" />
     <Compile Include="MainSceneTEA.fs" />
     <Compile Include="MainScene.fs" />
   </ItemGroup>

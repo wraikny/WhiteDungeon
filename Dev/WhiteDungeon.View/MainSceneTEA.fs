@@ -398,9 +398,9 @@ let view (model : Model) : Msg ViewModel =
     | WaitingGenerating ->
         Window1 [
             Separator
-            Space 100.0f
+            Space 200.0f
             HeaderText("迷宮生成中……")
-            Space 100.0f
+            Space 200.0f
             Separator
         ]
 
