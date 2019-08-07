@@ -34,7 +34,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
         Messenger.build
             { seed = 0 }
             {
-                init = gameModel, Cmd.viewMsg [ViewMsg.GenerateDungeonView (ViewMsg.DungeonView.fromModel gameModel)]
+                init = gameModel, Cmd.ports [ViewMsg.GenerateDungeonView (ViewMsg.DungeonView.fromModel gameModel)]
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }

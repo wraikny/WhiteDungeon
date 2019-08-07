@@ -27,10 +27,6 @@
     <Compile Include="Game\Update\Skill\Skill.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
-    <Compile Include="QuickPlay\Model.fs" />
-    <Compile Include="QuickPlay\Msg.fs" />
-    <Compile Include="QuickPlay\Update.fs" />
-    <Compile Include="QuickPlay\View.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpPlus" Version="1.0.0" />

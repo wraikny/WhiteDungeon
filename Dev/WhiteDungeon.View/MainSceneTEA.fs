@@ -57,9 +57,7 @@ type Msg =
     | SetDungeonParameters of count:int * minSize:int * maxSize:int * range:float32 * corridor:int
 
     | GenerateDungeon
-    | GenerateDungeonStart of int * int
-    | GeneratedDungeonModel of int * DungeonModel
-    //| GameStart
+    | GeneratedGameModel of Game.Model.Model
     | CloseGameMsg
 
 
@@ -140,90 +138,81 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         }, Cmd.none
 
     | GenerateDungeon ->
-        let rand =
-            //let generator = Random.int 0 (model.dungeonBuilder.roomCount - 1)
-            //Random.generate SetRandomRoomIndex generator
-            Random.random {
-                let! seed = Random.int minValue<int> maxValue<int>
-                let! roomIndex = Random.int 0 (model.dungeonBuilder.roomCount - 1)
-                return (seed, roomIndex)
-            }
-            |> Random.generate GenerateDungeonStart
-        { model with uiMode = WaitingGenerating }, rand
+        monad {
+            let! seed = Random.int minValue<int> maxValue<int>
+            let! roomIndex = Random.int 0 (model.dungeonBuilder.roomCount - 1)
+            return (seed, roomIndex)
+        }
+        |> TartTask.fromEnv(fun (seed, roomIndex) -> async {
+            let dungeonModel =
+                { model.dungeonBuilder with seed = seed }
+                |> DungeonBuilder.generate
 
-    | GenerateDungeonStart(seed, roomIndex) ->
-        let task =
-            async {
-                return
-                    { model.dungeonBuilder with seed = seed }
-                    |> DungeonBuilder.generate }
-            |> Async.perform (curry GeneratedDungeonModel roomIndex)
-        model, task
+            let largeRooms = toList dungeonModel.largeRooms
 
-    | GeneratedDungeonModel (randomRoomIndex, dungeonModel) ->
-        let largeRooms =
-            dungeonModel.largeRooms
-            |> HashMap.toList
+            let largeRoomsCount = length largeRooms
 
-        let largeRoomsCount =
-            largeRooms
-            |> List.length
+            let targetRoomIndex = roomIndex % largeRoomsCount
 
-        let targetRoomIndex =
-             randomRoomIndex % largeRoomsCount
+            let targetRoom = snd largeRooms.[targetRoomIndex]
 
-        let targetRoom = snd largeRooms.[targetRoomIndex]
+            let fromCell =
+                model.gameSetting.dungeonCellSize
+                |> DungeonModel.cellToCoordinate
 
-        let fromCell =
-            model.gameSetting.dungeonCellSize
-            |> DungeonModel.cellToCoordinate
+            let targetPosition =
+                targetRoom.rect
+                |>> fromCell
+                |> Rect.centerPosition
 
-        let targetPosition =
-            targetRoom.rect
-            |>> fromCell
-            |> Rect.centerPosition
+            let players =
+                [ model.playerName, model.selectOccupation ]
+                |> Seq.indexed
+                |> Seq.map(fun (index, (name, occupation)) ->
+                    let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
+                    let character : Model.Character = {
+                        id = Model.CharacterID -index
+                        name = name
+                        currentOccupation = occupation
+                        occupations = [
+                            occupation, status
+                        ] |> Map.ofList
+                    }
 
-        let players =
-            [ model.playerName, model.selectOccupation ]
-            |> Seq.indexed
-            |> Seq.map(fun (index, (name, occupation)) ->
-                let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
-                let character : Model.Character = {
-                    id = Model.CharacterID -index
-                    name = name
-                    currentOccupation = occupation
-                    occupations = [
-                        occupation, status
-                    ] |> Map.ofList
-                }
+                    let size = model.gameSetting.characterSize
 
-                let size = model.gameSetting.characterSize
+                    let playerId = Game.Model.PlayerID (uint32 index)
 
-                let playerId = Game.Model.PlayerID (uint32 index)
+                    let player =
+                        Game.Model.Actor.Player.init
+                            size
+                            (targetPosition - (Vec2.init (float32 index) 0.0f) * size)
+                            status
+                            playerId
+                            character
 
-                let player =
-                    Game.Model.Actor.Player.init
-                        size
-                        (targetPosition - (Vec2.init (float32 index) 0.0f) * size)
-                        status
-                        playerId
-                        character
+                    (playerId, player)
+                )
+                |> Map.ofSeq
 
-                (playerId, player)
-            )
-            |> Map.ofSeq
+            let gameModel =
+                Game.Model.Model.init
+                    players
+                    model.dungeonBuilder
+                    dungeonModel
+                    model.gameSetting
 
-        let gameModel =
-            Game.Model.Model.init
-                players
-                model.dungeonBuilder
-                dungeonModel
-                model.gameSetting
+            return gameModel
+        })
+        |> TartTask.performUnwrap GeneratedGameModel
+        |> fun cmd ->
+            { model with uiMode = WaitingGenerating }, cmd
 
-        model, Cmd.viewMsg [ StartGame gameModel ]
+    | GeneratedGameModel gameModel ->
+        model, Cmd.port(ViewMsg.StartGame gameModel)
 
     | CloseGameMsg ->
-        model, Cmd.viewMsg[CloseGame]
+        model, Cmd.port CloseGame
 
 
 let titleUI = [
