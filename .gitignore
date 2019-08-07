@@ -5,3 +5,5 @@ Dev/Lib/*.dylib
 ! Dev/Lib/.gitkeep
 
 .ionide/*
+
+Resources/*
