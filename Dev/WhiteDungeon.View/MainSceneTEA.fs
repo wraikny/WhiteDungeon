@@ -143,7 +143,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             let! roomIndex = Random.int 0 (model.dungeonBuilder.roomCount - 1)
             return (seed, roomIndex)
         }
-        |> TartTask.fromEnv(fun (seed, roomIndex) -> async {
+        |> TartTask.withEnv(fun (seed, roomIndex) -> async {
             let dungeonModel =
                 { model.dungeonBuilder with seed = seed }
                 |> DungeonBuilder.generate
