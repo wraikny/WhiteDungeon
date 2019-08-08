@@ -3,6 +3,7 @@
 
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Fs.Objects
@@ -17,26 +18,37 @@ open WhiteDungeon.View.Utils.Color
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Extension
+open wraikny.MilleFeuille.Fs
+open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 
 open FSharpPlus
 
 open System
+open System.Collections.Generic
 open System.Linq
 open System.Reactive
 open System.Reactive.Linq
 
 
+type UIArgs = {
+    windowSetting : UI.WindowSetting
+    headerFont : asd.Font
+    textFont : asd.Font
+    buttonFont : asd.Font
+}
+
+
 [<Class>]
-type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
+type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArgs : UIArgs) =
     inherit Scene()
 
     let messenger : IMessenger<_, _, _> =
         Messenger.build
             { seed = 0 }
             {
-                init = gameModel, Cmd.ports [ViewMsg.GenerateDungeonView (ViewMsg.DungeonView.fromModel gameModel)]
+                init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView gameModel.dungeonModel)
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
@@ -57,7 +69,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
             ]
         |> KeyboardBuilder.build
         :> IController<Game.Msg.PlayerInput>
-        
 
     let controllers = [|
         Game.Model.PlayerID 0u, gameKeybaord
@@ -67,12 +78,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
         let color = new asd.Color(255uy, 255uy, 255uy)
         new UI.BackGroundLayer(color)
 
+
     let dungeonLayer = new asd.Layer2D()
-
     let playerLayer = new asd.Layer2D()
-
     let skillEffectsLayer = new asd.Layer2D()
-
     let uiLayer = new asd.Layer2D()
 
     do
@@ -134,21 +143,62 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
                 .Subscribe o
         |> ignore
 
+    let dungeonCellUpdater = new MaptipsUpdater<_, _>({
+            create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize)
+            onError = raise
+            onCompleted = fun () -> printfn "Completed Dungeon MapChips"
+        })
+
+    do
+        messenger.ViewMsg
+            .Add(function
+                | ViewMsg.UpdateDungeonView dungeonModel ->
+                    seq {
+                        let cells = dungeonModel.cells |> HashMap.toSeq
+                        let mutable index = 0u
+                        for cell in cells do
+                            yield (index, cell)
+                            index <- index + 1u
+                    }
+                    |> toList
+                    |> (dungeonCellUpdater :> IObserver<_>).OnNext
+                | _ -> ()
+            )
+
+
+    let uiMouse =
+        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = true)
+        new UI.MouseButtonSelecter(mouse)
+
+
+    let uiWindowMain =
+        new UI.MouseWindow(uiArgs.windowSetting, uiMouse,
+            Position = asd.Engine.WindowSize.To2DF() / 2.0f
+        )
 
 
     override this.OnRegistered() =
+        GC.Collect()
+
+        // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
         this.AddLayer(playerLayer)
         this.AddLayer(skillEffectsLayer)
         this.AddLayer(uiLayer)
 
-        this.AddDungeonView(gameModel)
+        // Dungeon
+        dungeonLayer.AddObject(dungeonCellUpdater)
+        //this.AddDungeonView(gameModel)
 
+        // Camera
         dungeonLayer.AddObject(dungeonCamera)
         playerLayer.AddObject(playerCamera)
         // dungeonLayer.AddObject(minimapCamera)
         skillEffectsLayer.AddObject(skillEffectsCamera)
+
+        // UI
+        uiLayer.AddObject(uiWindowMain)
 
         messenger.StartAsync() |> ignore
 
@@ -158,6 +208,16 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
 
     override this.OnUpdated() =
         messenger.NotifyView()
+
+        // Mouse inside window
+        let mousePos = asd.Engine.Mouse.Position |> Vec2.fromVector2DF
+        let ws = asd.Engine.WindowSize.To2DF() |> Vec2.fromVector2DF
+        let margin = 0.025f
+        if Rect.isInside mousePos (Rect.init zero ws) |> not then
+            let mousePosX = asd.MathHelper.Clamp(mousePos.x, ws.x * (1.0f - margin * 2.0f), ws.x * margin)
+            let mousePosY = asd.MathHelper.Clamp(mousePos.y, ws.y * (1.0f - margin * 2.0f), ws.y * margin)
+            asd.Engine.Mouse.Position <- asd.Vector2DF(mousePosX, mousePosY)
+
 
         #if DEBUG
         this.PushControllerInput() |> function
@@ -196,33 +256,3 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
             | inputs ->
                 Some <| Msg.PlayerInputs (id, inputs |> Set.ofList)
         )
-
-
-    member this.AddDungeonView(gameModel : Model.Model) =
-        let dungeonView = ViewMsg.DungeonView.fromModel gameModel
-
-        let getRectangleShape (rect) =
-            new asd.RectangleShape(
-                DrawingArea = Rect.toRectF rect
-            )
-
-        for space in dungeonView.corridors do
-            new asd.GeometryObject2D(
-                Shape = getRectangleShape space
-                , Color = ColorPalette.ume
-            )
-            |> dungeonLayer.AddObject
-
-        for space in dungeonView.smallRooms do
-            new asd.GeometryObject2D(
-                Shape = getRectangleShape space
-                , Color = ColorPalette.sakura
-            )
-            |> dungeonLayer.AddObject
-
-        for space in dungeonView.largeRooms do
-            new asd.GeometryObject2D(
-                Shape = getRectangleShape space
-                , Color = ColorPalette.sakura
-            )
-            |> dungeonLayer.AddObject

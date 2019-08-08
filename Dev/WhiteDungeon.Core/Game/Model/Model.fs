@@ -5,6 +5,10 @@ open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Advanced
 
+type UIMode =
+    | HowToControl
+    | Stair
+    | GameMode
 
 
 type Model = {
@@ -23,6 +27,8 @@ type Model = {
     gameSetting : GameSetting
 
     timePassed : bool
+
+    uiMode : UIMode
 }
 
 
@@ -53,4 +59,6 @@ module Model =
         gameSetting = gameSetting
 
         timePassed = false
+
+        uiMode = HowToControl
     }

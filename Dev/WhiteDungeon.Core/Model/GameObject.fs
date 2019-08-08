@@ -64,10 +64,10 @@ module ActorStatus =
 
 
 type Occupation =
-    #if DEBUG
-    | DebugOccupation
-    #endif
-    | Hunter
+    //#if DEBUG
+    //| DebugOccupation
+    //#endif
+    | Seeker
 
 
 [<Struct>]

@@ -58,37 +58,37 @@ let appSetting : View.AppSetting = {
 
     gameViewSetting = {
         occupationImages = [
-        #if DEBUG
-            Model.DebugOccupation, ({
-                sleepWalk = 10u
-                sleepDash = 5u
-                front = [
-                    "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                frontRight = [
-                    "Image/Debug/rightdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                frontLeft = [
-                    "Image/Debug/leftdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                back = [
-                    "Image/Debug/up.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                backRight = [
-                    "Image/Debug/rightup.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                backLeft = [
-                    "Image/Debug/leftup.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                right = [
-                    "Image/Debug/right.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-                left = [
-                    "Image/Debug/left.png", Rect.init zero (Vec2.init 128 128), 0.0f
-                ]
-            } : ActorImages<_, _>)
-        #endif
-            Model.Hunter, ActorImages.fromGraphicmaker 9u 6u "Image/Game/Occupation/hunter.png"
+        //#if DEBUG
+        //    Model.DebugOccupation, ({
+        //        sleepWalk = 10u
+        //        sleepDash = 5u
+        //        front = [
+        //            "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        frontRight = [
+        //            "Image/Debug/rightdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        frontLeft = [
+        //            "Image/Debug/leftdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        back = [
+        //            "Image/Debug/up.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        backRight = [
+        //            "Image/Debug/rightup.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        backLeft = [
+        //            "Image/Debug/leftup.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        right = [
+        //            "Image/Debug/right.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //        left = [
+        //            "Image/Debug/left.png", Rect.init zero (Vec2.init 128 128), 0.0f
+        //        ]
+        //    } : ActorImages<_, _>)
+        //#endif
+            Model.Seeker, ActorImages.fromGraphicmaker 9u 6u "Image/Game/Occupation/hunter.png"
         ] |> Map.ofList
     }
 
@@ -99,15 +99,15 @@ let appSetting : View.AppSetting = {
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 200.0f
         occupationDefaultStatus = [
-        #if DEBUG
-            Model.DebugOccupation, ({
-                level = 1
-                hp = 100.0f
-                walkSpeed = 10.0f
-                dashSpeed = 15.0f
-            } : Model.ActorStatus)
-        #endif
-            Model.Hunter, ({
+        //#if DEBUG
+        //    Model.DebugOccupation, ({
+        //        level = 1
+        //        hp = 100.0f
+        //        walkSpeed = 10.0f
+        //        dashSpeed = 15.0f
+        //    } : Model.ActorStatus)
+        //#endif
+            Model.Seeker, ({
                 Model.ActorStatus.level = 1
                 hp = 100.0f
                 walkSpeed = 8.0f
@@ -122,7 +122,7 @@ let appSetting : View.AppSetting = {
 [<EntryPoint>]
 let main _ =
     let windowSize = appSetting.windowSize |> Vec2.toVector2DI
-    asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption())
+    asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
     |> ignore
 
     asd.Engine.File.AddRootDirectory("Resources")
@@ -130,15 +130,10 @@ let main _ =
     //let scene = new View.Title.TitleScene(viewSetting)
 
     let scene = new MainScene(appSetting)
-
     asd.Engine.ChangeScene(scene)
 
-    let rec loop() =
-        if asd.Engine.DoEvents() then
-            asd.Engine.Update()
-            loop()
-
-    loop()
+    while asd.Engine.DoEvents() do
+        asd.Engine.Update()
 
     asd.Engine.Terminate()
     0

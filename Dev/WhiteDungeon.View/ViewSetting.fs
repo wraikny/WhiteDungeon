@@ -61,6 +61,7 @@ module ActorImages =
             backLeft = List.map f x.backLeft
         }
 
+    // http://www.silversecond.com/WolfRPGEditor/
     let fromGraphicmaker sleepWalk sleepDash path =
         let size = Vec2.init 32 64
         let textures xi yi =

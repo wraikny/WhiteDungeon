@@ -222,7 +222,13 @@ type MainScene(setting : AppSetting) =
                 callbackAfterClosed(asd.Engine.Close)
             | StartGame gameModel ->
                 callbackAfterClosed(fun() ->
-                    let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting)
+                    let uiFonts : Game.UIArgs = {
+                        windowSetting = windowSetting
+                        headerFont = headerFont
+                        textFont = textFont
+                        buttonFont = buttonFont
+                    }
+                    let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
                     this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
                     |> ignore
                 )

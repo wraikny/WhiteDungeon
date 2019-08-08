@@ -23,10 +23,9 @@ type PlayerView(gameViewSetting) =
 
     let gameViewSetting : GameViewSetting = gameViewSetting
 
-
     let mutable lastPosition = zero
     let mutable lastSize = zero
-    let mutable lastOccupation = None
+    let mutable lastOccupation = ValueNone
 
     let textureOjb = new asd.TextureObject2D()
 
@@ -83,8 +82,8 @@ type PlayerView(gameViewSetting) =
 
 
     member __.SetOccupation(occupation) =
-        if Some occupation <> lastOccupation then
-            lastOccupation <- Some occupation
+        if lastOccupation <> ValueSome occupation then
+            lastOccupation <- ValueSome occupation
 
             gameViewSetting.occupationImages
             |> Map.find occupation

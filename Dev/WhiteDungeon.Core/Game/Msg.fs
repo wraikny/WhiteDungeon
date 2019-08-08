@@ -60,6 +60,7 @@ module PlayerInput =
 
 
 type Msg =
+    | StartGame
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
     #if DEBUG

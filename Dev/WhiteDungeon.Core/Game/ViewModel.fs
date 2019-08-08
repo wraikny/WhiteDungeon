@@ -94,6 +94,35 @@ module CameraView =
         |>> ((fun (_, p) -> p.actor.objectBase.position) >> init)
 
 
+open WhiteDungeon.Core.Game.Msg
+
+
+type UIItem =
+    | HeaderText of string
+    | Text of string
+    | Button of string * Msg
+    | Separator
+
+
+module UIItem =
+    let howToControll = [
+        HeaderText "操作方法"
+        Separator
+        Text "移動: WASD"
+        Text "攻撃: ---"
+        Text "一時停止: ---"
+        Button ("始める", StartGame)
+    ]
+
+    let stair = [
+        HeaderText "次の階層に移動しますか？"
+        Separator
+        //Button("はい")
+        //Button("タイトルに戻る")
+    ]
+
+
+
 
 type ViewModel = {
     camera : CameraView list
@@ -101,6 +130,8 @@ type ViewModel = {
     areaPlayer : UpdaterViewModel<AreaSkillEmitView>
     areaEnemy : UpdaterViewModel<AreaSkillEmitView>
     areaAll : UpdaterViewModel<AreaSkillEmitView>
+
+    mainUIWindow : UIItem list option
 }
 
 
@@ -132,4 +163,11 @@ module ViewModel =
         areaAll =
             model.skillList.areaAll
             |> AreaSkillEmitView.fromModels
+
+        mainUIWindow =
+            model.uiMode |> function
+            | HowToControl ->
+                Some UIItem.howToControll
+            | GameMode -> None
+            | Stair -> None
     }

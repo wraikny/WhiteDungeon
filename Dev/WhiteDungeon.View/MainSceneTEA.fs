@@ -83,10 +83,7 @@ let initModel (gameSetting : GameSetting) = {
     occupationListToggle = false
 
     playerName = "Player1"
-    selectOccupation =
-        #if DEBUG
-        DebugOccupation
-        #endif
+    selectOccupation = Seeker
 
     dungeonBuilder = {
         seed = 0

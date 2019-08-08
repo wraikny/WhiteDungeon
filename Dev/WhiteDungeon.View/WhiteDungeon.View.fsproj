@@ -77,6 +77,7 @@
     <Compile Include="Game\PlayerView.fs" />
     <Compile Include="Game\SkillEmitView.fs" />
     <Compile Include="Game\GameCamera.fs" />
+    <Compile Include="Game\DungeonCellView.fs" />
     <Compile Include="Game\GameScene.fs" />
     <Compile Include="MainSceneTEA.fs" />
     <Compile Include="MainScene.fs" />
