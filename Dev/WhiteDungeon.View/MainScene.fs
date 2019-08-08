@@ -227,6 +227,7 @@ type MainScene(setting : AppSetting) =
                         headerFont = headerFont
                         textFont = textFont
                         buttonFont = buttonFont
+                        createMainScene = fun() -> new MainScene(setting) :> asd.Scene
                     }
                     let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
                     this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))

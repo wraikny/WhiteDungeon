@@ -91,8 +91,8 @@ module Update =
         let model = { model with timePassed = false }
 
         msg |> function
-        | StartGame ->
-            { model with uiMode = GameMode }, Cmd.none
+        | SetGameMode mode ->
+            { model with uiMode = mode }, Cmd.none
         | TimePasses ->
             let model =
                 model

@@ -37,6 +37,7 @@ type UIArgs = {
     headerFont : asd.Font
     textFont : asd.Font
     buttonFont : asd.Font
+    createMainScene : unit -> asd.Scene
 }
 
 
@@ -162,7 +163,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                     }
                     |> toList
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
-                | _ -> ()
+                //| _ -> ()
             )
 
 
@@ -179,6 +180,47 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
 
     override this.OnRegistered() =
         GC.Collect()
+
+        let convert (item : ViewModel.UIItem) =
+            item |> function
+            | ViewModel.HeaderText text ->
+                UI.TextWith(text, uiArgs.headerFont)
+            | ViewModel.Text(text) -> UI.Text(text)
+            | ViewModel.Button(text, msg) ->
+                UI.Button(text, fun() -> messenger.Enqueue msg)
+            | ViewModel.Separator ->
+                UI.Rect(3.0f, 0.8f)
+            | ViewModel.TitleButton(text) ->
+                UI.Button(text, fun() ->
+                    messenger.Dispose()
+
+                    let scene = uiArgs.createMainScene()
+
+                    uiWindowMain.Toggle(false, fun() ->
+                        this.ChangeSceneWithTransition(scene, new asd.TransitionFade(0.5f, 0.5f))
+                        |> ignore
+                    )
+                )
+            | ViewModel.CloseButton(text) ->
+                UI.Button(text, fun() ->
+                    messenger.Dispose()
+
+                    uiWindowMain.Toggle(false, fun() ->
+                        asd.Engine.Close()
+                    )
+                )
+
+        messenger.ViewModel.Select(fun vm -> vm.mainUIWindow)
+            .Add(function
+                | None ->
+                    if uiWindowMain.IsToggleOn then
+                        uiWindowMain.Toggle(false)
+                | Some items ->
+                    uiWindowMain.UIContents <- map convert items
+                    if not uiWindowMain.IsToggleOn then
+                        uiWindowMain.Toggle(true)
+            )
+
 
         // Layer
         this.AddLayer(backLayer)
@@ -198,9 +240,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
         // UI
+        uiLayer.AddMouseButtonSelecter(uiMouse, "Mouse")
         uiLayer.AddObject(uiWindowMain)
 
         messenger.StartAsync() |> ignore
+
 
     override this.OnDispose() =
         messenger.Stop()
@@ -209,35 +253,42 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
     override this.OnUpdated() =
         messenger.NotifyView()
 
-        // Mouse inside window
-        let mousePos = asd.Engine.Mouse.Position |> Vec2.fromVector2DF
-        let ws = asd.Engine.WindowSize.To2DF() |> Vec2.fromVector2DF
-        let margin = 0.025f
-        if Rect.isInside mousePos (Rect.init zero ws) |> not then
-            let mousePosX = asd.MathHelper.Clamp(mousePos.x, ws.x * (1.0f - margin * 2.0f), ws.x * margin)
-            let mousePosY = asd.MathHelper.Clamp(mousePos.y, ws.y * (1.0f - margin * 2.0f), ws.y * margin)
-            asd.Engine.Mouse.Position <- asd.Vector2DF(mousePosX, mousePosY)
+        if not uiWindowMain.IsToggleOn then
+            // Mouse inside window
+            let mousePos = asd.Engine.Mouse.Position |> Vec2.fromVector2DF
+            let ws = asd.Engine.WindowSize.To2DF() |> Vec2.fromVector2DF
+            let margin = 0.025f
+            if Rect.isInside mousePos (Rect.init zero ws) |> not then
+                let mousePosX = asd.MathHelper.Clamp(mousePos.x, ws.x * (1.0f - margin * 2.0f), ws.x * margin)
+                let mousePosY = asd.MathHelper.Clamp(mousePos.y, ws.y * (1.0f - margin * 2.0f), ws.y * margin)
+                asd.Engine.Mouse.Position <- asd.Vector2DF(mousePosX, mousePosY)
 
 
-        #if DEBUG
-        this.PushControllerInput() |> function
-        | [||] ->
-            if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
-                messenger.Enqueue(Msg.TimePasses)
-        | msgs ->
-            messenger.Enqueue(Msg.TimePasses)
-            msgs |> iter messenger.Enqueue
+            // Pause
+            if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
+                messenger.Enqueue(Msg.SetGameMode Model.Pause)
+            
+            else
+                // Input
+                let inline mouseLeftPushed() =
+                    asd.Engine.Mouse.GetButtonInputState(asd.MouseButtons.ButtonLeft) = asd.ButtonState.Push
 
-        if asd.Engine.Keyboard.GetKeyState(asd.Keys.Space) = asd.ButtonState.Push then
-            messenger.Enqueue(Msg.AppendSkillEmits)
-            messenger.Enqueue(Msg.TimePasses)
-        #else
-        this.PushControllerInput() |> function
-        | true ->
-            messenger.Enqueue(Msg.TimePasses)
-        | false ->
-            ()
-        #endif
+                this.PushControllerInput() |> function
+                | [||] ->
+                    if mouseLeftPushed() then
+                        messenger.Enqueue(Msg.AppendSkillEmits)
+                        messenger.Enqueue(Msg.TimePasses)
+            #if DEBUG
+                    if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
+                        messenger.Enqueue(Msg.TimePasses)
+            #endif
+
+                | msgs ->
+                    messenger.Enqueue(Msg.TimePasses)
+                    msgs |> iter messenger.Enqueue
+
+                    if mouseLeftPushed() then
+                        messenger.Enqueue(Msg.AppendSkillEmits)
 
 
     member this.PushControllerInput() : Msg.Msg [] =

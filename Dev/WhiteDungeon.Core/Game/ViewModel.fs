@@ -102,16 +102,18 @@ type UIItem =
     | Text of string
     | Button of string * Msg
     | Separator
+    | TitleButton of string
+    | CloseButton of string
 
 
 module UIItem =
     let howToControll = [
         HeaderText "操作方法"
         Separator
-        Text "移動: WASD"
-        Text "攻撃: ---"
-        Text "一時停止: ---"
-        Button ("始める", StartGame)
+        Text "移動: WASDキー"
+        Text "攻撃: マウス左クリック"
+        Text "一時停止: Escキー"
+        Button ("始める", SetGameMode Model.GameMode)
     ]
 
     let stair = [
@@ -121,10 +123,20 @@ module UIItem =
         //Button("タイトルに戻る")
     ]
 
+    let pause = [
+        HeaderText "一時停止"
+        Separator
+        Button ("再開する", SetGameMode Model.GameMode)
+        TitleButton "タイトルに戻る"
+        CloseButton "ゲームを終了する"
+    ]
+
 
 
 
 type ViewModel = {
+    uiMode : GameSceneMode
+
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
     areaPlayer : UpdaterViewModel<AreaSkillEmitView>
@@ -143,6 +155,7 @@ module ViewModel =
     let inline getSkillAreaAll v = v.areaAll
 
     let view (model : Model) : ViewModel = {
+        uiMode = model.uiMode
         camera =
             model.players
             |> CameraView.fromPlayers
@@ -166,8 +179,8 @@ module ViewModel =
 
         mainUIWindow =
             model.uiMode |> function
-            | HowToControl ->
-                Some UIItem.howToControll
+            | HowToControl -> Some UIItem.howToControll
+            | Pause -> Some UIItem.pause
+            | Stair -> Some UIItem.stair
             | GameMode -> None
-            | Stair -> None
     }
