@@ -46,6 +46,7 @@ type UIMode =
     | Select of SelectMode
     | Credit of CreditMode
     | WaitingGenerating
+    | ErrorUI of exn
 
 
 type Msg =
@@ -204,7 +205,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
             return gameModel
         })
-        |> TartTask.performUnwrap GeneratedGameModel
+        |> TartTask.perform (ErrorUI >> SetUI) GeneratedGameModel
         |> fun cmd ->
             { model with uiMode = WaitingGenerating }, cmd
 
@@ -354,7 +355,16 @@ let creditUILibs = [
 
 
 let creditUIBGM = [
-    HeaderText "BGM"
+    HeaderText "音楽"
+    Separator
+    Text "てすと"
+    Text "あああああ"
+    Text "あああああ"
+    Separator
+]
+
+let creditUIImages = [
+    HeaderText "イラスト"
     Separator
     Text "てすと"
     Text "あああああ"
@@ -391,6 +401,15 @@ let view (model : Model) : Msg ViewModel =
             HeaderText("迷宮生成中……")
             Space 200.0f
             Separator
+        ]
+
+    | ErrorUI e ->
+        Window1 [
+            HeaderText "エラーが発生しました"
+            Separator
+            Text <| e.GetType().ToString()
+            Text e.Message
+            Button("もどる", SetUI (Select CheckSettiing))
         ]
 
 

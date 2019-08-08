@@ -118,7 +118,7 @@ module UIItem =
     ]
 
     let stair = [
-        HeaderText "次の階層に移動しますか？"
+        HeaderText "階層移動"
         Separator
         //Button("はい")
         //Button("タイトルに戻る")
