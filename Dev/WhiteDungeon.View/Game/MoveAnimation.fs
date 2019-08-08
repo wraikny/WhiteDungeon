@@ -31,31 +31,33 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     let mutable images = ActorImages.empty
 
-    let mutable current = Front
-
-    let mutable sleepFrame = 0u
+    let mutable current = Back
 
     let anim =
         seq {
             let textures =
                 images
                 |> ActorImages.fromDirection current
+            match textures with
+            | [] ->
+                ()
+            | (tex, area, angle)::[] ->
+                owner.Texture <- tex
+                owner.Src <- area
+                owner.Angle <- angle
+                yield()
+            | textures ->
+                while true do
+                    for (tex, area, angle) in textures do
+                        owner.Texture <- tex
+                        owner.Src <- area
+                        owner.Angle <- angle
+                        yield()
 
-            while true do
-                for (tex, area, angle) in textures do
-                    owner.Texture <- tex
-                    owner.Src <- area
-                    owner.Angle <- angle
-                    yield()
-
-                    yield! Coroutine.sleep(int sleepFrame)
+                        yield! Coroutine.sleep(int images.sleepTime)
         }
 
     let mutable coroutine = anim.GetEnumerator()
-
-    member __.SleepFrame
-        with get() = sleepFrame
-        and set(x) = sleepFrame <- x
 
     member __.SetAnimationTextures(images' : ActorImages<string, int Rect2>) =
         images <-

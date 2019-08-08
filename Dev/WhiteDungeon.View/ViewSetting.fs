@@ -10,6 +10,7 @@ open WhiteDungeon.Core.Game.Model
 type TexParam<'a, 'b> = 'a * 'b * float32
 
 type ActorImages<'a, 'b> = {
+    sleepTime : uint32
     front : TexParam<'a, 'b> list
     back : TexParam<'a, 'b> list
     right : TexParam<'a, 'b> list
@@ -23,6 +24,7 @@ type ActorImages<'a, 'b> = {
 module ActorImages =
     let empty =
         {
+            sleepTime = 0u
             front = []
             back = []
             right = []
@@ -33,20 +35,19 @@ module ActorImages =
             backLeft = []
         }
     let fromDirection dir images =
-        let path = dir |> function
-            | MoveDirection.Front -> images.front
-            | MoveDirection.FrontRight -> images.frontRight
-            | MoveDirection.FrontLeft -> images.frontLeft
-            | MoveDirection.Back -> images.back
-            | MoveDirection.BackRight -> images.backRight
-            | MoveDirection.BackLeft -> images.backLeft
-            | MoveDirection.Right -> images.right
-            | MoveDirection.Left -> images.left
-
-        path
+        dir |> function
+        | MoveDirection.Front -> images.front
+        | MoveDirection.FrontRight -> images.frontRight
+        | MoveDirection.FrontLeft -> images.frontLeft
+        | MoveDirection.Back -> images.back
+        | MoveDirection.BackRight -> images.backRight
+        | MoveDirection.BackLeft -> images.backLeft
+        | MoveDirection.Right -> images.right
+        | MoveDirection.Left -> images.left
 
     let map f x =
         {
+            sleepTime = x.sleepTime
             front = List.map f x.front
             back = List.map f x.back
             right = List.map f x.right

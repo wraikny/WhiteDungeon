@@ -1,6 +1,7 @@
 ﻿module WhiteDungeon.App.Program
 
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Geometry
 
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.UI
@@ -59,15 +60,31 @@ let appSetting : View.AppSetting = {
         occupationImages = [
         #if DEBUG
             Model.DebugOccupation, ({
-                front = "Image/Debug/down.png"
-                frontRight = "Image/Debug/rightdown.png"
-                frontLeft = "Image/Debug/leftdown.png"
-                back = "Image/Debug/up.png"
-                backRight = "Image/Debug/rightup.png"
-                backLeft = "Image/Debug/leftup.png"
-                right = "Image/Debug/right.png"
-                left = "Image/Debug/left.png"
-            } : ActorImages)
+                front = [
+                    "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                frontRight = [
+                    "Image/Debug/rightdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                frontLeft = [
+                    "Image/Debug/leftdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                back = [
+                    "Image/Debug/up.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                backRight = [
+                    "Image/Debug/rightup.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                backLeft = [
+                    "Image/Debug/leftup.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                right = [
+                    "Image/Debug/right.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+                left = [
+                    "Image/Debug/left.png", Rect.init zero (Vec2.init 128 128), 0.0f
+                ]
+            } : ActorImages<_, _>)
         #endif
         ] |> Map.ofList
     }
@@ -95,21 +112,6 @@ let appSetting : View.AppSetting = {
 
 [<EntryPoint>]
 let main _ =
-    //let viewSetting : View.ViewSetting = {
-    //    uiFontPath = "Font/mplus-1c-light.ttf"
-    //    menuButtonSize = new asd.Vector2DF(400.0f, 100.0f)
-    //    menuButtonFontSize = 70
-
-    //    messageFontSize = 70
-
-    //    titleText = "White Dungeon"
-    //    titleTextFontSize = 150
-
-    //    button1 = new asd.Vector2DF(250.0f, 400.0f)
-    //    button2 = new asd.Vector2DF(250.0f, 550.0f)
-    //    button3 = new asd.Vector2DF(250.0f, 700.0f)
-    //}
-
     let windowSize = appSetting.windowSize |> Vec2.toVector2DI
     asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption())
     |> ignore
