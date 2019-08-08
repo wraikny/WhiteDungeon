@@ -162,11 +162,15 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 |>> fromCell
                 |> Rect.centerPosition
 
+            let size = model.gameSetting.characterSize
             let players =
                 [ model.playerName, model.selectOccupation ]
                 |> Seq.indexed
                 |> Seq.map(fun (index, (name, occupation)) ->
-                    let status = model.gameSetting.occupationDefaultStatus |> Map.find occupation
+                    let status =
+                        model.gameSetting.occupationDefaultStatus
+                        |> Map.find occupation
+
                     let character : Model.Character = {
                         id = Model.CharacterID -index
                         name = name
@@ -176,7 +180,6 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         ] |> Map.ofList
                     }
 
-                    let size = model.gameSetting.characterSize
 
                     let playerId = Game.Model.PlayerID (uint32 index)
 

@@ -217,6 +217,8 @@ type MainScene(setting : AppSetting) =
 
 
     override this.OnRegistered() =
+        GC.Collect()
+
         messenger.ViewMsg.Add(function
             | CloseGame ->
                 callbackAfterClosed(asd.Engine.Close)
