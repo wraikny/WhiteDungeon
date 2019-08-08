@@ -2,22 +2,36 @@
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Geometry
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
-type ActorImages = {
-    front : string
-    frontRight : string
-    frontLeft : string
-    back : string
-    backRight : string
-    backLeft : string
-    right : string
-    left : string
+type TexParam<'a, 'b> = 'a * 'b * float32
+
+type ActorImages<'a, 'b> = {
+    front : TexParam<'a, 'b> list
+    back : TexParam<'a, 'b> list
+    right : TexParam<'a, 'b> list
+    left : TexParam<'a, 'b> list
+    frontRight : TexParam<'a, 'b> list
+    frontLeft : TexParam<'a, 'b> list
+    backRight : TexParam<'a, 'b> list
+    backLeft : TexParam<'a, 'b> list
 }
 
 module ActorImages =
+    let empty =
+        {
+            front = []
+            back = []
+            right = []
+            left = []
+            frontRight = []
+            frontLeft = []
+            backRight = []
+            backLeft = []
+        }
     let fromDirection dir images =
         let path = dir |> function
             | MoveDirection.Front -> images.front
@@ -31,8 +45,20 @@ module ActorImages =
 
         path
 
+    let map f x =
+        {
+            front = List.map f x.front
+            back = List.map f x.back
+            right = List.map f x.right
+            left = List.map f x.left
+            frontRight = List.map f x.frontRight
+            frontLeft = List.map f x.frontLeft
+            backRight = List.map f x.backRight
+            backLeft = List.map f x.backLeft
+        }
+
 type GameViewSetting = {
-    occupationImages : Map<Occupation, ActorImages>
+    occupationImages : Map<Occupation, ActorImages<string, int Rect2>>
 }
 
 open wraikny.MilleFeuille.Fs.UI

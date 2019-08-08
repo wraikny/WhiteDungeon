@@ -19,34 +19,6 @@ open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 
-type TexParam = string * int Rect2 * float32
-
-
-type AnimationTextures =
-    {
-        front : TexParam list
-        back : TexParam list
-        right : TexParam list
-        left : TexParam list
-        frontRight : TexParam list
-        frontLeft : TexParam list
-        backRight : TexParam list
-        backLeft : TexParam list
-    }
-
-module AnimationTextures =
-    let empty =
-        {
-            front = []
-            back = []
-            right = []
-            left = []
-            frontRight = []
-            frontLeft = []
-            backRight = []
-            backLeft = []
-        }
-
 
 type MoveAnimation(owner : asd.TextureObject2D) =
     let load =
@@ -57,7 +29,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
         )
         >> Seq.toList
 
-    let mutable texturesMap = Map.empty
+    let mutable images = ActorImages.empty
 
     let mutable current = Front
 
@@ -65,17 +37,18 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     let anim =
         seq {
-            match texturesMap |> Map.tryFind current with
-            | None -> ()
-            | Some textures ->
-                while true do
-                    for (tex, area, angle) in textures do
-                        owner.Texture <- tex
-                        owner.Src <- area
-                        owner.Angle <- angle
-                        yield()
+            let textures =
+                images
+                |> ActorImages.fromDirection current
 
-                        yield! Coroutine.sleep(int sleepFrame)
+            while true do
+                for (tex, area, angle) in textures do
+                    owner.Texture <- tex
+                    owner.Src <- area
+                    owner.Angle <- angle
+                    yield()
+
+                    yield! Coroutine.sleep(int sleepFrame)
         }
 
     let mutable coroutine = anim.GetEnumerator()
@@ -84,19 +57,14 @@ type MoveAnimation(owner : asd.TextureObject2D) =
         with get() = sleepFrame
         and set(x) = sleepFrame <- x
 
-    member __.SetAnimationTextures(textures : AnimationTextures) =
-        texturesMap <-
-            [
-                Front, load textures.front
-                Back, load textures.back
-                Right, load textures.right
-                Left, load textures.left
-                FrontRight, load textures.frontRight
-                FrontLeft, load textures.frontLeft
-                BackRight, load textures.backRight
-                BackLeft, load textures.backLeft
-
-            ] |> Map.ofList
+    member __.SetAnimationTextures(images' : ActorImages<string, int Rect2>) =
+        images <-
+            images'
+            |> ActorImages.map(fun (path, area, angle) ->
+                asd.Engine.Graphics.CreateTexture2D(path),
+                (Rect.toRectI area).ToF(),
+                angle
+            )
         
 
     member __.SetDirection(dir) =

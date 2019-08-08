@@ -39,14 +39,14 @@ type PlayerView(gameViewSetting) as this =
 
             this.SetSize(area.size)
 
-            this.SetDirection(viewModel.actorView.objectBaseView.direction)
-
             this.SetOccupation(viewModel.character.currentOccupation)
 
 
             moveAnimation.SetDirection(objectBase.direction)
             if objectBase.timePassed then
                 moveAnimation.Next()
+
+                this.SetScale()
         
 
     member this.SetPosition(pos) =
@@ -59,28 +59,14 @@ type PlayerView(gameViewSetting) as this =
             lastSize <- size
             this.SetScale()
 
-    member this.SetDirection(dir) =
-        if dir <> lastDirection then
-            lastDirection <- dir
-
-            this.SetTexture()
 
     member this.SetOccupation(occupation) =
         if Some occupation <> lastOccupation then
             lastOccupation <- Some occupation
 
-            this.SetTexture()
-
-    member this.SetTexture() =
-        lastOccupation |> function
-        | None -> ()
-        | Some occupation ->
-            let path =
-                gameViewSetting.occupationImages
-                |> Map.find occupation
-                |> ActorImages.fromDirection lastDirection
-
-            this.Texture <- asd.Engine.Graphics.CreateTexture2D(path)
+            gameViewSetting.occupationImages
+            |> Map.find occupation
+            |> moveAnimation.SetAnimationTextures
 
             this.SetScale()
 
