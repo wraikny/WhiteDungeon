@@ -74,6 +74,8 @@ type ObjectBase = {
     velocity : float32 Vec2
 
     direction : MoveDirection
+
+    isMoved : bool
 }
 
 module ObjectBase =
@@ -99,4 +101,5 @@ module ObjectBase =
         lastPosition = position
         velocity = zero
         direction = Front
+        isMoved = false
     }

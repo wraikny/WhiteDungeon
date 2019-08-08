@@ -54,7 +54,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
                         owner.Angle <- angle
                         yield()
 
-                        yield! Coroutine.sleep(int images.sleepTime)
+                        yield! Coroutine.sleep(int images.sleepFrame)
         }
 
     let mutable coroutine = anim.GetEnumerator()

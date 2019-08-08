@@ -14,14 +14,14 @@ open FSharpPlus
 
 
 type ObjectBaseView = {
-    timePassed : bool
+    isMoved : bool
     area : float32 Vec2 Rect
     direction : MoveDirection
 }
 
 module ObjectBaseView =
-    let inline fromModel timePassed (objectBase : ObjectBase) = {
-        timePassed = timePassed
+    let inline fromModel (objectBase : ObjectBase) = {
+        isMoved = objectBase.isMoved
         area =
             objectBase
             |> Model.ObjectBase.area
@@ -34,8 +34,8 @@ type ActorView = {
 }
 
 module ActorView =
-    let inline fromModel timePassed (actor : Actor.Actor) = {
-        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel timePassed
+    let inline fromModel (actor : Actor.Actor) = {
+        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
 
 
@@ -45,15 +45,15 @@ type PlayerView = {
 }
 
 module PlayerView =
-    let inline fromModel timePassed (player : Actor.Player) = {
+    let inline fromModel (player : Actor.Player) = {
         character = player.character
-        actorView = player.actor |> ActorView.fromModel timePassed
+        actorView = player.actor |> ActorView.fromModel
     }
 
-    let playersView timePassed =
+    let playersView =
         Map.toList
         >> map(fun (id : PlayerID, player) ->
-            (id.Value, fromModel timePassed player)
+            (id.Value, fromModel player)
         )
 
 
@@ -66,16 +66,16 @@ type AreaSkillEmitView = {
 module AreaSkillEmitView =
     open WhiteDungeon.Core.Game.Model.Skill
 
-    let inline fromModel timePassed (areaSkill : Model.Skill.AreaSkill) =
+    let inline fromModel (areaSkill : Model.Skill.AreaSkill) =
         {
-            baseView = ObjectBaseView.fromModel timePassed areaSkill.objectBase
+            baseView = ObjectBaseView.fromModel areaSkill.objectBase
             frameCurrent = areaSkill.frame
             frameFirst = areaSkill.frameFirst
         }
 
-    let fromModels timePassed : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
+    let fromModels  : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
         Map.toList
-        >> map (fun (id, a) -> (id, fromModel timePassed a))
+        >> map (fun (id, a) -> (id, fromModel a))
 
 
 type CameraView = {
@@ -119,17 +119,17 @@ module ViewModel =
         players =
             model
             |> Model.players
-            |> PlayerView.playersView model.timePassed
+            |> PlayerView.playersView
 
         areaPlayer =
             model.skillList.areaPlayer
-            |> AreaSkillEmitView.fromModels model.timePassed
+            |> AreaSkillEmitView.fromModels
 
         areaEnemy =
             model.skillList.areaEnemy
-            |> AreaSkillEmitView.fromModels model.timePassed
+            |> AreaSkillEmitView.fromModels
 
         areaAll =
             model.skillList.areaAll
-            |> AreaSkillEmitView.fromModels model.timePassed
+            |> AreaSkillEmitView.fromModels
     }

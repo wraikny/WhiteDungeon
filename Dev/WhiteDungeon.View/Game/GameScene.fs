@@ -15,6 +15,8 @@ open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
+open wraikny.Tart.Helper.Collections
+open wraikny.Tart.Helper.Extension
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 
@@ -159,12 +161,13 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
 
         #if DEBUG
         this.PushControllerInput() |> function
-        | true ->
-            messenger.Enqueue(Msg.TimePasses)
-        | false ->
+        | [||] ->
             if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
                 messenger.Enqueue(Msg.TimePasses)
-            ()
+        | msgs ->
+            messenger.Enqueue(Msg.TimePasses)
+            msgs |> iter messenger.Enqueue
+
         if asd.Engine.Keyboard.GetKeyState(asd.Keys.Space) = asd.ButtonState.Push then
             messenger.Enqueue(Msg.AppendSkillEmits)
             messenger.Enqueue(Msg.TimePasses)
@@ -177,9 +180,9 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
         #endif
 
 
-    member this.PushControllerInput() : bool =
+    member this.PushControllerInput() : Msg.Msg [] =
         controllers
-        |>> fun (id, controller) ->
+        |> filterMap(fun (id, controller) ->
             let getStateIs (state : asd.ButtonState) key =
                 controller.GetState(key)
                 |> Option.ofNullable
@@ -189,13 +192,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting) =
             Msg.PlayerInput.inputs
             |> filter (getStateIs asd.ButtonState.Hold)
             |> function
-            | [] -> false
+            | [] -> None
             | inputs ->
-                Msg.PlayerInputs (id, inputs |> Set.ofList)
-                |> messenger.Enqueue
-
-                true
-        |> fold (||) false
+                Some <| Msg.PlayerInputs (id, inputs |> Set.ofList)
+        )
 
 
     member this.AddDungeonView(gameModel : Model.Model) =

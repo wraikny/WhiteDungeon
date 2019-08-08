@@ -105,7 +105,8 @@ let private moveWithBS
     
     obj
     |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff0), isCollided
+    |> setDirection (MoveDirection.fromVector diff0)
+    |> fun x -> { x with isMoved = true }, isCollided
 
 let moveXYTogether = moveWithBS bsDiffXYTogether
 
@@ -118,3 +119,4 @@ let inline setVelocity velocity (obj : ObjectBase) =
 let inline update (obj : ObjectBase) =
     obj
     |> addPosition obj.velocity
+    |> fun x -> { x with isMoved = false }

@@ -60,6 +60,7 @@ let appSetting : View.AppSetting = {
         occupationImages = [
         #if DEBUG
             Model.DebugOccupation, ({
+                sleepFrame = 5u
                 front = [
                     "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
                 ]

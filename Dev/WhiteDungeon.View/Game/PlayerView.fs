@@ -43,7 +43,7 @@ type PlayerView(gameViewSetting) as this =
 
 
             moveAnimation.SetDirection(objectBase.direction)
-            if this.Texture = null || objectBase.timePassed then
+            if this.Texture = null || objectBase.isMoved then
                 moveAnimation.Next()
 
                 this.SetScale()
