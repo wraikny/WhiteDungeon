@@ -8,6 +8,12 @@ type ActorID =
     | OfPlayerID of PlayerID
     | OfEnemyID of EnemyID
 
+
+[<Struct>]
+type ActorMove =
+    | Walk
+    | Dash
+
      
 type Actor = {
     id : ActorID
@@ -16,6 +22,7 @@ type Actor = {
     statusDefault : ActorStatus
     // skillEmits : Skill.SkillEmit list
     // conditions : Skill.Condition list
+    currentMove : ActorMove
 }
 
 module Actor =
@@ -37,4 +44,5 @@ module Actor =
         objectBase = ObjectBase.init size position
         // skillEmits = []
         // conditions = []
+        currentMove = Walk
     }

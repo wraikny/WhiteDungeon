@@ -67,6 +67,7 @@ type Occupation =
     #if DEBUG
     | DebugOccupation
     #endif
+    | Hunter
 
 
 [<Struct>]

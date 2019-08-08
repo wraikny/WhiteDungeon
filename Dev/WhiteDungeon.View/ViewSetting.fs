@@ -10,7 +10,8 @@ open WhiteDungeon.Core.Game.Model
 type TexParam<'a, 'b> = 'a * 'b * float32
 
 type ActorImages<'a, 'b> = {
-    sleepFrame : uint32
+    sleepWalk : uint32
+    sleepDash : uint32
     front : TexParam<'a, 'b> list
     back : TexParam<'a, 'b> list
     right : TexParam<'a, 'b> list
@@ -24,7 +25,8 @@ type ActorImages<'a, 'b> = {
 module ActorImages =
     let empty =
         {
-            sleepFrame = 0u
+            sleepWalk = 0u
+            sleepDash = 0u
             front = []
             back = []
             right = []
@@ -47,7 +49,8 @@ module ActorImages =
 
     let map f x =
         {
-            sleepFrame = x.sleepFrame
+            sleepWalk = x.sleepWalk
+            sleepDash = x.sleepDash
             front = List.map f x.front
             back = List.map f x.back
             right = List.map f x.right
@@ -56,6 +59,27 @@ module ActorImages =
             frontLeft = List.map f x.frontLeft
             backRight = List.map f x.backRight
             backLeft = List.map f x.backLeft
+        }
+
+    let fromGraphicmaker sleepWalk sleepDash path =
+        let size = Vec2.init 32 64
+        let textures xi yi =
+            [ for i in 0..2 ->
+                ( path
+                , Rect.init (size * (Vec2.init (i + xi * 3) yi)) size
+                , 0.0f)
+            ]
+        {
+            sleepWalk = sleepWalk
+            sleepDash = sleepDash
+            front = textures 0 0
+            frontLeft = textures 1 0
+            left = textures 0 1
+            frontRight = textures 1 1
+            right = textures 0 2
+            backLeft = textures 1 2
+            back = textures 0 3
+            backRight = textures 1 3
         }
 
 type GameViewSetting = {

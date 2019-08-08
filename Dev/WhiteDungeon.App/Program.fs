@@ -60,7 +60,8 @@ let appSetting : View.AppSetting = {
         occupationImages = [
         #if DEBUG
             Model.DebugOccupation, ({
-                sleepFrame = 5u
+                sleepWalk = 10u
+                sleepDash = 5u
                 front = [
                     "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
                 ]
@@ -87,6 +88,7 @@ let appSetting : View.AppSetting = {
                 ]
             } : ActorImages<_, _>)
         #endif
+            Model.Hunter, ActorImages.fromGraphicmaker 9u 6u "Image/Game/Occupation/hunter.png"
         ] |> Map.ofList
     }
 
@@ -95,7 +97,7 @@ let appSetting : View.AppSetting = {
         minPlayerCount = 1
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
-        characterSize = Vec2.init 100.0f 100.0f
+        characterSize = Vec2.init 100.0f 200.0f
         occupationDefaultStatus = [
         #if DEBUG
             Model.DebugOccupation, ({
@@ -105,6 +107,12 @@ let appSetting : View.AppSetting = {
                 dashSpeed = 15.0f
             } : Model.ActorStatus)
         #endif
+            Model.Hunter, ({
+                Model.ActorStatus.level = 1
+                hp = 100.0f
+                walkSpeed = 8.0f
+                dashSpeed = 12.0f
+            } : Model.ActorStatus)
         ] |> Map.ofList
     }
 }

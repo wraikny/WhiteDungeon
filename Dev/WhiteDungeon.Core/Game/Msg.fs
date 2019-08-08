@@ -9,12 +9,6 @@ open FSharpPlus
 
 
 [<Struct>]
-type ActorMove =
-    | Walk
-    | Dash
-
-
-[<Struct>]
 type InputDirection =
     | Right
     | Left
@@ -41,9 +35,9 @@ module PlayerInput =
             DashKey
         ]
 
-    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : ActorMove * float32 Vec2 =
+    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : Actor.ActorMove * float32 Vec2 =
         let actorMove =
-            if inputSet |> Set.contains PlayerInput.DashKey then Dash else Walk
+            if inputSet |> Set.contains PlayerInput.DashKey then Actor.Dash else Actor.Walk
 
         let moveDirs = [|
             UpKey, Vec2.init 0.0f -1.0f

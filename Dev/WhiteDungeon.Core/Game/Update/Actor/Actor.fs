@@ -47,6 +47,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
     let direction = direction |> Vector.normalize
 
     actor
+    |> fun x -> { x with currentMove = move }
     |> updateObjectBase(
         Update.ObjectBase.moveXYAnother
             gameSetting

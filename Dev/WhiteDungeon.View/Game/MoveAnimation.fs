@@ -33,6 +33,8 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     let mutable current = Back
 
+    let mutable currentMove = Actor.ActorMove.Walk
+
     let anim =
         seq {
             let textures =
@@ -54,10 +56,17 @@ type MoveAnimation(owner : asd.TextureObject2D) =
                         owner.Angle <- angle
                         yield()
 
-                        yield! Coroutine.sleep(int images.sleepFrame)
+                        yield!(
+                            match currentMove with
+                            | Actor.Walk -> images.sleepWalk
+                            | Actor.Dash -> images.sleepDash
+                            |> int |> Coroutine.sleep
+                        )
         }
 
     let mutable coroutine = anim.GetEnumerator()
+
+    member __.Move with get() = currentMove and set(x) = currentMove <- x
 
     member __.SetAnimationTextures(images' : ActorImages<string, int Rect2>) =
         images <-
