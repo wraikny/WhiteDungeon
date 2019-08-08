@@ -92,7 +92,7 @@ module Update =
 
         msg |> function
         | SetGameMode mode ->
-            { model with uiMode = mode }, Cmd.none
+            { model with mode = mode }, Cmd.none
         | TimePasses ->
             let model =
                 model
@@ -103,6 +103,14 @@ module Update =
                 |> updateSkillList (Skill.SkillList.update model)
                 |> applySkills
                 |> fun m -> { m with timePassed = true }
+                |> fun m ->
+                    m.players
+                    |> Map.toSeq
+                    |>> snd
+                    |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+                    |> function
+                    | true -> m
+                    | false -> { m with mode = GameOver }
 
             model, Cmd.none
 

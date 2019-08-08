@@ -10,6 +10,8 @@ type GameSceneMode =
     | Stair
     | Pause
     | GameMode
+    | GameOver
+    | GameFinished
 
 
 type Model = {
@@ -29,7 +31,7 @@ type Model = {
 
     timePassed : bool
 
-    uiMode : GameSceneMode
+    mode : GameSceneMode
 }
 
 
@@ -61,5 +63,5 @@ module Model =
 
         timePassed = false
 
-        uiMode = HowToControl
+        mode = HowToControl
     }

@@ -102,6 +102,7 @@ type UIItem =
     | Text of string
     | Button of string * Msg
     | Separator
+    | URLButton of string * string
     | TitleButton of string
     | CloseButton of string
 
@@ -131,6 +132,15 @@ module UIItem =
         CloseButton "ゲームを終了する"
     ]
 
+    let gameFinished header = [
+        HeaderText header
+        Separator
+        URLButton("ツイートする", "https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ \n@LepusPluvia")
+        Separator
+        TitleButton "タイトルに戻る"
+        CloseButton "ゲームを終了する"
+    ]
+
 
 
 
@@ -155,7 +165,7 @@ module ViewModel =
     let inline getSkillAreaAll v = v.areaAll
 
     let view (model : Model) : ViewModel = {
-        uiMode = model.uiMode
+        uiMode = model.mode
         camera =
             model.players
             |> CameraView.fromPlayers
@@ -178,9 +188,12 @@ module ViewModel =
             |> AreaSkillEmitView.fromModels
 
         mainUIWindow =
-            model.uiMode |> function
+            model.mode |> function
             | HowToControl -> Some UIItem.howToControll
             | Pause -> Some UIItem.pause
             | Stair -> Some UIItem.stair
-            | GameMode -> None
+            | GameFinished -> Some( UIItem.gameFinished "ゲーム終了")
+            | GameOver -> Some( UIItem.gameFinished "ゲームオーバー")
+            | GameMode ->
+                None
     }

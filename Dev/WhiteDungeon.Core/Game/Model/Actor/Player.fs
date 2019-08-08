@@ -25,16 +25,3 @@ module Player =
         id = id
         character = character
     }
-
-
-open wraikny.Tart.Helper.Math
-
-
-//module PlayerBuilder =
-//    let inline build size position id actorStatus (character : Character) =
-//        Player.init
-//            size
-//            position
-//            actorStatus
-//            id
-//            character

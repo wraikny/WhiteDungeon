@@ -190,6 +190,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                 UI.Button(text, fun() -> messenger.Enqueue msg)
             | ViewModel.Separator ->
                 UI.Rect(3.0f, 0.8f)
+            | ViewModel.URLButton(text, url) ->
+                UI.Button(text, fun() ->
+                    Diagnostics.Process.Start(url) |> ignore
+                )
             | ViewModel.TitleButton(text) ->
                 UI.Button(text, fun() ->
                     messenger.Dispose()
@@ -247,7 +251,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
 
 
     override this.OnDispose() =
-        messenger.Stop()
+        messenger.Dispose()
 
 
     override this.OnUpdated() =
