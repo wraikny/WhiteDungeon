@@ -21,6 +21,8 @@ type Model = {
     skillList : Skill.SkillList
 
     gameSetting : GameSetting
+
+    timePassed : bool
 }
 
 
@@ -49,4 +51,6 @@ module Model =
         dungeonModel = dungeonModel
 
         gameSetting = gameSetting
+
+        timePassed = false
     }

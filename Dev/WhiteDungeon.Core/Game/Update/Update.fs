@@ -88,6 +88,8 @@ module Update =
 
 
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
+        let model = { model with timePassed = false }
+
         msg |> function
         | TimePasses ->
             let model =
@@ -98,6 +100,7 @@ module Update =
                 model
                 |> updateSkillList (Skill.SkillList.update model)
                 |> applySkills
+                |> fun m -> { m with timePassed = true }
 
             model, Cmd.none
 

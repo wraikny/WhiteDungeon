@@ -15,7 +15,7 @@ open WhiteDungeon.View.Utils.Color
 open FSharpPlus
 
 
-type PlayerView(gameViewSetting) =
+type PlayerView(gameViewSetting) as this =
     // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
     inherit asd.TextureObject2D()
 
@@ -26,6 +26,8 @@ type PlayerView(gameViewSetting) =
     let mutable lastSize = zero
     let mutable lastDirection = Model.MoveDirection.Front
     let mutable lastOccupation = None
+
+    let moveAnimation = MoveAnimation(this)
 
     interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
@@ -42,8 +44,9 @@ type PlayerView(gameViewSetting) =
             this.SetOccupation(viewModel.character.currentOccupation)
 
 
-    //override this.OnAdded() =
-    //    this.Shape <- rect
+            moveAnimation.SetDirection(objectBase.direction)
+            if objectBase.timePassed then
+                moveAnimation.Next()
         
 
     member this.SetPosition(pos) =
