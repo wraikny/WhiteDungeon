@@ -115,6 +115,8 @@ module UIItem =
         Text "移動: WASDキー"
         Text "攻撃: マウス左クリック"
         Text "一時停止: Escキー"
+        Separator
+        Text "門に触れると階層を遷移"
         Button ("始める", SetGameMode Model.GameMode)
         Separator
     ]
@@ -153,6 +155,7 @@ module UIItem =
         Text <| e.GetType().ToString()
         Text e.Message
         TitleButton("タイトルに戻る")
+        Separator
     ]
 
 
