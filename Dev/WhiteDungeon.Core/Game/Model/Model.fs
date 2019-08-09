@@ -98,17 +98,12 @@ module Dungeon =
             let gen = (Random.int 0 (dungeonBuilder.roomCount - 1) )
 
             let! roomIndex = gen
-            let gateCellsGen = Random.list gateCount (Random.pair gen gen)
-            let rec loop gates = monad {
-                let gates1 = gates |>> fst
-                if gates1 |> List.contains roomIndex || (Seq.distinct gates1 |> length <> gateCount) then
-                    let! gateCells = gateCellsGen
-                    return! loop gateCells
-                else
-                    return gates
-            }
-            let! gateCells = gateCellsGen
-            let! gateCellIndexs = loop gateCells
+            let gateCellsGen = Random.distinctList gateCount (Random.pair gen gen)
+
+            let! gateCellIndexs =
+                gateCellsGen
+                |> Random.until(List.map fst >> List.contains roomIndex >> not)
+
             return (seed, roomIndex, gateCellIndexs)
         }
         |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
