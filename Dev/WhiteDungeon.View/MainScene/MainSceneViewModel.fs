@@ -97,9 +97,8 @@ let dungeonView (model : Model) =
     let db = model.dungeonBuilder
     [
         Text(sprintf "生成数: %d" db.roomCount)
-        Text(sprintf "最小部屋サイズ: %A" db.minRoomSize)
-        Text(sprintf "最大部屋サイズ: %A" db.maxRoomSize)
-        Text(sprintf "廊下幅: %d" db.corridorWidth)
+        Text(sprintf "部屋サイズ: %A~%A" db.minRoomSize db.maxRoomSize)
+        Text(sprintf "廊下幅: %d / 門の数: %d" db.corridorWidth model.gateCount)
     ]
 
 

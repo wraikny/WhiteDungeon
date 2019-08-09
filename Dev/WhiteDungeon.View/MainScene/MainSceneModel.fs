@@ -82,7 +82,7 @@ let initModel (gameSetting : GameSetting) = {
     playerName = None
     selectOccupation = Seeker
 
-    gateCount = 3
+    gateCount = 4
     dungeonBuilder = {
         seed = 0
         roomCount = 200
@@ -94,8 +94,8 @@ let initModel (gameSetting : GameSetting) = {
 
         roomMoveRate = 0.2f
         roomMeanThreshold = 1.25f
-        restoreEdgeRate = 0.1f
-        corridorWidth = 2
+        restoreEdgeRate = 0.15f
+        corridorWidth = 3
     }
 
     gameSetting = gameSetting

@@ -98,7 +98,7 @@ let main _ =
 
     //let scene = new View.Title.TitleScene(viewSetting)
 
-    let scene = new MainScene(appSetting)
+    let scene = new MainScene.MainScene(appSetting)
     asd.Engine.ChangeScene(scene)
 
     while asd.Engine.DoEvents() do
@@ -106,3 +106,4 @@ let main _ =
 
     asd.Engine.Terminate()
     0
+

@@ -22,12 +22,15 @@ type ViewMsg =
     | StartGame of Game.Model.Model * float32
 
 
+let bgmToFloat bgmVolume = float32 bgmVolume / 100.0f
+
+
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     msg |> function
     | UndoModel ->
         model.prevModel |> function
         | Some(x) ->
-            { x with prevModel = None }, Cmd.port(SetBGMVolume (float32 x.bgmVolume / 10.0f))
+            { x with prevModel = None }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
         | None ->
             model, Cmd.none
     | SetUIWithHistory uiMode ->
@@ -42,7 +45,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
     | AddBGMVolume i ->
         let v = model.bgmVolume + i |> min 10 |> max 0 
-        { model with bgmVolume = v}, Cmd.port(SetBGMVolume (float32 v / 10.0f))
+        { model with bgmVolume = v}, Cmd.port(SetBGMVolume (bgmToFloat v))
 
     | OccupationListToggle x ->
         { model with occupationListToggle = x }, Cmd.none
@@ -73,7 +76,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             let! seed = Random.int minValue<int> maxValue<int>
             
             //let roomsCount = (model.dungeonBuilder.roomCount - 1)
-            let gen = Random.int minValue<int> maxValue<int>
+            let gen = Random.int 0 maxValue<int>
             let! roomIndex = gen
             let! gateCellIndexs = Random.list model.gateCount (Random.pair gen gen)
             return (seed, roomIndex, gateCellIndexs)
@@ -141,7 +144,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     for (a, b) in gateCellIndexs ->
                         let room = snd largeRooms.[a % largeRoomsCount]
                         let cells = room |> Space.cells
-                        let cell = fst cells.[length cells % b]
+                        let cell = fst cells.[ b % length cells]
                         cell
                 }
                 |> toList
@@ -162,7 +165,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             { model with uiMode = WaitingGenerating }, cmd
 
     | GeneratedGameModel gameModel ->
-        model, Cmd.port(ViewMsg.StartGame (gameModel, float32 model.bgmVolume / 10.0f))
+        model, Cmd.port(ViewMsg.StartGame (gameModel, bgmToFloat model.bgmVolume))
 
     | CloseGameMsg ->
         model, Cmd.port CloseGame

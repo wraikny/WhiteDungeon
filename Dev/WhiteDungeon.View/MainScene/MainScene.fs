@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.View
+﻿namespace WhiteDungeon.View.MainScene
 
 open wraikny.Tart.Core
 open FSharpPlus
@@ -146,10 +146,25 @@ type MainScene(setting : AppSetting) =
 
     let messenger =
         Messenger.build { seed = Random().Next() } {
-            init = Model.initModel setting.gameSetting, Cmd.none
+            init =
+                let initModel = Model.initModel setting.gameSetting
+                
+                initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update
             view = ViewModel.view
         }
+
+    let bgmPlayer =
+        new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ],
+            FadeSeconds = 1.0f, Volume = 0.05f)
+    do
+
+        base.AddComponent(bgmPlayer, bgmPlayer.Name)
+        bgmPlayer.Start()
+
+    let playSE s =
+        let id = asd.Engine.Sound.Play(s)
+        asd.Engine.Sound.SetVolume(id, bgmPlayer.Volume)
 
     let se_button = asd.Engine.Sound.CreateSoundSource("se/button47.ogg", true)
 
@@ -164,13 +179,13 @@ type MainScene(setting : AppSetting) =
         | ViewModel.Button(text, msg) ->
             UI.Button(text, fun() ->
                 // TODO
-                asd.Engine.Sound.Play(se_button) |> ignore
+                playSE se_button
                 messenger.Enqueue(msg))
 
         | ViewModel.WebsiteButton(text, url) ->
             UI.Button(text, fun() ->
                 // TODO
-                asd.Engine.Sound.Play(se_button) |> ignore
+                playSE se_button
                 Diagnostics.Process.Start(url) |> ignore
             )
         | ViewModel.InputField(maxLength, placeHolder, current, msg) ->
@@ -208,7 +223,7 @@ type MainScene(setting : AppSetting) =
                 if lastWindow = ViewModel.W2 then
                     callbackAfterClosed(fun () ->
                         // TODO
-                        asd.Engine.Sound.Play(se_page) |> ignore
+                        playSE se_page
                         uiWindowMain.Toggle(true)
                     )
 
@@ -221,19 +236,13 @@ type MainScene(setting : AppSetting) =
                 if lastWindow = ViewModel.W1 then
                     callbackAfterClosed(fun() ->
                         // TODO
-                        asd.Engine.Sound.Play(se_page) |> ignore
+                        playSE se_page
                         sideWindow.Toggle(true)
                         uiWindow2.Toggle(true)
                     )
 
                 lastWindow <- ViewModel.W2
         )
-
-    let bgmPlayer = new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ], FadeSeconds = 1.0f)
-    do
-
-        base.AddComponent(bgmPlayer, bgmPlayer.Name)
-        bgmPlayer.Start()
 
 
     override this.OnRegistered() =
@@ -278,7 +287,7 @@ type MainScene(setting : AppSetting) =
         uiWindowMain.UIContents <- viewConverter <!> ViewModel.titleUI
 
         // TODO
-        asd.Engine.Sound.Play(se_page) |> ignore
+        playSE se_page
         uiWindowMain.Toggle(true)
 
         messenger.StartAsync()
