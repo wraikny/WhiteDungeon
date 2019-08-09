@@ -60,7 +60,7 @@ let appSetting : View.AppSetting = {
 
     gameViewSetting = {
         occupationImages = [
-            Model.Seeker, ActorImages.fromGraphicmaker 9u 6u "Image/Game/Occupation/hunter.png"
+            Model.Seeker, ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
         ] |> Map.ofList
 
         bgms = [
@@ -80,7 +80,7 @@ let appSetting : View.AppSetting = {
                 Model.ActorStatus.level = 1
                 hp = 100.0f
                 walkSpeed = 6.0f
-                dashSpeed = 8.0f
+                dashSpeed = 12.0f
             } : Model.ActorStatus)
         ] |> Map.ofList
     }

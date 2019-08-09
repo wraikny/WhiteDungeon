@@ -77,7 +77,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
     | SetGameSceneRandomSeed x ->
         Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
-        |> TartTask.perform (fun _ -> GenerateDungeon) GeneratedGameModel
+        |> TartTask.perform (fun e -> System.Console.WriteLine(e); GenerateDungeon) GeneratedGameModel
         |> fun cmd ->
             { model with gameSceneRandomSeed = x }, cmd
 

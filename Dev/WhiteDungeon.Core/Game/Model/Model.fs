@@ -95,10 +95,20 @@ module Dungeon =
         monad {
             let! seed = Random.int minValue<int> maxValue<int>
             
-            //let roomsCount = (model.dungeonBuilder.roomCount - 1)
-            let gen = Random.int 0 maxValue<int>
+            let gen = (Random.int 0 (dungeonBuilder.roomCount - 1) )
+
             let! roomIndex = gen
-            let! gateCellIndexs = Random.list gateCount (Random.pair gen gen)
+            let gateCellsGen = Random.list gateCount (Random.pair gen gen)
+            let rec loop gates = monad {
+                let gates1 = gates |>> fst
+                if gates1 |> List.contains roomIndex || (Seq.distinct gates1 |> length <> gateCount) then
+                    let! gateCells = gateCellsGen
+                    return! loop gateCells
+                else
+                    return gates
+            }
+            let! gateCells = gateCellsGen
+            let! gateCellIndexs = loop gateCells
             return (seed, roomIndex, gateCellIndexs)
         }
         |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
