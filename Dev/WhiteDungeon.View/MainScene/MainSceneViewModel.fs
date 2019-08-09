@@ -13,7 +13,7 @@ open WhiteDungeon.Core.Model
 
 open FSharpPlus
 
-open WhiteDungeon.View.MainScene.TEA
+open WhiteDungeon.View.MainScene.Model
 
 type 'Msg MenuItem =
     | TitleText of string

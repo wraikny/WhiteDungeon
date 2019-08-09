@@ -13,7 +13,14 @@ open WhiteDungeon.Core.Model
 
 open FSharpPlus
 
-open WhiteDungeon.View.MainScene.TEA
+open WhiteDungeon.View.MainScene.Model
+
+
+type ViewMsg =
+    | SetBGMVolume of float32
+    | CloseGame
+    | StartGame of Game.Model.Model * float32
+
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     msg |> function

@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.View.MainScene.TEA
+﻿module WhiteDungeon.View.MainScene.Model
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
@@ -55,11 +55,6 @@ type Msg =
     | CloseGameMsg
     | AddBGMVolume of int
 
-
-type ViewMsg =
-    | SetBGMVolume of float32
-    | CloseGame
-    | StartGame of Game.Model.Model * float32
 
 type Model = {
     uiMode : UIMode
