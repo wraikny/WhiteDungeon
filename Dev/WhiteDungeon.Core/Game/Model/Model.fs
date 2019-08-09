@@ -1,5 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Game.Model
 
+open wraikny.Tart.Helper.Math
+
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
@@ -24,6 +26,7 @@ type Model = {
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
+    dungeonGateCells : int Vec2 list
 
     skillList : Skill.SkillList
 
@@ -46,7 +49,7 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let inline init players dungeonBuilder dungeonModel gameSetting = {
+    let inline init players dungeonBuilder dungeonModel dungeonGateCells gameSetting = {
         count = 0u
 
         nextPlayerID = players |> Map.count |> uint32
@@ -58,6 +61,7 @@ module Model =
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
+        dungeonGateCells = dungeonGateCells
 
         gameSetting = gameSetting
 

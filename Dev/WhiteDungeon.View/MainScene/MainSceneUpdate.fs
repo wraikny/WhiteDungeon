@@ -55,8 +55,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             selectOccupation = x
             occupationListToggle = false }, Cmd.none
 
-    | SetDungeonParameters(count, minSize, maxSize, range, corridor) ->
+    | SetDungeonParameters(count, minSize, maxSize, range, corridor, gateCount) ->
         { model with
+            gateCount = gateCount
             dungeonBuilder =
                 { model.dungeonBuilder with
                     roomCount = count
@@ -70,10 +71,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     | GenerateDungeon ->
         monad {
             let! seed = Random.int minValue<int> maxValue<int>
-            let! roomIndex = Random.int 0 (model.dungeonBuilder.roomCount - 1)
-            return (seed, roomIndex)
+            
+            //let roomsCount = (model.dungeonBuilder.roomCount - 1)
+            let gen = Random.int minValue<int> maxValue<int>
+            let! roomIndex = gen
+            let! gateCellIndexs = Random.list model.gateCount (Random.pair gen gen)
+            return (seed, roomIndex, gateCellIndexs)
         }
-        |> TartTask.withEnv(fun (seed, roomIndex) -> async {
+        |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
             let dungeonModel =
                 { model.dungeonBuilder with seed = seed }
                 |> DungeonBuilder.generate
@@ -82,16 +87,16 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
             let largeRoomsCount = length largeRooms
 
-            let targetRoomIndex = roomIndex % largeRoomsCount
+            let initRoomIndex = roomIndex % largeRoomsCount
 
-            let targetRoom = snd largeRooms.[targetRoomIndex]
+            let initRoom = snd largeRooms.[initRoomIndex]
 
             let fromCell =
                 model.gameSetting.dungeonCellSize
                 |> DungeonModel.cellToCoordinate
 
-            let targetPosition =
-                targetRoom.rect
+            let initPosition =
+                initRoom.rect
                 |>> fromCell
                 |> Rect.centerPosition
 
@@ -121,7 +126,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     let player =
                         Game.Model.Actor.Player.init
                             size
-                            (targetPosition - (Vec2.init (float32 index) 0.0f) * size)
+                            (initPosition - (Vec2.init (float32 index) 0.0f) * size)
                             status
                             playerId
                             character
@@ -130,11 +135,24 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 )
                 |> Map.ofSeq
 
+
+            let gateCells =
+                seq {
+                    for (a, b) in gateCellIndexs ->
+                        let room = snd largeRooms.[a % largeRoomsCount]
+                        let cells = room |> Space.cells
+                        let cell = fst cells.[length cells % b]
+                        cell
+                }
+                |> toList
+
+
             let gameModel =
                 Game.Model.Model.init
                     players
                     model.dungeonBuilder
                     dungeonModel
+                    gateCells
                     model.gameSetting
 
             return gameModel

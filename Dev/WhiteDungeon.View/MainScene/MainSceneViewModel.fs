@@ -115,7 +115,8 @@ let selectUIDungeon (model : Model) =
                     100 * i,
                     2 * (i + 1),
                     4 * (i + 1),
-                    33.3f * float32 i, 1 + i ))
+                    33.3f * float32 i, 1 + i,
+                    2 + i))
         yield Separator
     }
     |> Seq.toList

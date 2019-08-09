@@ -48,7 +48,7 @@ type Msg =
     | SelectOccupation of Occupation
     | InputName of string
 
-    | SetDungeonParameters of count:int * minSize:int * maxSize:int * range:float32 * corridor:int
+    | SetDungeonParameters of count:int * minSize:int * maxSize:int * range:float32 * corridor:int * gateCount:int
 
     | GenerateDungeon
     | GeneratedGameModel of Game.Model.Model
@@ -63,6 +63,7 @@ type Model = {
     playerName : string option
     selectOccupation : Occupation
 
+    gateCount : int
     dungeonBuilder : DungeonBuilder
 
     gameSetting : GameSetting
@@ -70,6 +71,7 @@ type Model = {
     bgmVolume : int
 
     prevModel : Model option
+
 }
 
 
@@ -80,6 +82,7 @@ let initModel (gameSetting : GameSetting) = {
     playerName = None
     selectOccupation = Seeker
 
+    gateCount = 3
     dungeonBuilder = {
         seed = 0
         roomCount = 200
