@@ -23,8 +23,8 @@ type PlayerInput =
     | UpKey
     | DownKey
     | DashKey
-    | Skill1Key
-    | Skill2Key
+    //| Skill1Key
+    //| Skill2Key
 
 
 module PlayerInput =
@@ -60,11 +60,11 @@ module PlayerInput =
         actorMove, direction
 
 
-
 type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
+    | PlayerSkill of PlayerID * Actor.SkillKind
     | GenerateNewDungeon
     | GeneratedDungeon of Dungeon.GeneratedDungeonParams
     //#if DEBUG

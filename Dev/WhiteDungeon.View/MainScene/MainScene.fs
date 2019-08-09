@@ -211,10 +211,14 @@ type MainScene(setting : AppSetting) =
             uiWindow2.Toggle(false, fun() ->
                 callBack()
             )
+
+#if DEBUG
     do
         messenger.Msg.Add(printfn "Msg: %A")
         messenger.ViewMsg.Add(printfn "ViewMsg: %A")
+#endif
 
+    do
         messenger.ViewModel.Add(fun viewModel ->
             viewModel |> function
             | ViewModel.Window1 items ->

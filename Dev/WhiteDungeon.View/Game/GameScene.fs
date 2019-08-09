@@ -201,7 +201,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         new Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = gameSceneArgs.bgmVolume, FadeSeconds = 0.5f)
     do
         base.AddComponent(bgmPlayer, bgmPlayer.Name)
-        bgmPlayer.Start()
 
     let playSE s =
         asd.Engine.Sound.Play s
@@ -216,11 +215,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             if gameMode <> vm.uiMode then
                 gameMode <- vm.uiMode
         )
-
-    // Input
-    let mousePushed =
-        asd.Engine.Mouse.GetButtonInputState
-        >> (=) asd.ButtonState.Push
 
 
     override this.OnRegistered() =
@@ -290,6 +284,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             )
 
 
+        // BGM
+        bgmPlayer.Start()
+
+
         // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
@@ -340,21 +338,24 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             else
                 messenger.Enqueue(Msg.TimePasses)
                 
-                
-
-                //this.PushControllerInput() |> function
-                //| [||] -> ()
-                //| msgs ->
-                //    //messenger.Enqueue(Msg.TimePasses)
-                //    msgs |> iter messenger.Enqueue
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 
-                //if mousePushed asd.MouseButtons.ButtonLeft then
-                //    //messenger.Enqueue(Msg.AppendSkillEmits)
-                //    messenger.Enqueue(
-                //        Msg.PlayerInputs(Model.PlayerID 0u, Set.ofList [Msg.Skill1Key])
-                //    )
+                // Input
+                let mousePushed =
+                    asd.Engine.Mouse.GetButtonInputState
+                    >> (=) asd.ButtonState.Push
+
+                [|
+                    asd.MouseButtons.ButtonLeft, Model.Actor.Skill1
+                    asd.MouseButtons.ButtonRight, Model.Actor.Skill2
+                |]
+                |> iter(fun (m, s) ->
+                    if mousePushed m then
+                        messenger.Enqueue(
+                            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                        )
+                )
 
         | Model.HowToControl
         | Model.Pause
@@ -366,24 +367,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
 
     member this.PushControllerInput() : Msg.Msg option =
-        let inline ifThen cond f = if cond then f else id
-
-        //controllers
-        //|> filterMap(fun (id, controller) ->
-        //    let getStateIs (state : asd.ButtonState) key =
-        //        controller.GetState(key)
-        //        |> Option.ofNullable
-        //        |>> ((=) state)
-        //        |> Option.defaultValue false
-
-        //    Msg.PlayerInput.inputs
-        //    |> filter (getStateIs asd.ButtonState.Hold)
-        //    |> function
-        //    | [] -> None
-        //    | inputs ->
-        //        Some <| Msg.PlayerInputs (id, inputs |> Set.ofList)
-        //)
-
         let getStateIs (state : asd.ButtonState) key =
             gameKeybaord.GetState(key)
             |> Option.ofNullable
@@ -392,13 +375,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
         Msg.PlayerInput.inputs
         |> filter (getStateIs asd.ButtonState.Hold)
-
-        |> ifThen (mousePushed asd.MouseButtons.ButtonLeft)
-            (fun xs -> Msg.Skill1Key::xs)
-
-        |> ifThen (mousePushed asd.MouseButtons.ButtonRight)
-            (fun xs -> Msg.Skill2Key::xs)
-
         |> function
         | [] -> None
         | inputs ->

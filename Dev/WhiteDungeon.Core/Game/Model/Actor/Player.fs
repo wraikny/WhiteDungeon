@@ -3,6 +3,8 @@
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+type SkillKind = Skill1 | Skill2
+
 
 type Player = {
     actor : Actor
@@ -31,3 +33,15 @@ module Player =
         skill1CoolTime = 0us
         skill2CoolTime = 0us
     }
+
+    let inline coolTime kind player =
+        kind |> function
+        | Skill1 -> player.skill1CoolTime
+        | Skill2 -> player.skill2CoolTime
+
+    let inline mapCoolTime kind f player =
+        kind |> function
+        | Skill1 ->
+            { player with skill1CoolTime = f player.skill1CoolTime }
+        | Skill2 ->
+            { player with skill2CoolTime = f player.skill2CoolTime }

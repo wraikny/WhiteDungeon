@@ -24,6 +24,12 @@ type OccupationSetting =
         skill2CoolTime : uint16
     }
 
+module OccupationSetting =
+    let inline skillOf kind x =
+        kind |> function
+        | Actor.Skill1 -> x.skill1CoolTime, x.skill1
+        | Actor.Skill2 -> x.skill2CoolTime, x.skill2
+
 
 type GameSetting = {
     dungeonCellSize : float32 Vec2

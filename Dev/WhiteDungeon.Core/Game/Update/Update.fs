@@ -1,10 +1,12 @@
 ﻿namespace WhiteDungeon.Core.Game.Update
 
+open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 open WhiteDungeon.Core.Game.Model.Skill
 
 open WhiteDungeon.Core.Game.Update
@@ -49,10 +51,10 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (actor : Actor.Actor) (skills : seq<Skill.SkillEmitBuilder>) (model : Model) : Model =
+    let appendSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) (model : Model) : Model =
         model
         |> updateSkillList (
-            skills
+            skills actor
             |>> Skill.SkillEmitBuilder.build actor
             |> Skill.SkillList.append
         )
@@ -123,17 +125,7 @@ module Update =
             model, Cmd.none
 
         | PlayerInputs (playerId, inputSet) ->
-            let player = (model.players |> Map.find playerId)
-
-            let occupationSetting = lazy (
-                model.gameSetting.occupationSettings
-                |> Map.find player.character.currentOccupation
-            )
-
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
-
-            let inline ifThen cond f = if cond then f else id
-            
 
             model
             |> ifThen (direction <> zero) (
@@ -145,18 +137,22 @@ module Update =
                 |> Update.Actor.Player.updateActor
                 |> updatePlayerOf playerId
             )
-            |> ifThen (player.skill1CoolTime = 0us && inputSet.Contains Skill1Key) (
-                let setting = occupationSetting.Force()
-                updatePlayerOf playerId (Actor.Player.setSkill1CoolTime setting.skill1CoolTime)
-                >> appendSkills player.actor (setting.skill1 player.actor)
-            )
-            |> ifThen (player.skill2CoolTime = 0us && inputSet.Contains Skill2Key) (
-                let setting = occupationSetting.Force()
-                updatePlayerOf playerId (Actor.Player.setSkill2CoolTime setting.skill2CoolTime)
-                >> appendSkills player.actor (setting.skill2 player.actor)
-            )
+            , Cmd.none
 
+        | PlayerSkill (playerId, kind) ->
+            let player = (model.players |> Map.find playerId)
 
+            let coolTime, skill =
+                model.gameSetting.occupationSettings
+                |> Map.find player.character.currentOccupation
+                |> OccupationSetting.skillOf kind
+            
+
+            model
+            |> ifThen (player |> Player.coolTime kind = 0us) (
+                updatePlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
+                >> appendSkills player.actor skill
+            )
             , Cmd.none
 
         | GenerateNewDungeon ->
