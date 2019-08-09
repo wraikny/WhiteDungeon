@@ -70,7 +70,7 @@ let appSetting : View.AppSetting = {
     }
 
     gameSetting = {
-        dungeonCellSize = Vec2.init 200.0f 200.0f
+        dungeonCellSize = Vec2.init 250.0f 250.0f
         minPlayerCount = 1
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4

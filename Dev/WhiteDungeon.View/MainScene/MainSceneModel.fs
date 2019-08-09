@@ -10,6 +10,7 @@ open wraikny.Tart.Advanced.Dungeon
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Model
+open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 
@@ -95,8 +96,8 @@ let initModel (gameSetting : GameSetting) = {
         maxRoomSize = (12, 12)
 
         roomMoveRate = 0.2f
-        roomMeanThreshold = 1.25f
-        restoreEdgeRate = 0.15f
+        roomMeanThreshold = 1.28f
+        restoreEdgeRate = 0.11f
         corridorWidth = 3
     }
 

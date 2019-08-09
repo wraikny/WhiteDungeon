@@ -116,7 +116,7 @@ module UIItem =
         Text "攻撃: マウス左クリック"
         Text "一時停止: Escキー"
         Separator
-        Text "門に触れると階層を遷移"
+        Text "黒いマスに触れて階層を移動できます"
         Button ("始める", SetGameMode Model.GameMode)
         Separator
     ]

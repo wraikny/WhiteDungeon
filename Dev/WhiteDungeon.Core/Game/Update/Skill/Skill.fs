@@ -12,12 +12,11 @@ open FSharpPlus
 open wraikny.Tart.Helper.Extension
 
 module Effect =
-    let apply gameSetting (invoker : Actor.Actor) (effect : Effect) (actor : Actor.Actor) =
+    let apply (invoker : Actor.Actor) (effect : Effect) (actor : Actor.Actor) =
         effect |> function
         | Damage calc ->
             let damage =
                 calc
-                    gameSetting
                     invoker.statusCurrent
                     actor.statusCurrent
 
@@ -75,13 +74,13 @@ module AreaSkill =
 
 
 
-    let isCollided (areaSkill : AreaSkill) (actor : Actor.Actor) : bool =
+    let inline isCollided (areaSkill : AreaSkill) (actor : Actor.Actor) : bool =
         Rect.isCollided
             (actor.objectBase |> ObjectBase.area)
             (areaSkill.objectBase |> ObjectBase.area)
 
 
-    let checkCollision (actors : seq<Actor.Actor>) (areaSkill : AreaSkill) : AreaSkill =
+    let inline checkCollision (actors : seq<Actor.Actor>) (areaSkill : AreaSkill) : AreaSkill =
         {
             areaSkill with
                 collidedActors =
@@ -91,35 +90,35 @@ module AreaSkill =
                     |> Set.ofSeq
         }
 
-    let private apply (gameSetting : GameSetting) (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor =
+    let private apply (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor =
         // TODO
         areaSkill.collidedActors
         |> Set.contains actor.id
         |> function
         | true ->
             areaSkill.skillBase.effects
-            |>> (Effect.apply gameSetting areaSkill.skillBase.invokerActor)
+            |>> (Effect.apply areaSkill.skillBase.invokerActor)
             |> fold (|>) actor
         | false ->
             actor
 
-    let getFoledSkills gameSetting =
-        Map.toSeq
-        >> map (snd >> apply gameSetting)
-        >> fold (>>) id
+    let inline getFoledSkills skillsMap =
+        skillsMap
+        |> Map.toSeq
+        |> map (snd >> apply)
+        |> fold (>>) id
 
-    let applyToActorHolders
-        (gameSetting)
+    let inline applyToActorHolders
         (updater : (Actor.Actor -> Actor.Actor) -> 'a -> 'a)
         (skills : Map<_, AreaSkill>)
         (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
 
-        let foledSkills = getFoledSkills gameSetting skills
+        let foledSkills = getFoledSkills skills
 
         holders
         |>> updater foledSkills
 
-    let hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
+    let inline hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
         if areaSkill.removeWhenHitActor && (areaSkill.emits |> Array.isEmpty |> not) then
             None
         else

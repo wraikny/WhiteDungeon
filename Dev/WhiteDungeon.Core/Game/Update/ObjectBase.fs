@@ -88,7 +88,7 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : f
 
 let private moveWithBS
     f
-    (gameSetting : Model.GameSetting)
+    (gameSetting : Game.Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
     (diff0) (obj : ObjectBase)
     =

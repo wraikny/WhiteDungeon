@@ -9,7 +9,7 @@ open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Model
+
 
 open FSharpPlus
 

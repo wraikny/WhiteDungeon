@@ -17,6 +17,7 @@
     <Compile Include="Game\Model\Actor\Player.fs" />
     <Compile Include="Game\Model\Actor\Enemy.fs" />
     <Compile Include="Game\Model\Skill\Skill.fs" />
+    <Compile Include="Game\Model\GameSetting.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />

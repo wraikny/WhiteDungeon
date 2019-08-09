@@ -41,6 +41,8 @@ type Model = {
     mode : GameSceneMode
 
     lastCollidedGate : bool
+
+    dungeonFloor : uint32
 }
 
 
@@ -76,6 +78,8 @@ module Model =
         mode = HowToControl
 
         lastCollidedGate = false
+
+        dungeonFloor = 1u
     }
 
 open wraikny.Tart.Core

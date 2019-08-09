@@ -95,9 +95,7 @@ module Update =
                 model
                 |> updateEachPlayer Actor.Player.update
                 |> updateEachEnemy Actor.Enemy.update
-            let model =
-                model
-                |> updateSkillList (Skill.SkillList.update model)
+                |> fun x -> updateSkillList (Skill.SkillList.update x) x
                 |> applySkills
                 |> fun m -> { m with timePassed = true }
                 |> fun m ->
@@ -117,7 +115,10 @@ module Update =
                             if m.lastCollidedGate then
                                 { m with lastCollidedGate = true }
                             else
-                                { m with mode = Stair; lastCollidedGate = true}
+                                { m with
+                                    mode = Stair
+                                    lastCollidedGate = true
+                                    dungeonFloor = model.dungeonFloor + 1u }
                         | false ->
                             { m with lastCollidedGate = false }
 
@@ -187,7 +188,7 @@ module Update =
                         {
                             delay = 0u
                             effects = [|
-                                Skill.Damage(fun gs atk def ->
+                                Skill.Damage(fun atk def ->
                                     0.0f
                                 )
                             |]
