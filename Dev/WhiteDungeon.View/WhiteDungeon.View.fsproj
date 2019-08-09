@@ -79,7 +79,7 @@
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\DungeonCellView.fs" />
     <Compile Include="Game\GameScene.fs" />
-    <Compile Include="MainScene\MainSceneTEA.fs" />
+    <Compile Include="MainScene\MainSceneModel.fs" />
     <Compile Include="MainScene\MainSceneUpdate.fs" />
     <Compile Include="MainScene\MainSceneViewModel.fs" />
     <Compile Include="MainScene\MainScene.fs" />
