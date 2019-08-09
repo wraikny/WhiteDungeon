@@ -77,7 +77,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
     | SetGameSceneRandomSeed x ->
         Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
-        |> TartTask.perform (fun e -> System.Console.WriteLine(e); GenerateDungeon) GeneratedGameModel
+        |> TartTask.perform (fun e ->
+#if DEBUG
+            System.Console.WriteLine(e)
+#endif
+            GenerateDungeon) GeneratedGameModel
         |> fun cmd ->
             { model with gameSceneRandomSeed = x }, cmd
 
@@ -91,8 +95,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     let name = Option.defaultValue (sprintf "Player%d" index) name
 
                     let status =
-                        model.gameSetting.occupationDefaultStatus
+                        model.gameSetting.occupationSettings
                         |> Map.find occupation
+                        |> fun x -> x.status
 
                     let character : Model.Character = {
                         id = Model.CharacterID -index

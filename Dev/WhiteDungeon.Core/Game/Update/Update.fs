@@ -49,11 +49,11 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (skills : seq<Actor.Actor * Skill.SkillEmitBuilder>) (model : Model) : Model =
+    let appendSkills (actor : Actor.Actor) (skills : seq<Skill.SkillEmitBuilder>) (model : Model) : Model =
         model
         |> updateSkillList (
             skills
-            |>> fun (a, b) -> Skill.SkillEmitBuilder.build a b
+            |>> Skill.SkillEmitBuilder.build actor
             |> Skill.SkillList.append
         )
 
@@ -66,7 +66,6 @@ module Update =
             players =
                 let f =
                     Skill.AreaSkill.applyToActorHolders
-                        gameSetting
                         Actor.Player.updateActor
 
                 model.players
@@ -76,7 +75,6 @@ module Update =
             enemies =
                 let f =
                     Skill.AreaSkill.applyToActorHolders
-                        gameSetting
                         Actor.Enemy.updateActor
 
                 model.enemies
@@ -124,29 +122,50 @@ module Update =
 
             model, Cmd.none
 
-        | PlayerInputs (id, inputSet) ->
+        | PlayerInputs (playerId, inputSet) ->
+            let player = (model.players |> Map.find playerId)
+
+            let occupationSetting = lazy (
+                model.gameSetting.occupationSettings
+                |> Map.find player.character.currentOccupation
+            )
+
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
+
+            let inline ifThen cond f = if cond then f else id
             
-            let model =
-                if direction <> zero then
-                    model
-                    |> updatePlayerOf id (
-                        Update.Actor.Player.updateActor <|
-                            Update.Actor.Actor.move
-                                model.gameSetting
-                                model.dungeonModel
-                                move
-                                direction
-                    )
-                else
-                    model
+
+            model
+            |> ifThen (direction <> zero) (
+                Update.Actor.Actor.move
+                    model.gameSetting
+                    model.dungeonModel
+                    move
+                    direction
+                |> Update.Actor.Player.updateActor
+                |> updatePlayerOf playerId
+            )
+            |> ifThen (player.skill1CoolTime = 0us && inputSet.Contains Skill1Key) (
+                let setting = occupationSetting.Force()
+                updatePlayerOf playerId (Actor.Player.setSkill1CoolTime setting.skill1CoolTime)
+                >> appendSkills player.actor (setting.skill1 player.actor)
+            )
+            |> ifThen (player.skill2CoolTime = 0us && inputSet.Contains Skill2Key) (
+                let setting = occupationSetting.Force()
+                updatePlayerOf playerId (Actor.Player.setSkill2CoolTime setting.skill2CoolTime)
+                >> appendSkills player.actor (setting.skill2 player.actor)
+            )
 
 
-            model, Cmd.none
+            , Cmd.none
 
         | GenerateNewDungeon ->
             Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
-            |> TartTask.perform (fun _ -> GenerateNewDungeon) GeneratedDungeon
+            |> TartTask.perform (fun e ->
+#if DEBUG
+                System.Console.WriteLine(e)
+#endif
+                GenerateNewDungeon) GeneratedDungeon
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
 
@@ -169,46 +188,46 @@ module Update =
             , Cmd.port ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
 
 
-        #if DEBUG
+        //#if DEBUG
 
-        | AppendSkillEmits ->
-            let id = PlayerID 0u
-            let player0 = model.players |> Map.find id
-            let dir = 
-                player0.actor.objectBase.direction
-                |> Model.MoveDirection.toVector
+        //| AppendSkillEmits ->
+        //    let id = PlayerID 0u
+        //    let player0 = model.players |> Map.find id
+        //    let dir = 
+        //        player0.actor.objectBase.direction
+        //        |> Model.MoveDirection.toVector
 
-            let pos =
-                player0.actor.objectBase.position
-                + (100.0f *. dir)
+        //    let pos =
+        //        player0.actor.objectBase.position
+        //        + (100.0f *. dir)
 
-            let emit : Skill.SkillEmitBuilder =
-                {
-                    skillBase =
-                        {
-                            delay = 0u
-                            effects = [|
-                                Skill.Damage(fun atk def ->
-                                    0.0f
-                                )
-                            |]
-                        }
-                    objectBase = ObjectBase.init (one .* 100.0f) pos
+        //    let emit : Skill.SkillEmitBuilder =
+        //        Skill.AreaBuilder {
+        //            skillBase =
+        //                {
+        //                    delay = 0u
+        //                    effects = [|
+        //                        Skill.Damage(fun atk def ->
+        //                            0.0f
+        //                        )
+        //                    |]
+        //                }
+        //            objectBase = ObjectBase.init (one .* 100.0f) pos
 
-                    target = Skill.AreaTarget.Enemies
+        //            target = Skill.AreaTarget.Enemies
 
-                    removeWhenHitWall = true
-                    removeWhenHitActor = true
+        //            removeWhenHitWall = true
+        //            removeWhenHitActor = true
 
-                    move = seq {
-                        for _ in 1..10 -> Skill.Stay
-                        for _ in 1..60 -> Skill.Move(dir .* 5.0f)
-                        for _ in 1..60 -> Skill.Scale(one .* 5.0f)
-                    } |> toList
-                } |> Skill.AreaBuilder
+        //            move = seq {
+        //                for _ in 1..10 -> Skill.Stay
+        //                for _ in 1..60 -> Skill.Move(dir .* 5.0f)
+        //                for _ in 1..60 -> Skill.Scale(one .* 5.0f)
+        //            } |> toList
+        //        }
 
-            let emits = [player0.actor, emit]
+        //    let emits = [emit]
 
-            model |> appendSkills emits, Cmd.none
+        //    model |> appendSkills player0.actor emits, Cmd.none
 
-        #endif
+        //#endif

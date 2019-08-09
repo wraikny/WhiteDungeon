@@ -78,9 +78,9 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         |> KeyboardBuilder.build
         :> IController<Game.Msg.PlayerInput>
 
-    let controllers = [|
-        Game.Model.PlayerID 0u, gameKeybaord
-    |]
+    //let controllers = [|
+    //    Game.Model.PlayerID 0u, gameKeybaord
+    //|]
 
     let backLayer =
         let color = new asd.Color(255uy, 255uy, 255uy)
@@ -217,6 +217,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                 gameMode <- vm.uiMode
         )
 
+    // Input
+    let mousePushed =
+        asd.Engine.Mouse.GetButtonInputState
+        >> (=) asd.ButtonState.Push
+
 
     override this.OnRegistered() =
         let convert (item : ViewModel.UIItem) =
@@ -335,18 +340,22 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             else
                 messenger.Enqueue(Msg.TimePasses)
                 
-                // Input
-                let inline mouseLeftPushed() =
-                    asd.Engine.Mouse.GetButtonInputState(asd.MouseButtons.ButtonLeft) = asd.ButtonState.Push
+                
 
-                this.PushControllerInput() |> function
-                | [||] -> ()
-                | msgs ->
-                    //messenger.Enqueue(Msg.TimePasses)
-                    msgs |> iter messenger.Enqueue
+                //this.PushControllerInput() |> function
+                //| [||] -> ()
+                //| msgs ->
+                //    //messenger.Enqueue(Msg.TimePasses)
+                //    msgs |> iter messenger.Enqueue
+                this.PushControllerInput()
+                |> iter messenger.Enqueue
 
-                if mouseLeftPushed() then
-                    messenger.Enqueue(Msg.AppendSkillEmits)
+                //if mousePushed asd.MouseButtons.ButtonLeft then
+                //    //messenger.Enqueue(Msg.AppendSkillEmits)
+                //    messenger.Enqueue(
+                //        Msg.PlayerInputs(Model.PlayerID 0u, Set.ofList [Msg.Skill1Key])
+                //    )
+
         | Model.HowToControl
         | Model.Pause
         | Model.GameFinished true ->
@@ -356,19 +365,44 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         | _ -> ()
 
 
-    member this.PushControllerInput() : Msg.Msg [] =
-        controllers
-        |> filterMap(fun (id, controller) ->
-            let getStateIs (state : asd.ButtonState) key =
-                controller.GetState(key)
-                |> Option.ofNullable
-                |>> ((=) state)
-                |> Option.defaultValue false
+    member this.PushControllerInput() : Msg.Msg option =
+        let inline ifThen cond f = if cond then f else id
 
-            Msg.PlayerInput.inputs
-            |> filter (getStateIs asd.ButtonState.Hold)
-            |> function
-            | [] -> None
-            | inputs ->
-                Some <| Msg.PlayerInputs (id, inputs |> Set.ofList)
-        )
+        //controllers
+        //|> filterMap(fun (id, controller) ->
+        //    let getStateIs (state : asd.ButtonState) key =
+        //        controller.GetState(key)
+        //        |> Option.ofNullable
+        //        |>> ((=) state)
+        //        |> Option.defaultValue false
+
+        //    Msg.PlayerInput.inputs
+        //    |> filter (getStateIs asd.ButtonState.Hold)
+        //    |> function
+        //    | [] -> None
+        //    | inputs ->
+        //        Some <| Msg.PlayerInputs (id, inputs |> Set.ofList)
+        //)
+
+        let getStateIs (state : asd.ButtonState) key =
+            gameKeybaord.GetState(key)
+            |> Option.ofNullable
+            |>> ((=) state)
+            |> Option.defaultValue false
+
+        Msg.PlayerInput.inputs
+        |> filter (getStateIs asd.ButtonState.Hold)
+
+        |> ifThen (mousePushed asd.MouseButtons.ButtonLeft)
+            (fun xs -> Msg.Skill1Key::xs)
+
+        |> ifThen (mousePushed asd.MouseButtons.ButtonRight)
+            (fun xs -> Msg.Skill2Key::xs)
+
+        |> function
+        | [] -> None
+        | inputs ->
+
+            (Model.PlayerID 0u, inputs |> Set.ofList)
+            |> Msg.PlayerInputs
+            |> Some

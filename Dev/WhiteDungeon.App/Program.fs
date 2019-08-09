@@ -8,11 +8,13 @@ open wraikny.MilleFeuille.Fs.UI
 open WhiteDungeon
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 open WhiteDungeon.Core.Game.Model.Skill
 
+open FSharpPlus.Math.Applicative
 open FSharpPlus
 
 let black = Vec3.init 0uy 0uy 0uy
@@ -75,14 +77,53 @@ let appSetting : View.AppSetting = {
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 200.0f
-        occupationDefaultStatus = [
-            Model.Seeker, ({
-                Model.ActorStatus.level = 1
-                hp = 100.0f
-                walkSpeed = 6.0f
-                dashSpeed = 12.0f
-            } : Model.ActorStatus)
-        ] |> Map.ofList
+        occupationSettings = Map.ofList [
+            Model.Seeker, {
+                status =
+                    {
+                        Model.ActorStatus.level = 1
+                        hp = 100.0f
+                        walkSpeed = 6.0f
+                        dashSpeed = 12.0f
+                    }
+                skill1 = fun actor ->
+                    let dir = 
+                        actor.objectBase.direction
+                        |> Model.MoveDirection.toVector
+
+                    let pos = actor.objectBase.position + (100.0f *. dir)
+
+                    [
+                        Skill.AreaBuilder {
+                            skillBase =
+                                {
+                                    delay = 0u
+                                    effects = [|
+                                        Skill.Damage(fun atk def ->
+                                            0.0f
+                                        )
+                                    |]
+                                }
+                            objectBase = ObjectBase.init (one .* 100.0f) pos
+
+                            target = Skill.AreaTarget.Enemies
+
+                            removeWhenHitWall = true
+                            removeWhenHitActor = true
+
+                            move = seq {
+                                for _ in 1..10 -> Skill.Stay
+                                for _ in 1..60 -> Skill.Move(dir .* 5.0f)
+                                for _ in 1..60 -> Skill.Scale(one .* 5.0f)
+                            } |> toList
+                        }
+                    ]
+                skill2 = fun _ -> []
+
+                skill1CoolTime = 20us
+                skill2CoolTime = 120us
+            }
+        ]
     }
 }
 

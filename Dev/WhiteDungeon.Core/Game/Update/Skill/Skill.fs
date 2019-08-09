@@ -102,13 +102,13 @@ module AreaSkill =
         | false ->
             actor
 
-    let inline getFoledSkills skillsMap =
+    let getFoledSkills skillsMap =
         skillsMap
         |> Map.toSeq
         |> map (snd >> apply)
         |> fold (>>) id
 
-    let inline applyToActorHolders
+    let applyToActorHolders
         (updater : (Actor.Actor -> Actor.Actor) -> 'a -> 'a)
         (skills : Map<_, AreaSkill>)
         (holders : Map<'ID, 'a>) : Map<'ID, 'a> =

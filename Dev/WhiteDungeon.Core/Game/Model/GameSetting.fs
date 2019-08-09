@@ -14,15 +14,15 @@ open WhiteDungeon.Core.Model
 //    }
 
 
-type OccupationSetting = {
-    status : ActorStatus
-    skill1 : Actor.Actor -> Skill.SkillEmitBuilder list
-    skill2 : Actor.Actor -> Skill.SkillEmitBuilder list
+type OccupationSetting =
+    {
+        status : ActorStatus
+        skill1 : Actor.Actor -> Skill.SkillEmitBuilder list
+        skill2 : Actor.Actor -> Skill.SkillEmitBuilder list
 
-    skill1CoolTime : uint16
-    skill2CoolTime : uint16
-}
-
+        skill1CoolTime : uint16
+        skill2CoolTime : uint16
+    }
 
 
 type GameSetting = {
@@ -31,7 +31,7 @@ type GameSetting = {
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
     characterSize : float32 Vec2
-    occupationDefaultStatus : Map<Occupation, ActorStatus>
+    occupationSettings : Map<Occupation, OccupationSetting>
 }
 
 
@@ -39,38 +39,23 @@ module GameSetting =
     open wraikny.Tart.Advanced
     open wraikny.Tart.Helper.Collections
 
-    let collidedWithCell (gameSetting) cell =
-        Seq.exists(fun point ->
-            Dungeon.DungeonModel.coordinateToCell
-                gameSetting.dungeonCellSize
-                point
-            |> (=) cell
-        )
+    let inline collidedWithCell (gameSetting) cell =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> (=) cell
+        |> Seq.exists
 
-    let collidedWiithCells
-        (gameSetting : GameSetting)
-        (cells : _) =
-        Seq.exists(fun point ->
-            let cell =
-                Dungeon.DungeonModel.coordinateToCell
-                    gameSetting.dungeonCellSize
-                    point
-            cells
-            |> Set.contains cell
-        )
+    let collidedWiithCells (gameSetting : GameSetting) cells =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> flip Set.contains cells
+        |> Seq.exists
 
-    let insideCells
-        (gameSetting : GameSetting)
-        (cells : _) =
-        Seq.forall(fun point ->
-            let cell =
-                Dungeon.DungeonModel.coordinateToCell
-                    gameSetting.dungeonCellSize
-                    point
-            cells
-            |> HashMap.containsKey cell
-
-        )
+    let insideCells (gameSetting : GameSetting) cells =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> flip HashMap.containsKey cells
+        |> Seq.forall
 
     let inline insideDungeon 
         (gameSetting : GameSetting)

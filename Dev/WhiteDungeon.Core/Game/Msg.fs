@@ -23,6 +23,8 @@ type PlayerInput =
     | UpKey
     | DownKey
     | DashKey
+    | Skill1Key
+    | Skill2Key
 
 
 module PlayerInput =
@@ -65,7 +67,7 @@ type Msg =
     | PlayerInputs of PlayerID * PlayerInput Set
     | GenerateNewDungeon
     | GeneratedDungeon of Dungeon.GeneratedDungeonParams
-    #if DEBUG
-    /// for Debug
-    | AppendSkillEmits
-    #endif
+    //#if DEBUG
+    ///// for Debug
+    //| AppendSkillEmits
+    //#endif
