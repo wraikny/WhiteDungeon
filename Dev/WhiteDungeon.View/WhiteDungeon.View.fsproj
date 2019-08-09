@@ -79,8 +79,8 @@
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\DungeonCellView.fs" />
     <Compile Include="Game\GameScene.fs" />
-    <Compile Include="MainSceneTEA.fs" />
-    <Compile Include="MainScene.fs" />
+    <Compile Include="MainScene\MainSceneTEA.fs" />
+    <Compile Include="MainScene\MainScene.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Altseed">
