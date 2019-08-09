@@ -10,8 +10,8 @@ type GameSceneMode =
     | Stair
     | Pause
     | GameMode
-    | GameOver
-    | GameFinished
+    //| GameOver
+    | GameFinished of back:bool
 
 
 type Model = {

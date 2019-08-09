@@ -115,6 +115,7 @@ module UIItem =
         Text "攻撃: マウス左クリック"
         Text "一時停止: Escキー"
         Button ("始める", SetGameMode Model.GameMode)
+        Separator
     ]
 
     let stair = [
@@ -128,8 +129,8 @@ module UIItem =
         HeaderText "一時停止"
         Separator
         Button ("再開する", SetGameMode Model.GameMode)
-        TitleButton "タイトルに戻る"
-        CloseButton "ゲームを終了する"
+        Button ("ゲームを終了する", SetGameMode <| GameFinished true)
+        Separator
     ]
 
     let gameFinished header = [
@@ -138,7 +139,8 @@ module UIItem =
         URLButton("ツイートする", "https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ \n@LepusPluvia")
         Separator
         TitleButton "タイトルに戻る"
-        CloseButton "ゲームを終了する"
+        CloseButton "閉じる"
+        Separator
     ]
 
 
@@ -192,8 +194,8 @@ module ViewModel =
             | HowToControl -> Some UIItem.howToControll
             | Pause -> Some UIItem.pause
             | Stair -> Some UIItem.stair
-            | GameFinished -> Some( UIItem.gameFinished "ゲーム終了")
-            | GameOver -> Some( UIItem.gameFinished "ゲームオーバー")
+            | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
+            | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
             | GameMode ->
                 None
     }

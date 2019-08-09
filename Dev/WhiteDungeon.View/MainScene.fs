@@ -75,6 +75,7 @@ type MainScene(setting : AppSetting) =
 
     let windowSetting =
         { UI.WindowSetting.Default(null) with
+            animationFrame = 20u
             itemMargin = 20.0f
             itemAlignment = UI.WindowSetting.Center
 
@@ -165,14 +166,15 @@ type MainScene(setting : AppSetting) =
                 Diagnostics.Process.Start(url) |> ignore
             )
         | InputField(maxLength, placeHolder, current, msg) ->
-            let text = if current = "" then None else Some current
-            UI.InputField(maxLength, placeHolder, text, fun s -> messenger.Enqueue(msg s))
+            UI.InputField(maxLength, placeHolder, current, fun s -> messenger.Enqueue(msg s))
         | Separator ->
             UI.Rect(5.0f, 0.8f)
         | Space x ->
             UI.Space x
 
     let mutable lastWindow = WindowKind.W1
+
+    let se_page = asd.Engine.Sound.CreateSoundSource("se/page03.ogg", true)
 
     let callbackAfterClosed (callBack : unit -> unit) =
         lastWindow |> function
@@ -197,6 +199,8 @@ type MainScene(setting : AppSetting) =
 
                 if lastWindow = WindowKind.W2 then
                     callbackAfterClosed(fun () ->
+                        // TODO
+                        asd.Engine.Sound.Play(se_page) |> ignore
                         uiWindowMain.Toggle(true)
                     )
 
@@ -208,6 +212,8 @@ type MainScene(setting : AppSetting) =
 
                 if lastWindow = WindowKind.W1 then
                     callbackAfterClosed(fun() ->
+                        // TODO
+                        asd.Engine.Sound.Play(se_page) |> ignore
                         sideWindow.Toggle(true)
                         uiWindow2.Toggle(true)
                     )
@@ -215,23 +221,36 @@ type MainScene(setting : AppSetting) =
                 lastWindow <- W2
         )
 
+    let bgmPlayer = new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ], FadeSeconds = 1.0f)
+    do
+
+        base.AddComponent(bgmPlayer, bgmPlayer.Name)
+        bgmPlayer.Start()
+
 
     override this.OnRegistered() =
         GC.Collect()
 
         messenger.ViewMsg.Add(function
+            | SetBGMVolume v ->
+                bgmPlayer.Volume <- v
+
             | CloseGame ->
+                bgmPlayer.FadeOut(0.5f)
                 callbackAfterClosed(asd.Engine.Close)
-            | StartGame gameModel ->
+
+            | StartGame (gameModel, bgmVolume) ->
                 callbackAfterClosed(fun() ->
                     let uiFonts : Game.UIArgs = {
                         windowSetting = windowSetting
                         headerFont = headerFont
                         textFont = textFont
                         buttonFont = buttonFont
+                        bgmVolume = bgmVolume
                         createMainScene = fun() -> new MainScene(setting) :> asd.Scene
                     }
                     let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
+                    bgmPlayer.FadeOut(0.5f)
                     this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
                     |> ignore
                 )
@@ -249,6 +268,9 @@ type MainScene(setting : AppSetting) =
         uiLayer.AddObject(sideWindow)
 
         uiWindowMain.UIContents <- viewConverter <!> titleUI
+
+        // TODO
+        asd.Engine.Sound.Play(se_page) |> ignore
         uiWindowMain.Toggle(true)
 
         messenger.StartAsync()

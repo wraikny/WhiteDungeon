@@ -70,8 +70,8 @@
     <Content Include="packages.config" />
     <Compile Include="ViewSetting.fs" />
     <Compile Include="Utils\Color.fs" />
+    <Compile Include="Utils\BGMPlayer.fs" />
     <Compile Include="UI\BackGround.fs" />
-    <Compile Include="UI\Button.fs" />
     <Compile Include="UI\Keyboard.fs" />
     <Compile Include="Game\MoveAnimation.fs" />
     <Compile Include="Game\PlayerView.fs" />

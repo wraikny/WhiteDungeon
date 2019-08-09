@@ -42,7 +42,7 @@ let appSetting : View.AppSetting = {
             frameColor = Vec4.init ume.x ume.y ume.z 200uy
             buttonColor = createButtonColor sumire 1.0f 0.8f 0.6f
             inputColor = createButtonColor sakura 1.0f 0.8f 0.6f
-            inputFocusColor = createButtonColor sakura 0.8f 0.8f 0.8f
+            inputFocusColor = createButtonColor sakura 1.0f 1.0f 1.0f
 
             inputFont = "Font/mplus-1c-light.ttf"
             inputFontSize = 30
@@ -52,44 +52,21 @@ let appSetting : View.AppSetting = {
             window2MarginRate = 0.02f
             window2HeightRate = 0.9f
 
+            bgm = "bgm/seirei_no_machi.ogg"
+
             #if !DEBUG
             #endif
         }
 
     gameViewSetting = {
         occupationImages = [
-        //#if DEBUG
-        //    Model.DebugOccupation, ({
-        //        sleepWalk = 10u
-        //        sleepDash = 5u
-        //        front = [
-        //            "Image/Debug/down.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        frontRight = [
-        //            "Image/Debug/rightdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        frontLeft = [
-        //            "Image/Debug/leftdown.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        back = [
-        //            "Image/Debug/up.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        backRight = [
-        //            "Image/Debug/rightup.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        backLeft = [
-        //            "Image/Debug/leftup.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        right = [
-        //            "Image/Debug/right.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //        left = [
-        //            "Image/Debug/left.png", Rect.init zero (Vec2.init 128 128), 0.0f
-        //        ]
-        //    } : ActorImages<_, _>)
-        //#endif
             Model.Seeker, ActorImages.fromGraphicmaker 9u 6u "Image/Game/Occupation/hunter.png"
         ] |> Map.ofList
+
+        bgms = [
+            "bgm/gensei_no_rakuen.ogg"
+            "bgm/buriki_no_coffee_maker.ogg"
+        ]
     }
 
     gameSetting = {
@@ -99,19 +76,11 @@ let appSetting : View.AppSetting = {
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 200.0f
         occupationDefaultStatus = [
-        //#if DEBUG
-        //    Model.DebugOccupation, ({
-        //        level = 1
-        //        hp = 100.0f
-        //        walkSpeed = 10.0f
-        //        dashSpeed = 15.0f
-        //    } : Model.ActorStatus)
-        //#endif
             Model.Seeker, ({
                 Model.ActorStatus.level = 1
                 hp = 100.0f
-                walkSpeed = 8.0f
-                dashSpeed = 12.0f
+                walkSpeed = 6.0f
+                dashSpeed = 8.0f
             } : Model.ActorStatus)
         ] |> Map.ofList
     }

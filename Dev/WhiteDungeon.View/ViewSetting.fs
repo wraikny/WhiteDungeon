@@ -65,11 +65,12 @@ module ActorImages =
     let fromGraphicmaker sleepWalk sleepDash path =
         let size = Vec2.init 32 64
         let textures xi yi =
-            [ for i in 0..2 ->
+            [1; 2; 1; 0]
+            |> List.map (fun i ->
                 ( path
                 , Rect.init (size * (Vec2.init (i + xi * 3) yi)) size
                 , 0.0f)
-            ]
+            )
         {
             sleepWalk = sleepWalk
             sleepDash = sleepDash
@@ -85,6 +86,7 @@ module ActorImages =
 
 type GameViewSetting = {
     occupationImages : Map<Occupation, ActorImages<string, int Rect2>>
+    bgms : string list
 }
 
 open wraikny.MilleFeuille.Fs.UI
@@ -103,6 +105,8 @@ type MainSceneSetting = {
     windowWidthWRate : float32
     window2MarginRate : float32
     window2HeightRate : float32
+
+    bgm : string
     
 #if !DEBUG
     titleFont : string

@@ -37,6 +37,9 @@ type UIArgs = {
     headerFont : asd.Font
     textFont : asd.Font
     buttonFont : asd.Font
+
+    bgmVolume : float32
+
     createMainScene : unit -> asd.Scene
 }
 
@@ -177,6 +180,28 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
             Position = asd.Engine.WindowSize.To2DF() / 2.0f
         )
 
+    let bgmPlayer =
+        new Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = uiArgs.bgmVolume, FadeSeconds = 0.5f)
+    do
+        base.AddComponent(bgmPlayer, bgmPlayer.Name)
+        bgmPlayer.Start()
+
+    let se_page = asd.Engine.Sound.CreateSoundSource("se/page03.ogg", true)
+    //let se_metal = asd.Engine.Sound.CreateSoundSource("se/metal03.ogg", true)
+
+    let mutable gameMode = Model.HowToControl
+    do
+        messenger.ViewModel.Add(fun vm ->
+            if gameMode <> vm.uiMode then
+                gameMode <- vm.uiMode
+
+                vm.uiMode |> function
+                | Model.Pause ->
+                    //asd.Engine.Sound.Play(se_metal) |> ignore
+                    ()
+                | _ -> ()
+        )
+
 
     override this.OnRegistered() =
         GC.Collect()
@@ -201,6 +226,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                     let scene = uiArgs.createMainScene()
 
                     uiWindowMain.Toggle(false, fun() ->
+                        bgmPlayer.FadeOut(0.5f)
                         this.ChangeSceneWithTransition(scene, new asd.TransitionFade(0.5f, 0.5f))
                         |> ignore
                     )
@@ -208,7 +234,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
             | ViewModel.CloseButton(text) ->
                 UI.Button(text, fun() ->
                     messenger.Dispose()
-
+                    bgmPlayer.FadeOut(0.5f)
                     uiWindowMain.Toggle(false, fun() ->
                         asd.Engine.Close()
                     )
@@ -218,10 +244,17 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
             .Add(function
                 | None ->
                     if uiWindowMain.IsToggleOn then
-                        uiWindowMain.Toggle(false)
+                        uiWindowMain.Toggle(false, fun() ->
+                            bgmPlayer.Resume()
+                        )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
+
                     if not uiWindowMain.IsToggleOn then
+                        bgmPlayer.Pause()
+
+                        // TODO
+                        asd.Engine.Sound.Play(se_page) |> ignore
                         uiWindowMain.Toggle(true)
             )
 
@@ -257,7 +290,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
     override this.OnUpdated() =
         messenger.NotifyView()
 
-        if not uiWindowMain.IsToggleOn then
+        gameMode |> function
+        | Model.GameMode ->
             // Mouse inside window
             let mousePos = asd.Engine.Mouse.Position |> Vec2.fromVector2DF
             let ws = asd.Engine.WindowSize.To2DF() |> Vec2.fromVector2DF
@@ -273,26 +307,27 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                 messenger.Enqueue(Msg.SetGameMode Model.Pause)
             
             else
+                messenger.Enqueue(Msg.TimePasses)
+                
                 // Input
                 let inline mouseLeftPushed() =
                     asd.Engine.Mouse.GetButtonInputState(asd.MouseButtons.ButtonLeft) = asd.ButtonState.Push
 
                 this.PushControllerInput() |> function
-                | [||] ->
-                    if mouseLeftPushed() then
-                        messenger.Enqueue(Msg.AppendSkillEmits)
-                        messenger.Enqueue(Msg.TimePasses)
-            #if DEBUG
-                    if asd.Engine.Keyboard.GetKeyState(asd.Keys.T) = asd.ButtonState.Hold then
-                        messenger.Enqueue(Msg.TimePasses)
-            #endif
-
+                | [||] -> ()
                 | msgs ->
-                    messenger.Enqueue(Msg.TimePasses)
+                    //messenger.Enqueue(Msg.TimePasses)
                     msgs |> iter messenger.Enqueue
 
-                    if mouseLeftPushed() then
-                        messenger.Enqueue(Msg.AppendSkillEmits)
+                if mouseLeftPushed() then
+                    messenger.Enqueue(Msg.AppendSkillEmits)
+        | Model.HowToControl
+        | Model.Pause
+        | Model.GameFinished true ->
+            if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
+                messenger.Enqueue(Msg.SetGameMode Model.GameMode)
+
+        | _ -> ()
 
 
     member this.PushControllerInput() : Msg.Msg [] =

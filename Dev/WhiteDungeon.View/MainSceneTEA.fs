@@ -19,7 +19,7 @@ type 'Msg MenuItem =
     | Text of string
     | Button of string * 'Msg
     | WebsiteButton of string * string
-    | InputField of int * string * string * (string -> 'Msg)
+    | InputField of int * string * string option * (string -> 'Msg)
     | Separator
     | Space of float32
 
@@ -38,13 +38,20 @@ type SelectMode =
 type CreditMode =
     | CreditProject
     | CreditLibs
-    | CreditBGM
+    | CreditMusic
+    | CreditImage
+    //| CreditTool
+
+
+type SettingMode =
+    | SoundVolume
 
 
 type UIMode =
     | Title
     | Select of SelectMode
     | Credit of CreditMode
+    | Setting of SettingMode
     | WaitingGenerating
     | ErrorUI of exn
 
@@ -60,22 +67,26 @@ type Msg =
     | GenerateDungeon
     | GeneratedGameModel of Game.Model.Model
     | CloseGameMsg
+    | AddBGMVolume of int
 
 
 type ViewMsg =
+    | SetBGMVolume of float32
     | CloseGame
-    | StartGame of Game.Model.Model
+    | StartGame of Game.Model.Model * float32
 
 type Model = {
     uiMode : UIMode
     occupationListToggle : bool
 
-    playerName : string
+    playerName : string option
     selectOccupation : Occupation
 
     dungeonBuilder : DungeonBuilder
 
     gameSetting : GameSetting
+
+    bgmVolume : int
 }
 
 
@@ -83,7 +94,7 @@ let initModel (gameSetting : GameSetting) = {
     uiMode = Title
     occupationListToggle = false
 
-    playerName = "Player1"
+    playerName = None
     selectOccupation = Seeker
 
     dungeonBuilder = {
@@ -102,6 +113,8 @@ let initModel (gameSetting : GameSetting) = {
     }
 
     gameSetting = gameSetting
+
+    bgmVolume = 5
 }
 
 
@@ -112,11 +125,15 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             uiMode = uiMode
             occupationListToggle = false }, Cmd.none
 
+    | AddBGMVolume i ->
+        let v = model.bgmVolume + i |> min 10 |> max 0 
+        { model with bgmVolume = v}, Cmd.port(SetBGMVolume (float32 v / 10.0f))
+
     | OccupationListToggle x ->
         { model with occupationListToggle = x }, Cmd.none
 
     | InputName s ->
-        { model with playerName = s }, Cmd.none
+        { model with playerName = if s = "" then None else Some s }, Cmd.none
 
     | SelectOccupation x ->
         { model with
@@ -168,6 +185,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 [ model.playerName, model.selectOccupation ]
                 |> Seq.indexed
                 |> Seq.map(fun (index, (name, occupation)) ->
+                    let name = Option.defaultValue (sprintf "Player%d" index) name
+
                     let status =
                         model.gameSetting.occupationDefaultStatus
                         |> Map.find occupation
@@ -210,22 +229,21 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             { model with uiMode = WaitingGenerating }, cmd
 
     | GeneratedGameModel gameModel ->
-        model, Cmd.port(ViewMsg.StartGame gameModel)
+        model, Cmd.port(ViewMsg.StartGame (gameModel, float32 model.bgmVolume / 10.0f))
 
     | CloseGameMsg ->
         model, Cmd.port CloseGame
 
 
 let titleUI = [
-    Space 50.0f
     TitleText "九十九のラビリンス"
     Text "C96体験版 / Lepus Pluvia"
     Separator
     Button("始める", SetUI <| Select CharacterSelect)
+    Button("設定", SetUI <| Setting SoundVolume)
     Button("クレジット", SetUI <| Credit CreditProject)
     Button("終わる", CloseGameMsg)
     Separator
-    Space 50.0f
 ]
 
 
@@ -241,7 +259,7 @@ let playerView (model : Model) =
     let x = model.selectOccupation
     let status = model.gameSetting.occupationDefaultStatus |> Map.find x
     [
-        Text(sprintf "名前: %s" model.playerName)
+        Text(sprintf "名前: %s" <| Option.defaultValue "Player1" model.playerName)
         Text(sprintf "キャラクター: %A" x)
         Text(sprintf "レベル: %d" status.level)
         Text(sprintf "体力: %.1f" status.hp)
@@ -312,7 +330,7 @@ let selectUICheck (model : Model) =
         [
             Text("以下の内容でゲームを開始します")
             Separator
-            Text(sprintf "%s / %A" model.playerName model.selectOccupation)
+            Text(sprintf "%s / %A" (Option.defaultValue "Player1" model.playerName) model.selectOccupation)
             Separator
         ]
         dungeonView model
@@ -328,7 +346,9 @@ let creditUISide = [
     Button("もどる", SetUI Title)
     Button("制作", SetUI <| Credit CreditProject)
     Button("ライブラリ", SetUI <| Credit CreditLibs)
-    Button("BGM", SetUI <| Credit CreditBGM)
+    Button("音楽", SetUI <| Credit CreditMusic)
+    Button("画像", SetUI <| Credit CreditImage)
+    //Button("ツール", SetUI <| Credit CreditTool)
 ]
 
 
@@ -357,22 +377,59 @@ let creditUILibs = [
 let creditUIBGM = [
     HeaderText "音楽"
     Separator
-    Text "てすと"
-    Text "あああああ"
-    Text "あああああ"
+    WebsiteButton("フリー音楽素材 H/MIX GALLERY", "http://www.hmix.net/")
+    Text "精霊の街"
+    Text "原生の楽園"
+    Text "ブリキのコーヒーメーカー"
+    Separator
+    WebsiteButton("くらげ工匠", "http://www.kurage-kosho.info/")
+    Text "ページめくり03"
     Separator
 ]
 
-let creditUIImages = [
-    HeaderText "イラスト"
+let creditUIImage = [
+    HeaderText "画像"
     Separator
-    Text "てすと"
-    Text "あああああ"
-    Text "あああああ"
+    WebsiteButton("彩黄月/8方向キャラチップ合成素材", "http://kaengouraiu.yu-nagi.com/")
+    WebsiteButton("ヒバナ/紙の壁紙", "http://hibana.rgr.jp/")
+    Separator
+    WebsiteButton("グラフィック合成器", "http://www.silversecond.com/WolfRPGEditor/")
     Separator
 ]
+
+//let creditUITool = [
+//    HeaderText "ツール"
+//    Separator
+//    WebsiteButton("グラフィック合成器", "http://www.silversecond.com/WolfRPGEditor/")
+//    Separator
+//]
 
 // https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ @LepusPluvia
+
+let settingUISide = [
+    Button("もどる", SetUI Title)
+    Button("音量", SetUI <| Setting SoundVolume)
+]
+
+let settingUISoundVolume model =
+    [
+        HeaderText "音量"
+        Separator
+        Text <| sprintf "BGM: %d/10" model.bgmVolume
+    ] @ (
+        let upButton = Button("上げる", AddBGMVolume 1)
+        let downButton = Button("下げる", AddBGMVolume -1)
+        model.bgmVolume |> function
+        | 0 -> 
+            [ upButton; Text "下げる" ]
+        | 10 ->
+            [ Text "上げる"; downButton ]
+        | _ ->
+            [ upButton; downButton ]
+
+    ) @ [
+        Separator
+    ]
 
 
 let view (model : Model) : Msg ViewModel =
@@ -391,7 +448,14 @@ let view (model : Model) : Msg ViewModel =
         Window2(creditUISide, x |> function
             | CreditProject -> creditUIProj
             | CreditLibs -> creditUILibs
-            | CreditBGM -> creditUIBGM
+            | CreditMusic -> creditUIBGM
+            | CreditImage -> creditUIImage
+            //| CreditTool -> creditUITool
+        )
+
+    | Setting x ->
+        Window2(settingUISide, x |> function
+            | SoundVolume -> settingUISoundVolume model
         )
 
     | WaitingGenerating ->

@@ -110,7 +110,7 @@ module Update =
                     |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
                     |> function
                     | true -> m
-                    | false -> { m with mode = GameOver }
+                    | false -> { m with mode = GameFinished false }
 
             model, Cmd.none
 

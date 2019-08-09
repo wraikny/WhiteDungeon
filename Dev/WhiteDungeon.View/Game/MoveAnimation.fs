@@ -82,6 +82,9 @@ type MoveAnimation(owner : asd.TextureObject2D) =
         if current <> dir then
             current <- dir
             coroutine <- anim.GetEnumerator()
+            true
+        else
+            false
 
     member __.Next() =
         if coroutine <> null then

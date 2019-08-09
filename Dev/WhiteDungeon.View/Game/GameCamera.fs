@@ -26,7 +26,7 @@ type GameCamera() =
     let mutable currentPosition = ValueNone
 
     member val Zoom = 0.8f with get, set
-    member val Speed = 0.4f with get, set
+    member val Speed = 0.2f with get, set
 
     override this.OnUpdate() =
         targetPosition
@@ -57,15 +57,6 @@ type GameCamera() =
                     this.SetSrc(nextPosition)
         )
 
-    interface IObserver<ViewModel.CameraView list> with
-        member this.OnNext(cameras) =
-            // TODO
-            let cameraView = cameras |> head
-            targetPosition <- ValueSome cameraView.position
-
-        member __.OnError(e) = raise e
-        member __.OnCompleted() = printfn "GameCamera Completed"
-
 
     member this.SetSrc(srcPos : float32 Vec2) =
 
@@ -76,3 +67,12 @@ type GameCamera() =
             (Vec2.toVector2DI (int <!> srcPos)) - size / 2
             , size
         )
+
+    interface IObserver<ViewModel.CameraView list> with
+        member this.OnNext(cameras) =
+            // TODO
+            let cameraView = cameras |> head
+            targetPosition <- ValueSome cameraView.position
+
+        member __.OnError(e) = raise e
+        member __.OnCompleted() = printfn "GameCamera Completed"

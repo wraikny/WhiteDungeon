@@ -30,7 +30,14 @@ type PlayerView(gameViewSetting) =
     let textureOjb = new asd.TextureObject2D()
 
     let sizeViewRect = new asd.RectangleShape()
-    let sizeView = new asd.GeometryObject2D( Shape = sizeViewRect, Color = asd.Color(0, 0, 255, 50) )
+    let sizeView =
+        let enabled = false
+        new asd.GeometryObject2D(
+            Shape = sizeViewRect,
+            Color = asd.Color(0, 0, 255, 50),
+            IsUpdated = enabled,
+            IsDrawn = enabled
+        )
     do
         base.AddDrawnChild(
             textureOjb,
@@ -59,7 +66,7 @@ type PlayerView(gameViewSetting) =
             let area = objectBase.area
             let centerPos = Rect.centerPosition area
             lastPosition <- centerPos
-            this.Position <- Vec2.toVector2DF centerPos
+            this.Position <- Vec2.toVector2DF (map floor centerPos)
 
             // Size
             lastSize <- area.size
@@ -68,9 +75,9 @@ type PlayerView(gameViewSetting) =
 
             this.SetOccupation(viewModel.character.currentOccupation)
 
-            moveAnimation.SetDirection(objectBase.direction)
+            let changedDir = moveAnimation.SetDirection(objectBase.direction)
 
-            if textureOjb.Texture = null || objectBase.isMoved then
+            if changedDir || objectBase.isMoved || textureOjb.Texture = null then
                 moveAnimation.Next()
 
                 let texSize = textureOjb.Src.Size

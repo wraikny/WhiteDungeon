@@ -53,7 +53,8 @@ type DungeonCellView(cellSize : float32 Vec2) =
     inherit asd.Chip2D()
 
     do
-        base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Debug/empty200x200white.png")
+        //base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Debug/empty200x200white.png")
+        base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Game/cotton-c.png")
 
     interface IUpdatee<int Vec2 * Dungeon.SpaceID> with
         member this.Update(viewModel) =
