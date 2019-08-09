@@ -151,6 +151,8 @@ type MainScene(setting : AppSetting) =
             view = view
         }
 
+    let se_button = asd.Engine.Sound.CreateSoundSource("se/button47.ogg", true)
+
     let viewConverter item =
         item |> function
         | TitleText text ->
@@ -160,9 +162,15 @@ type MainScene(setting : AppSetting) =
         | Text text ->
             UI.Text(text)
         | Button(text, msg) ->
-            UI.Button(text, fun() -> messenger.Enqueue(msg))
+            UI.Button(text, fun() ->
+                // TODO
+                asd.Engine.Sound.Play(se_button) |> ignore
+                messenger.Enqueue(msg))
+
         | WebsiteButton(text, url) ->
             UI.Button(text, fun() ->
+                // TODO
+                asd.Engine.Sound.Play(se_button) |> ignore
                 Diagnostics.Process.Start(url) |> ignore
             )
         | InputField(maxLength, placeHolder, current, msg) ->

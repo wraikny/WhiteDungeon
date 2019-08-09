@@ -384,6 +384,7 @@ let creditUIBGM = [
     Separator
     WebsiteButton("くらげ工匠", "http://www.kurage-kosho.info/")
     Text "ページめくり03"
+    Text "ボタン47"
     Separator
 ]
 
@@ -393,6 +394,7 @@ let creditUIImage = [
     WebsiteButton("彩黄月/8方向キャラチップ合成素材", "http://kaengouraiu.yu-nagi.com/")
     WebsiteButton("ヒバナ/紙の壁紙", "http://hibana.rgr.jp/")
     Separator
+    HeaderText "ツール"
     WebsiteButton("グラフィック合成器", "http://www.silversecond.com/WolfRPGEditor/")
     Separator
 ]

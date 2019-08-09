@@ -186,6 +186,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
         base.AddComponent(bgmPlayer, bgmPlayer.Name)
         bgmPlayer.Start()
 
+    let se_button = asd.Engine.Sound.CreateSoundSource("se/button47.ogg", true)
     let se_page = asd.Engine.Sound.CreateSoundSource("se/page03.ogg", true)
     //let se_metal = asd.Engine.Sound.CreateSoundSource("se/metal03.ogg", true)
 
@@ -217,10 +218,16 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                 UI.Rect(3.0f, 0.8f)
             | ViewModel.URLButton(text, url) ->
                 UI.Button(text, fun() ->
+                    // TODO
+                    asd.Engine.Sound.Play(se_button) |> ignore
+
                     Diagnostics.Process.Start(url) |> ignore
                 )
             | ViewModel.TitleButton(text) ->
                 UI.Button(text, fun() ->
+                    // TODO
+                    asd.Engine.Sound.Play(se_button) |> ignore
+
                     messenger.Dispose()
 
                     let scene = uiArgs.createMainScene()
@@ -233,6 +240,9 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                 )
             | ViewModel.CloseButton(text) ->
                 UI.Button(text, fun() ->
+                    // TODO
+                    asd.Engine.Sound.Play(se_button) |> ignore
+
                     messenger.Dispose()
                     bgmPlayer.FadeOut(0.5f)
                     uiWindowMain.Toggle(false, fun() ->
