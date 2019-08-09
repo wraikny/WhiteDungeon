@@ -35,6 +35,7 @@ type DungeonCellKind =
     | Corridor
     | SmallRoom
     | LargeRoom
+    | Gate
 
 module DungeonCellKind =
     let fromSpaceID = function
@@ -56,18 +57,17 @@ type DungeonCellView(cellSize : float32 Vec2) =
         //base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Debug/empty200x200white.png")
         base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Game/cotton-c.png")
 
-    interface IUpdatee<int Vec2 * Dungeon.SpaceID> with
+    interface IUpdatee<int Vec2 * DungeonCellKind> with
         member this.Update(viewModel) =
             //let ((kind, cell), (v1, v2, v3)) = viewModel
             ////let c00, c01, c02 = v1.x, v1.y, v1.z
             ////let c10,      c12 = v2.x,       v2.y
             ////let c20, c21, c22 = v3.x, v3.y, v3.z
 
-            let cell, id = viewModel
+            let cell, kind = viewModel
 
             this.Color <-
-                id
-                |> DungeonCellKind.fromSpaceID
+                kind
                 |> function
                 | Corridor ->
                     ColorPalette.sumire
@@ -75,6 +75,8 @@ type DungeonCellView(cellSize : float32 Vec2) =
                     ColorPalette.ume
                 | LargeRoom ->
                     ColorPalette.sakura
+                | Gate ->
+                    ColorPalette.black
 
             let pos =
                 Dungeon.DungeonModel.cellToCoordinate cellSize cell

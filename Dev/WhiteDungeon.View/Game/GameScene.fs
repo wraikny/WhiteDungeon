@@ -52,7 +52,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
         Messenger.build
             { seed = 0 }
             {
-                init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView gameModel.dungeonModel)
+                init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
@@ -93,13 +93,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
         messenger.ViewModel
             .Select(fun v -> ViewModel.ViewModel.getPlayers v)
             .Subscribe(
-            new ActorsUpdater<_, _>(
-                playerLayer, {
+                ActorsUpdater<_, _>(playerLayer, {
                     create = fun () -> new PlayerView(gameViewSetting)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed PlayersUpdater"
-                }
-            ))
+                }))
         |> ignore
 
         // SkillEffects
@@ -112,7 +110,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
             messenger.ViewModel
                 .Select(fun v -> s v)
                 .Subscribe(
-                    new ActorsUpdater<_, _>(skillEffectsLayer, {
+                    ActorsUpdater<_, _>(skillEffectsLayer, {
                             create = fun () -> new SkillEmitView(gameViewSetting)
                             onError = raise
                             onCompleted = fun () -> printfn "Completed %A" s
@@ -156,16 +154,25 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
     do
         messenger.ViewMsg
             .Add(function
-                | ViewMsg.UpdateDungeonView dungeonModel ->
+                | ViewMsg.UpdateDungeonView (dungeonModel, gateCells) ->
+                    let cellsDict = 
+                        dungeonModel.cells
+                        |> HashMap.toSeq
+                        |>> fun (pos, id) -> (pos, DungeonCellKind.fromSpaceID id)
+                        |> fun x -> Dictionary<_, _>(dict x)
+
+                    for pos in gateCells do
+                        cellsDict.[pos] <- DungeonCellKind.Gate
+
                     seq {
-                        let cells = dungeonModel.cells |> HashMap.toSeq
-                        let mutable index = 0u
-                        for cell in cells do
-                            yield (index, cell)
-                            index <- index + 1u
+                        let mutable i = 0u
+                        for KeyValue(p, k) in cellsDict do
+                            yield (i, (p, k))
+                            i <- i + 1u
                     }
                     |> toList
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
+                    GC.Collect()
                 //| _ -> ()
             )
 

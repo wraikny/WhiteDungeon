@@ -25,7 +25,7 @@ type GameCamera() =
     let mutable targetPosition = ValueNone
     let mutable currentPosition = ValueNone
 
-    member val Zoom = 0.8f with get, set
+    member val Zoom = 0.3f with get, set
     member val Speed = 0.2f with get, set
 
     override this.OnUpdate() =
