@@ -32,7 +32,7 @@ open System.Reactive
 open System.Reactive.Linq
 
 
-type UIArgs = {
+type GameSceneArgs = {
     windowSetting : UI.WindowSetting
     headerFont : asd.Font
     textFont : asd.Font
@@ -41,16 +41,20 @@ type UIArgs = {
     bgmVolume : float32
 
     createMainScene : unit -> asd.Scene
+
+    randomSeed : int
 }
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArgs : UIArgs) =
+type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
 
     let messenger : IMessenger<_, _, _> =
         Messenger.build
-            { seed = 0 }
+            {
+                seed = gameSceneArgs.randomSeed
+            }
             {
                 init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
                 view = ViewModel.ViewModel.view
@@ -87,6 +91,13 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
     let playerLayer = new asd.Layer2D()
     let skillEffectsLayer = new asd.Layer2D()
     let uiLayer = new asd.Layer2D()
+
+    let uiBackRect =
+        let rect = new asd.RectangleShape(DrawingArea = asd.RectF(asd.Vector2DF(), asd.Engine.WindowSize.To2DF()))
+        new asd.GeometryObject2D(Shape = rect, IsUpdated = false)
+    do
+        uiLayer.AddObject(uiBackRect)
+
 
     do
         // Players
@@ -149,7 +160,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
             create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
-        })
+        }, UpdatingOption = View.UpdatingOption.Updating)
 
     do
         messenger.ViewMsg
@@ -172,7 +183,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                     }
                     |> toList
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
-                    GC.Collect()
                 //| _ -> ()
             )
 
@@ -183,45 +193,36 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
 
 
     let uiWindowMain =
-        new UI.MouseWindow(uiArgs.windowSetting, uiMouse,
+        new UI.MouseWindow(gameSceneArgs.windowSetting, uiMouse,
             Position = asd.Engine.WindowSize.To2DF() / 2.0f
         )
 
     let bgmPlayer =
-        new Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = uiArgs.bgmVolume, FadeSeconds = 0.5f)
+        new Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = gameSceneArgs.bgmVolume, FadeSeconds = 0.5f)
     do
         base.AddComponent(bgmPlayer, bgmPlayer.Name)
         bgmPlayer.Start()
 
     let playSE s =
         asd.Engine.Sound.Play s
-        |> fun i -> asd.Engine.Sound.SetVolume(i, uiArgs.bgmVolume)
+        |> fun i -> asd.Engine.Sound.SetVolume(i, gameSceneArgs.bgmVolume)
 
     let se_button = asd.Engine.Sound.CreateSoundSource("se/button47.ogg", true)
     let se_page = asd.Engine.Sound.CreateSoundSource("se/page03.ogg", true)
-    //let se_metal = asd.Engine.Sound.CreateSoundSource("se/metal03.ogg", true)
 
     let mutable gameMode = Model.HowToControl
     do
         messenger.ViewModel.Add(fun vm ->
             if gameMode <> vm.uiMode then
                 gameMode <- vm.uiMode
-
-                vm.uiMode |> function
-                | Model.Pause ->
-                    //asd.Engine.Sound.Play(se_metal) |> ignore
-                    ()
-                | _ -> ()
         )
 
 
     override this.OnRegistered() =
-        GC.Collect()
-
         let convert (item : ViewModel.UIItem) =
             item |> function
             | ViewModel.HeaderText text ->
-                UI.TextWith(text, uiArgs.headerFont)
+                UI.TextWith(text, gameSceneArgs.headerFont)
             | ViewModel.Text(text) -> UI.Text(text)
             | ViewModel.Button(text, msg) ->
                 UI.Button(text, fun() -> messenger.Enqueue msg)
@@ -243,7 +244,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
 
                     messenger.Dispose()
 
-                    let scene = uiArgs.createMainScene()
+                    let scene = gameSceneArgs.createMainScene()
 
                     uiWindowMain.Toggle(false, fun() ->
                         bgmPlayer.FadeOut(0.5f)
@@ -269,6 +270,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                     if uiWindowMain.IsToggleOn then
                         uiWindowMain.Toggle(false, fun() ->
                             bgmPlayer.Resume()
+                            uiBackRect.IsDrawn <- false
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -278,6 +280,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
 
                         // TODO
                         playSE(se_page)
+                        uiBackRect.IsDrawn <- true
                         uiWindowMain.Toggle(true)
             )
 

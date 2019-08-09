@@ -90,20 +90,24 @@ let appSetting : View.AppSetting = {
 
 [<EntryPoint>]
 let main _ =
-    let windowSize = appSetting.windowSize |> Vec2.toVector2DI
-    asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
-    |> ignore
+    try
+        let windowSize = appSetting.windowSize |> Vec2.toVector2DI
+        asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
+        |> function
+        | false -> ()
+        | true ->
+            asd.Engine.File.AddRootDirectory("Resources")
 
-    asd.Engine.File.AddRootDirectory("Resources")
+            //let scene = new View.Title.TitleScene(viewSetting)
 
-    //let scene = new View.Title.TitleScene(viewSetting)
+            let scene = new MainScene.MainScene(appSetting)
+            asd.Engine.ChangeScene(scene)
 
-    let scene = new MainScene.MainScene(appSetting)
-    asd.Engine.ChangeScene(scene)
+            while asd.Engine.DoEvents() do
+                asd.Engine.Update()
 
-    while asd.Engine.DoEvents() do
-        asd.Engine.Update()
+            asd.Engine.Terminate()
+    with e ->
+        System.Console.WriteLine(e)
 
-    asd.Engine.Terminate()
     0
-

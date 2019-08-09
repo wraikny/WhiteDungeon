@@ -19,7 +19,7 @@ open WhiteDungeon.View.MainScene.Model
 type ViewMsg =
     | SetBGMVolume of float32
     | CloseGame
-    | StartGame of Game.Model.Model * float32
+    | StartGame of Game.Model.Model * int * float32
 
 
 let bgmToFloat bgmVolume = float32 bgmVolume / 100.0f
@@ -72,10 +72,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         }, Cmd.none
 
     | GenerateDungeon ->
+        let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
+        { model with uiMode = WaitingGenerating }, randomCmd
+
+    | SetGameSceneRandomSeed x ->
         Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
-        |> TartTask.perform (ErrorUI >> SetUI) GeneratedGameModel
+        |> TartTask.perform (fun _ -> GenerateDungeon) GeneratedGameModel
         |> fun cmd ->
-            { model with uiMode = WaitingGenerating }, cmd
+            { model with gameSceneRandomSeed = x }, cmd
 
     | GeneratedGameModel dungeonParams ->
         let gameModel =
@@ -121,7 +125,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 dungeonParams.gateCells
                 model.gameSetting
 
-        model, Cmd.port(ViewMsg.StartGame (gameModel, bgmToFloat model.bgmVolume))
+        model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
 
     | CloseGameMsg ->
         model, Cmd.port CloseGame

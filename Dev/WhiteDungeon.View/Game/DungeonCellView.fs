@@ -44,12 +44,6 @@ module DungeonCellKind =
         | Dungeon.Large _ -> LargeRoom
 
 
-type CellAround = DungeonCellKind ValueOption
-
-type DungeonCellViewModel =
-    (CellAround * int Vec2) * (CellAround Vec3 * CellAround Vec2 * CellAround Vec3)
-
-
 type DungeonCellView(cellSize : float32 Vec2) =
     inherit asd.Chip2D()
 
@@ -59,11 +53,6 @@ type DungeonCellView(cellSize : float32 Vec2) =
 
     interface IUpdatee<int Vec2 * DungeonCellKind> with
         member this.Update(viewModel) =
-            //let ((kind, cell), (v1, v2, v3)) = viewModel
-            ////let c00, c01, c02 = v1.x, v1.y, v1.z
-            ////let c10,      c12 = v2.x,       v2.y
-            ////let c20, c21, c22 = v3.x, v3.y, v3.z
-
             let cell, kind = viewModel
 
             this.Color <-
@@ -83,4 +72,3 @@ type DungeonCellView(cellSize : float32 Vec2) =
             this.Position <- Vec2.toVector2DF pos
 
             this.Scale <- (Vec2.toVector2DF cellSize) / this.Texture.Size.To2DF()
-

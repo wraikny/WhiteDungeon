@@ -75,7 +75,7 @@ type MainScene(setting : AppSetting) =
     let mainWindowWidth = windowSize.x * menuSetting.windowWidthWRate
 
     let windowSetting =
-        { UI.WindowSetting.Default(null) with
+        { UI.WindowSetting.Default(textFont) with
             animationFrame = 20u
             itemMargin = 20.0f
             itemAlignment = UI.WindowSetting.Center
@@ -271,7 +271,7 @@ type MainScene(setting : AppSetting) =
                     yield()
                 })
 
-            | Update.StartGame (gameModel, bgmVolume) ->
+            | Update.StartGame (gameModel, randomSeed, bgmVolume) ->
                 messenger.Dispose()
                 this.StartCoroutine("StartGame", seq {
                     
@@ -281,12 +281,13 @@ type MainScene(setting : AppSetting) =
                         yield! Coroutine.sleep 10
 
                     callbackAfterClosed(fun() ->
-                        let uiFonts : Game.UIArgs = {
+                        let uiFonts : Game.GameSceneArgs = {
                             windowSetting = windowSetting
                             headerFont = headerFont
                             textFont = textFont
                             buttonFont = buttonFont
                             bgmVolume = bgmVolume
+                            randomSeed = randomSeed
                             createMainScene = fun() -> new MainScene(setting) :> asd.Scene
                         }
                         let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)

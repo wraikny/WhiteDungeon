@@ -41,6 +41,7 @@ type UIMode =
 
 
 type Msg =
+    | SetGameSceneRandomSeed of int
     | UndoModel
     | SetUI of UIMode
     | SetUIWithHistory of UIMode
@@ -72,6 +73,7 @@ type Model = {
 
     prevModel : Model option
 
+    gameSceneRandomSeed : int
 }
 
 
@@ -103,4 +105,6 @@ let initModel (gameSetting : GameSetting) = {
     bgmVolume = 5
 
     prevModel = None
+
+    gameSceneRandomSeed = 0
 }

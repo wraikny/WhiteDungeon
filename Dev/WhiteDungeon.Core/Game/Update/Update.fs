@@ -145,7 +145,7 @@ module Update =
 
         | GenerateNewDungeon ->
             Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
-            |> TartTask.perform (ErrorUI >> SetGameMode) GeneratedDungeon
+            |> TartTask.perform (fun _ -> GenerateNewDungeon) GeneratedDungeon
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
 

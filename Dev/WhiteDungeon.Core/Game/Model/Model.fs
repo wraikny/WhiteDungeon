@@ -133,50 +133,6 @@ module Dungeon =
                 }
                 |> Set.ofSeq
 
-            //let size = model.gameSetting.characterSize
-            //let players =
-            //    [ model.playerName, model.selectOccupation ]
-            //    |> Seq.indexed
-            //    |> Seq.map(fun (index, (name, occupation)) ->
-            //        let name = Option.defaultValue (sprintf "Player%d" index) name
-
-            //        let status =
-            //            model.gameSetting.occupationDefaultStatus
-            //            |> Map.find occupation
-
-            //        let character : Model.Character = {
-            //            id = Model.CharacterID -index
-            //            name = name
-            //            currentOccupation = occupation
-            //            occupations = [
-            //                occupation, status
-            //            ] |> Map.ofList
-            //        }
-
-
-            //        let playerId = Game.Model.PlayerID (uint32 index)
-
-            //        let player =
-            //            Game.Model.Actor.Player.init
-            //                size
-            //                (initPosition - (Vec2.init (float32 index) 0.0f) * size)
-            //                status
-            //                playerId
-            //                character
-
-            //        (playerId, player)
-            //    )
-            //    |> Map.ofSeq
-
-
-            //let gameModel =
-            //    Game.Model.Model.init
-            //        players
-            //        model.dungeonBuilder
-            //        dungeonModel
-            //        gateCells
-            //        model.gameSetting
-
             return {
                 dungeonBuilder = dungeonBuilder
                 dungeonModel = dungeonModel
