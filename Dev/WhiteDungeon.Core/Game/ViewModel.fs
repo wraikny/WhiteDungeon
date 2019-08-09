@@ -105,6 +105,7 @@ type UIItem =
     | URLButton of string * string
     | TitleButton of string
     | CloseButton of string
+    | Space of float32
 
 
 module UIItem =
@@ -121,10 +122,10 @@ module UIItem =
     let stair = [
         HeaderText "次の階層に移動しますか？"
         Separator
-        //Button("移動する", )
+        Button("移動する", GenerateNewDungeon)
         Button("このまま続ける", SetGameMode Model.GameMode)
         Separator
-        TitleButton "タイトルに戻る"
+        Button ("ゲームを終了する", SetGameMode <| GameFinished true)
         Separator
     ]
 
@@ -144,6 +145,14 @@ module UIItem =
         TitleButton "タイトルに戻る"
         CloseButton "閉じる"
         Separator
+    ]
+
+    let errorUI (e : exn) = [
+        HeaderText "エラーが発生しました"
+        Separator
+        Text <| e.GetType().ToString()
+        Text e.Message
+        TitleButton("タイトルに戻る")
     ]
 
 
@@ -199,6 +208,15 @@ module ViewModel =
             | Stair -> Some UIItem.stair
             | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
             | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
+            | ErrorUI e -> Some <| UIItem.errorUI e
+            | WaitingGenerating ->
+                Some [
+                    Separator
+                    Space 200.0f
+                    HeaderText("迷宮生成中……")
+                    Space 200.0f
+                    Separator
+                ]
             | GameMode ->
                 None
     }

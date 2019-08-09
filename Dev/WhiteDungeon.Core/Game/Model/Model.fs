@@ -14,6 +14,8 @@ type GameSceneMode =
     | Stair
     | Pause
     | GameMode
+    | WaitingGenerating
+    | ErrorUI of exn
     //| GameOver
     | GameFinished of back:bool
 
@@ -37,6 +39,8 @@ type Model = {
     timePassed : bool
 
     mode : GameSceneMode
+
+    lastCollidedGate : bool
 }
 
 
@@ -70,6 +74,8 @@ module Model =
         timePassed = false
 
         mode = HowToControl
+
+        lastCollidedGate = false
     }
 
 open wraikny.Tart.Core

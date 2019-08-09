@@ -120,7 +120,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 dungeonParams.dungeonModel
                 dungeonParams.gateCells
                 model.gameSetting
-        
+
         model, Cmd.port(ViewMsg.StartGame (gameModel, bgmToFloat model.bgmVolume))
 
     | CloseGameMsg ->

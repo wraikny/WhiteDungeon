@@ -63,6 +63,8 @@ type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
+    | GenerateNewDungeon
+    | GeneratedDungeon of Dungeon.GeneratedDungeonParams
     #if DEBUG
     /// for Debug
     | AppendSkillEmits

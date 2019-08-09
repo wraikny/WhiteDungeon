@@ -227,6 +227,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, uiArg
                 UI.Button(text, fun() -> messenger.Enqueue msg)
             | ViewModel.Separator ->
                 UI.Rect(3.0f, 0.8f)
+            | ViewModel.Space x ->
+                UI.Space x
             | ViewModel.URLButton(text, url) ->
                 UI.Button(text, fun() ->
                     // TODO

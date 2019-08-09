@@ -1,6 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Game.Update
 
 open wraikny.Tart.Core
+open wraikny.Tart.Core.Libraries
 
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
@@ -113,9 +114,12 @@ module Update =
                         |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
                         |> function
                         | true ->
-                            { m with mode = Stair }
+                            if m.lastCollidedGate then
+                                { m with lastCollidedGate = true }
+                            else
+                                { m with mode = Stair; lastCollidedGate = true}
                         | false ->
-                            m
+                            { m with lastCollidedGate = false }
 
             model, Cmd.none
 
@@ -139,6 +143,31 @@ module Update =
 
             model, Cmd.none
 
+        | GenerateNewDungeon ->
+            Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
+            |> TartTask.perform (ErrorUI >> SetGameMode) GeneratedDungeon
+            |> fun cmd ->
+                { model with mode = GameSceneMode.WaitingGenerating }, cmd
+
+        | GeneratedDungeon dungeonParams ->
+            let size = model.gameSetting.characterSize
+            let model =
+                model
+                |> updateEachPlayer (fun p ->
+                    let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * size)
+                    
+                    Actor.Player.updateObjectBase (ObjectBase.setPosition pos) p
+                )
+
+            { model with
+                mode = GameSceneMode.GameMode
+                dungeonBuilder = dungeonParams.dungeonBuilder
+                dungeonModel = dungeonParams.dungeonModel
+                dungeonGateCells = dungeonParams.gateCells
+            }
+            , Cmd.port ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
+
+
         #if DEBUG
 
         | AppendSkillEmits ->
@@ -152,29 +181,6 @@ module Update =
                 player0.actor.objectBase.position
                 + (100.0f *. dir)
 
-            //let emit : Skill.Skill.EmitBase = {
-            //    invokerActor = player0.actor
-            //    target = Skill.Skill.Target.Area {
-            //            removeWhenHitActor = false
-            //            removeWhenHitWall = true
-            //            area = ObjectBase.init (Vec2.init(100.0f, 100.0f)) pos
-            //            move = seq {
-            //                for _ in 1..10 -> Skill.Skill.Stay
-            //                for _ in 1..60 -> Skill.Skill.Move(dir *. 5.0f)
-            //                for _ in 1..60 -> Skill.Skill.Scale(Vec2.init(3.0f, 3.0f))
-            //            } |> Seq.toList
-            //            emits = [||]
-            //            collidedActors = Set.empty
-            //        }
-                
-                
-            //    delay = 0u
-            //    effects = [|
-            //        Skill.Damage(fun gs atk def ->
-            //            0.0f
-            //        )
-            //    |]
-            //}
             let emit : Skill.SkillEmitBuilder =
                 {
                     skillBase =

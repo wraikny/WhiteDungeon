@@ -14,6 +14,7 @@ open wraikny.MilleFeuille.Core.UI
 open wraikny.MilleFeuille.Fs.Input
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs
+open wraikny.MilleFeuille.Fs.Component.Coroutine
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
@@ -212,7 +213,7 @@ type MainScene(setting : AppSetting) =
             )
     do
         messenger.Msg.Add(printfn "Msg: %A")
-        messenger.ViewMsg.Add(printfn "Msg: %A")
+        messenger.ViewMsg.Add(printfn "ViewMsg: %A")
 
         messenger.ViewModel.Add(fun viewModel ->
             viewModel |> function
@@ -244,6 +245,10 @@ type MainScene(setting : AppSetting) =
                 lastWindow <- ViewModel.W2
         )
 
+    let uiWindowsAnimating() =
+        uiWindowMain.IsToggleAnimating
+        || uiWindow2.IsToggleAnimating
+        || sideWindow.IsToggleAnimating
 
     override this.OnRegistered() =
         GC.Collect()
@@ -253,25 +258,45 @@ type MainScene(setting : AppSetting) =
                 bgmPlayer.Volume <- v
 
             | Update.CloseGame ->
-                bgmPlayer.FadeOut(0.5f)
-                callbackAfterClosed(asd.Engine.Close)
+                messenger.Dispose()
+                this.StartCoroutine("CloseGame", seq {
+
+                    if uiWindowsAnimating() then
+                        while uiWindowsAnimating() do
+                            yield()
+                        yield! Coroutine.sleep 10
+
+                    bgmPlayer.FadeOut(0.5f)
+                    callbackAfterClosed(asd.Engine.Close)
+                    yield()
+                })
 
             | Update.StartGame (gameModel, bgmVolume) ->
-                callbackAfterClosed(fun() ->
-                    let uiFonts : Game.UIArgs = {
-                        windowSetting = windowSetting
-                        headerFont = headerFont
-                        textFont = textFont
-                        buttonFont = buttonFont
-                        bgmVolume = bgmVolume
-                        createMainScene = fun() -> new MainScene(setting) :> asd.Scene
-                    }
-                    let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
-                    bgmPlayer.FadeOut(0.5f)
-                    this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
-                    |> ignore
-                )
-                printfn "%A" gameModel
+                messenger.Dispose()
+                this.StartCoroutine("StartGame", seq {
+                    
+                    if not uiWindowMain.IsToggleOn then
+                        while not uiWindowMain.IsToggleOn do
+                            yield()
+                        yield! Coroutine.sleep 10
+
+                    callbackAfterClosed(fun() ->
+                        let uiFonts : Game.UIArgs = {
+                            windowSetting = windowSetting
+                            headerFont = headerFont
+                            textFont = textFont
+                            buttonFont = buttonFont
+                            bgmVolume = bgmVolume
+                            createMainScene = fun() -> new MainScene(setting) :> asd.Scene
+                        }
+                        let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
+                        bgmPlayer.FadeOut(0.5f)
+                        this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
+                        |> ignore
+                    )
+
+                    yield()
+                })
         )
 
         this.AddLayer(backLayer)
