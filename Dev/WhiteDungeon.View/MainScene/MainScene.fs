@@ -98,7 +98,7 @@ type MainScene(setting : AppSetting) =
 
 
     let mouse =
-        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = true)
+        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = false)
         new UI.MouseButtonSelecter(mouse)
 
 

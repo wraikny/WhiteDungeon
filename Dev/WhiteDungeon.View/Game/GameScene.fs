@@ -188,7 +188,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
 
     let uiMouse =
-        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = true)
+        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = false)
         new UI.MouseButtonSelecter(mouse)
 
 
@@ -211,8 +211,20 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
     let mutable gameMode = Model.HowToControl
     do
+        let gameCursor =
+            asd.Engine.CreateCursor("image/Debug/empty1x1.png", asd.Vector2DI())
+
         messenger.ViewModel.Add(fun vm ->
             if gameMode <> vm.uiMode then
+                if gameMode = Model.HowToControl then
+                    bgmPlayer.Start()
+
+                asd.Engine.SetCursor <|
+                    if vm.uiMode = Model.GameMode then
+                        gameCursor
+                    else
+                        null
+
                 gameMode <- vm.uiMode
         )
 
@@ -283,11 +295,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                         uiWindowMain.Toggle(true)
             )
 
-
-        // BGM
-        bgmPlayer.Start()
-
-
         // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
@@ -321,15 +328,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
         gameMode |> function
         | Model.GameMode ->
-            // Mouse inside window
-            let mousePos = asd.Engine.Mouse.Position |> Vec2.fromVector2DF
-            let ws = asd.Engine.WindowSize.To2DF() |> Vec2.fromVector2DF
-            let margin = 0.025f
-            if Rect.isInside mousePos (Rect.init zero ws) |> not then
-                let mousePosX = asd.MathHelper.Clamp(mousePos.x, ws.x * (1.0f - margin * 2.0f), ws.x * margin)
-                let mousePosY = asd.MathHelper.Clamp(mousePos.y, ws.y * (1.0f - margin * 2.0f), ws.y * margin)
-                asd.Engine.Mouse.Position <- asd.Vector2DF(mousePosX, mousePosY)
-
+            asd.Engine.Mouse.Position <- asd.Engine.WindowSize.To2DF() / 2.0f
 
             // Pause
             if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then

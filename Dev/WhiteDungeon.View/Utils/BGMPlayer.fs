@@ -62,7 +62,7 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
     member __.Start() =
         bgmId |> function
         | ValueNone -> play()
-        | _ -> invalidOp "BGM has already been played!"
+        | _ -> ()
 
     member __.Pause() =
         bgmId |> ValueOption.iter (asd.Engine.Sound.Pause)
