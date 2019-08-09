@@ -57,7 +57,9 @@ type UIMode =
 
 
 type Msg =
+    | UndoModel
     | SetUI of UIMode
+    | SetUIWithHistory of UIMode
     | OccupationListToggle of bool
     | SelectOccupation of Occupation
     | InputName of string
@@ -87,6 +89,8 @@ type Model = {
     gameSetting : GameSetting
 
     bgmVolume : int
+
+    prevModel : Model option
 }
 
 
@@ -115,11 +119,24 @@ let initModel (gameSetting : GameSetting) = {
     gameSetting = gameSetting
 
     bgmVolume = 5
+
+    prevModel = None
 }
 
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     msg |> function
+    | UndoModel ->
+        model.prevModel |> function
+        | Some(x) ->
+            { x with prevModel = None }, Cmd.port(SetBGMVolume (float32 x.bgmVolume / 10.0f))
+        | None ->
+            model, Cmd.none
+    | SetUIWithHistory uiMode ->
+        { model with
+            uiMode = uiMode
+            occupationListToggle = false
+            prevModel = Some { model with prevModel = None } }, Cmd.none
     | SetUI uiMode ->
         { model with
             uiMode = uiMode
@@ -239,8 +256,8 @@ let titleUI = [
     TitleText "九十九のラビリンス"
     Text "C96体験版 / Lepus Pluvia"
     Separator
-    Button("始める", SetUI <| Select CharacterSelect)
-    Button("設定", SetUI <| Setting SoundVolume)
+    Button("始める", SetUIWithHistory <| Select CharacterSelect)
+    Button("設定", SetUIWithHistory <| Setting SoundVolume)
     Button("クレジット", SetUI <| Credit CreditProject)
     Button("終わる", CloseGameMsg)
     Separator
@@ -248,7 +265,7 @@ let titleUI = [
 
 
 let selectUISide (_ : Model) = [
-    Button("もどる", SetUI Title)
+    Button("もどる", UndoModel)
     Button("キャラクター", SetUI <| Select CharacterSelect)
     Button("迷宮", SetUI <| Select DungeonSelect)
     Button("始める", SetUI <| Select CheckSettiing)
@@ -409,8 +426,9 @@ let creditUIImage = [
 // https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ @LepusPluvia
 
 let settingUISide = [
-    Button("もどる", SetUI Title)
+    Button("もどる", UndoModel)
     Button("音量", SetUI <| Setting SoundVolume)
+    Button("確定", SetUI Title)
 ]
 
 let settingUISoundVolume model =
