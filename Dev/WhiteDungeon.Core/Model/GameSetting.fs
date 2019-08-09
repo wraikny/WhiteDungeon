@@ -27,16 +27,40 @@ module GameSetting =
     open wraikny.Tart.Advanced
     open wraikny.Tart.Helper.Collections
 
-    let insideDungeon 
+    let collidedWithCell (gameSetting) cell =
+        Seq.exists(fun point ->
+            Dungeon.DungeonModel.coordinateToCell
+                gameSetting.dungeonCellSize
+                point
+            |> (=) cell
+        )
+
+    let collidedWiithCells
         (gameSetting : GameSetting)
-        (dungeonModel : Dungeon.DungeonModel) =
-        Array.map(fun point ->
+        (cells : _) =
+        Seq.exists(fun point ->
             let cell =
                 Dungeon.DungeonModel.coordinateToCell
                     gameSetting.dungeonCellSize
                     point
-    
-            dungeonModel.cells
-            |> HashMap.containsKey cell
+            cells
+            |> Set.contains cell
         )
-        >> fold (&&) true
+
+    let insideCells
+        (gameSetting : GameSetting)
+        (cells : _) =
+        Seq.forall(fun point ->
+            let cell =
+                Dungeon.DungeonModel.coordinateToCell
+                    gameSetting.dungeonCellSize
+                    point
+            cells
+            |> HashMap.containsKey cell
+
+        )
+
+    let inline insideDungeon 
+        (gameSetting : GameSetting)
+        (dungeonModel : Dungeon.DungeonModel) =
+        insideCells gameSetting dungeonModel.cells

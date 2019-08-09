@@ -11,5 +11,5 @@ open WhiteDungeon.Core.Game.Model
 
 
 type ViewMsg =
-    | UpdateDungeonView of Dungeon.DungeonModel
+    | UpdateDungeonView of Dungeon.DungeonModel * int Vec2 list
     //| AppendSkills of Skill.SkillEmit list

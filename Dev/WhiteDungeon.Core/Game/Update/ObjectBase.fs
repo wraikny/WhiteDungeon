@@ -29,17 +29,34 @@ let inline addSize diff obj =
 let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
-let insideDungeon
-    (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel) obj =
+
+let inline getCorners obj =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
-    
+    [|lu; rd; ld; ru|]
+
+
+let collidedCell (gameSetting : GameSetting) (cell) obj =
+    GameSetting.collidedWithCell
+        gameSetting
+        cell
+        (getCorners obj)
+
+
+let collidedCells (gameSetting : GameSetting) (cells) obj =
+    GameSetting.collidedWiithCells
+        gameSetting
+        cells
+        (getCorners obj)
+
+let insideDungeon
+    (gameSetting : GameSetting)
+    (dungeonModel : Dungeon.DungeonModel) obj =
     GameSetting.insideDungeon
         gameSetting
         dungeonModel
-        [|lu; rd; ld; ru|]
+        (getCorners obj)
 
 open WhiteDungeon.Core.Utils
 

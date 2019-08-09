@@ -38,9 +38,7 @@ module Update =
 
     let inline updateEachEnemy f (model : Model) : Model = {
         model with
-            enemies =
-                model.enemies
-                |>> f
+            enemies = model.enemies |>> f
     }
 
     open wraikny.Tart.Helper.Math
@@ -85,8 +83,6 @@ module Update =
                 |> f skillList.areaAll
         }
 
-
-
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         let model = { model with timePassed = false }
 
@@ -109,8 +105,17 @@ module Update =
                     |>> snd
                     |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
                     |> function
-                    | true -> m
                     | false -> { m with mode = GameFinished false }
+                    | true ->
+                        m.players
+                        |> Map.toSeq
+                        |>> ( snd >> (fun p -> p.actor.objectBase) )
+                        |> exists(ObjectBase.collidedCells model.gameSetting <| Set.ofList model.dungeonGateCells)
+                        |> function
+                        | true ->
+                            { m with mode = Stair }
+                        | false ->
+                            m
 
             model, Cmd.none
 

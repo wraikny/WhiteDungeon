@@ -7,6 +7,8 @@ open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Advanced
 
+open FSharpPlus
+
 type GameSceneMode =
     | HowToControl
     | Stair
@@ -61,7 +63,7 @@ module Model =
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
-        dungeonGateCells = dungeonGateCells
+        dungeonGateCells = Seq.toList dungeonGateCells //|> Set.ofSeq
 
         gameSetting = gameSetting
 
