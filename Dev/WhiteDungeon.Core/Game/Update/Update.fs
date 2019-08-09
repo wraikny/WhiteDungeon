@@ -110,7 +110,7 @@ module Update =
                         m.players
                         |> Map.toSeq
                         |>> ( snd >> (fun p -> p.actor.objectBase) )
-                        |> exists(ObjectBase.collidedCells model.gameSetting <| Set.ofList model.dungeonGateCells)
+                        |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
                         |> function
                         | true ->
                             { m with mode = Stair }

@@ -119,10 +119,13 @@ module UIItem =
     ]
 
     let stair = [
-        HeaderText "階層移動"
+        HeaderText "次の階層に移動しますか？"
         Separator
-        //Button("はい")
-        //Button("タイトルに戻る")
+        //Button("移動する", )
+        Button("このまま続ける", SetGameMode Model.GameMode)
+        Separator
+        TitleButton "タイトルに戻る"
+        Separator
     ]
 
     let pause = [

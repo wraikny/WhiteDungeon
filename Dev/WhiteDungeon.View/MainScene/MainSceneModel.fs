@@ -51,7 +51,7 @@ type Msg =
     | SetDungeonParameters of count:int * minSize:int * maxSize:int * range:float32 * corridor:int * gateCount:int
 
     | GenerateDungeon
-    | GeneratedGameModel of Game.Model.Model
+    | GeneratedGameModel of Game.Model.Dungeon.GeneratedDungeonParams
     | CloseGameMsg
     | AddBGMVolume of int
 

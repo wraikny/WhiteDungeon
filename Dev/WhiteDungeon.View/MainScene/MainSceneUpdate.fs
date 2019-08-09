@@ -72,37 +72,13 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         }, Cmd.none
 
     | GenerateDungeon ->
-        monad {
-            let! seed = Random.int minValue<int> maxValue<int>
-            
-            //let roomsCount = (model.dungeonBuilder.roomCount - 1)
-            let gen = Random.int 0 maxValue<int>
-            let! roomIndex = gen
-            let! gateCellIndexs = Random.list model.gateCount (Random.pair gen gen)
-            return (seed, roomIndex, gateCellIndexs)
-        }
-        |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
-            let dungeonModel =
-                { model.dungeonBuilder with seed = seed }
-                |> DungeonBuilder.generate
+        Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
+        |> TartTask.perform (ErrorUI >> SetUI) GeneratedGameModel
+        |> fun cmd ->
+            { model with uiMode = WaitingGenerating }, cmd
 
-            let largeRooms = toList dungeonModel.largeRooms
-
-            let largeRoomsCount = length largeRooms
-
-            let initRoomIndex = roomIndex % largeRoomsCount
-
-            let initRoom = snd largeRooms.[initRoomIndex]
-
-            let fromCell =
-                model.gameSetting.dungeonCellSize
-                |> DungeonModel.cellToCoordinate
-
-            let initPosition =
-                initRoom.rect
-                |>> fromCell
-                |> Rect.centerPosition
-
+    | GeneratedGameModel dungeonParams ->
+        let gameModel =
             let size = model.gameSetting.characterSize
             let players =
                 [ model.playerName, model.selectOccupation ]
@@ -129,7 +105,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     let player =
                         Game.Model.Actor.Player.init
                             size
-                            (initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                            (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
                             status
                             playerId
                             character
@@ -138,33 +114,13 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 )
                 |> Map.ofSeq
 
-
-            let gateCells =
-                seq {
-                    for (a, b) in gateCellIndexs ->
-                        let room = snd largeRooms.[a % largeRoomsCount]
-                        let cells = room |> Space.cells
-                        let cell = fst cells.[ b % length cells]
-                        cell
-                }
-                |> toList
-
-
-            let gameModel =
-                Game.Model.Model.init
-                    players
-                    model.dungeonBuilder
-                    dungeonModel
-                    gateCells
-                    model.gameSetting
-
-            return gameModel
-        })
-        |> TartTask.perform (ErrorUI >> SetUI) GeneratedGameModel
-        |> fun cmd ->
-            { model with uiMode = WaitingGenerating }, cmd
-
-    | GeneratedGameModel gameModel ->
+            Game.Model.Model.init
+                players
+                dungeonParams.dungeonBuilder
+                dungeonParams.dungeonModel
+                dungeonParams.gateCells
+                model.gameSetting
+        
         model, Cmd.port(ViewMsg.StartGame (gameModel, bgmToFloat model.bgmVolume))
 
     | CloseGameMsg ->

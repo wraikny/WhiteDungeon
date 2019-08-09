@@ -28,7 +28,7 @@ type Model = {
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
-    dungeonGateCells : int Vec2 list
+    dungeonGateCells : int Vec2 Set
 
     skillList : Skill.SkillList
 
@@ -63,7 +63,7 @@ module Model =
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
-        dungeonGateCells = Seq.toList dungeonGateCells //|> Set.ofSeq
+        dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
 
         gameSetting = gameSetting
 
@@ -71,3 +71,110 @@ module Model =
 
         mode = HowToControl
     }
+
+open wraikny.Tart.Core
+open wraikny.Tart.Core.Libraries
+open wraikny.Tart.Advanced.Dungeon
+open wraikny.Tart.Helper.Geometry
+
+module Dungeon =
+    type GeneratedDungeonParams = {
+        dungeonBuilder : DungeonBuilder
+        dungeonModel : DungeonModel
+        gateCells : int Vec2 Set
+        initPosition : float32 Vec2
+    }
+
+    let generateTask gameSetting (dungeonBuilder : DungeonBuilder) gateCount : GeneratedDungeonParams TartTask =
+        monad {
+            let! seed = Random.int minValue<int> maxValue<int>
+            
+            //let roomsCount = (model.dungeonBuilder.roomCount - 1)
+            let gen = Random.int 0 maxValue<int>
+            let! roomIndex = gen
+            let! gateCellIndexs = Random.list gateCount (Random.pair gen gen)
+            return (seed, roomIndex, gateCellIndexs)
+        }
+        |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
+            let dungeonModel =
+                { dungeonBuilder with seed = seed }
+                |> DungeonBuilder.generate
+
+            let largeRooms = toList dungeonModel.largeRooms
+
+            let largeRoomsCount = length largeRooms
+
+            let initRoomIndex = roomIndex % largeRoomsCount
+
+            let initRoom = snd largeRooms.[initRoomIndex]
+
+            let fromCell =
+                gameSetting.dungeonCellSize
+                |> DungeonModel.cellToCoordinate
+
+            let initPosition =
+                initRoom.rect
+                |>> fromCell
+                |> Rect.centerPosition
+
+            let gateCells =
+                seq {
+                    for (a, b) in gateCellIndexs ->
+                        let room = snd largeRooms.[a % largeRoomsCount]
+                        let cells = room |> Space.cells
+                        let cell = fst cells.[ b % length cells]
+                        cell
+                }
+                |> Set.ofSeq
+
+            //let size = model.gameSetting.characterSize
+            //let players =
+            //    [ model.playerName, model.selectOccupation ]
+            //    |> Seq.indexed
+            //    |> Seq.map(fun (index, (name, occupation)) ->
+            //        let name = Option.defaultValue (sprintf "Player%d" index) name
+
+            //        let status =
+            //            model.gameSetting.occupationDefaultStatus
+            //            |> Map.find occupation
+
+            //        let character : Model.Character = {
+            //            id = Model.CharacterID -index
+            //            name = name
+            //            currentOccupation = occupation
+            //            occupations = [
+            //                occupation, status
+            //            ] |> Map.ofList
+            //        }
+
+
+            //        let playerId = Game.Model.PlayerID (uint32 index)
+
+            //        let player =
+            //            Game.Model.Actor.Player.init
+            //                size
+            //                (initPosition - (Vec2.init (float32 index) 0.0f) * size)
+            //                status
+            //                playerId
+            //                character
+
+            //        (playerId, player)
+            //    )
+            //    |> Map.ofSeq
+
+
+            //let gameModel =
+            //    Game.Model.Model.init
+            //        players
+            //        model.dungeonBuilder
+            //        dungeonModel
+            //        gateCells
+            //        model.gameSetting
+
+            return {
+                dungeonBuilder = dungeonBuilder
+                dungeonModel = dungeonModel
+                gateCells = gateCells
+                initPosition = initPosition
+            }
+        })
