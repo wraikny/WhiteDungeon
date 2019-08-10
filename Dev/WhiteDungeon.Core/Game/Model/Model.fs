@@ -95,37 +95,38 @@ module Dungeon =
         initPosition : float32 Vec2
     }
 
-    let generateTask gameSetting (dungeonBuilder : DungeonBuilder) gateCount : GeneratedDungeonParams TartTask =
-        monad {
-            let! seed = Random.int minValue<int> maxValue<int>
-            
-            let gen = (Random.int 0 (dungeonBuilder.roomCount - 1) )
-
-            let! roomIndex = gen
-            let gateCellsGen = Random.distinctList gateCount (Random.pair gen gen)
-
-            let! gateCellIndexs =
-                gateCellsGen
-                |> Random.until(List.map fst >> List.contains roomIndex >> not)
-
-            return (seed, roomIndex, gateCellIndexs)
-        }
-        |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
-            let dungeonModel =
+    let generateDungeonModel (dungeonBuilder : DungeonBuilder) =
+        (Random.int minValue<int> maxValue<int>)
+        |> TartTask.withEnv(fun seed -> async {
+            let builder = { dungeonBuilder with seed = seed }
+            return(
+                builder,
                 { dungeonBuilder with seed = seed }
                 |> DungeonBuilder.generate
+            )
+        })
 
-            let largeRooms = toList dungeonModel.largeRooms
+    let generateDungeonParams gameSetting gateCount dungeonBuilder (dungeonModel : DungeonModel) =
+        let largeRooms = toList dungeonModel.largeRooms
+        
+        let largeRoomsCount = length largeRooms
 
-            let largeRoomsCount = length largeRooms
+        let fromCell =
+            gameSetting.dungeonCellSize
+            |> DungeonModel.cellToCoordinate
+
+        monad {
+            let gen = Random.int 0 (largeRoomsCount - 1)
+
+            let! roomIndex = gen
+
+            let! gateCellIndexs =
+                Random.distinctList gateCount (Random.pair gen gen)
+                |> Random.until(List.map fst >> List.contains roomIndex >> not)
 
             let initRoomIndex = roomIndex % largeRoomsCount
 
             let initRoom = snd largeRooms.[initRoomIndex]
-
-            let fromCell =
-                gameSetting.dungeonCellSize
-                |> DungeonModel.cellToCoordinate
 
             let initPosition =
                 initRoom.rect
@@ -148,4 +149,5 @@ module Dungeon =
                 gateCells = gateCells
                 initPosition = initPosition
             }
-        })
+        }
+        |> flip Random.generate

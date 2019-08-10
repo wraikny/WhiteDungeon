@@ -67,16 +67,26 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         { model with uiMode = WaitingGenerating }, randomCmd
 
     | SetGameSceneRandomSeed x ->
-        Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
+        Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
         |> TartTask.perform (fun e ->
 #if DEBUG
             System.Console.WriteLine(e)
 #endif
-            GenerateDungeon) GeneratedGameModel
+            GenerateDungeon) GeneratedDungeonModel
         |> fun cmd ->
             { model with gameSceneRandomSeed = x }, cmd
 
-    | GeneratedGameModel dungeonParams ->
+    | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
+        let cmd =
+            Game.Model.Dungeon.generateDungeonParams
+                model.gameSetting
+                model.gateCount
+                dungeonBuilder
+                dungeonModel
+                GeneratedDungeonParams
+        model, cmd
+
+    | GeneratedDungeonParams dungeonParams ->
         let gameModel =
             let size = model.gameSetting.characterSize
             let players =

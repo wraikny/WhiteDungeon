@@ -153,16 +153,27 @@ module Update =
             , Cmd.none
 
         | GenerateNewDungeon ->
-            Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
+            //Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
+            Dungeon.generateDungeonModel model.dungeonBuilder
             |> TartTask.perform (fun e ->
 #if DEBUG
                 System.Console.WriteLine(e)
 #endif
-                GenerateNewDungeon) GeneratedDungeon
+                GenerateNewDungeon) GeneratedDungeonModel
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
 
-        | GeneratedDungeon dungeonParams ->
+        | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
+            let cmd =
+                Dungeon.generateDungeonParams
+                    model.gameSetting
+                    (length model.dungeonGateCells)
+                    dungeonBuilder
+                    dungeonModel
+                    GeneratedDungeonParams
+            model, cmd
+
+        | GeneratedDungeonParams dungeonParams ->
             let size = model.gameSetting.characterSize
             let model =
                 model

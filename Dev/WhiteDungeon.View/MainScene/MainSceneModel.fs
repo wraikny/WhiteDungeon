@@ -53,7 +53,8 @@ type Msg =
     | SetDungeonParameters of int
 
     | GenerateDungeon
-    | GeneratedGameModel of Game.Model.Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonModel of DungeonBuilder * DungeonModel
+    | GeneratedDungeonParams of Game.Model.Dungeon.GeneratedDungeonParams
     | CloseGameMsg
     | AddBGMVolume of int
 
