@@ -275,7 +275,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     )
                 )
 
-        messenger.ViewModel.Select(fun vm -> vm.mainUIWindow)
+        messenger.ViewModel
+            .Select(fun vm -> vm.mainUIWindow)
             .Add(function
                 | None ->
                     if uiWindowMain.IsToggleOn then

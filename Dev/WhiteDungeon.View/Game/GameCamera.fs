@@ -25,47 +25,57 @@ type GameCamera() =
     let mutable targetPosition = ValueNone
     let mutable currentPosition = ValueNone
 
-    member val Zoom = 0.3f with get, set
+    member val Zoom = 0.5f with get, set
     member val Speed = 0.2f with get, set
 
     override this.OnUpdate() =
         targetPosition
-        |> ValueOption.iter(fun targetPosition ->
+        |> ValueOption.iter (fun targetPosition ->
             currentPosition |> function
             | ValueNone ->
-                this.SetSrc(targetPosition)
                 currentPosition <- ValueSome targetPosition
 
             | ValueSome currentPosition' ->
                 let dir = targetPosition - currentPosition'
                 let length = Vector.length dir
-
-                let update(diff) =
-                    let nextPosition = currentPosition' + diff
-                    currentPosition <- ValueSome nextPosition
-                    this.SetSrc(nextPosition)
                     
                 length |> function
                 | 0.0f -> ()
                 | x when x <= 1.0f ->
                     currentPosition <- ValueSome targetPosition
-                    this.SetSrc(targetPosition)
                 | _ ->
                     let diff = (Vector.normalize dir) .* this.Speed .* length
                     let nextPosition = currentPosition' + diff
                     currentPosition <- ValueSome nextPosition
-                    this.SetSrc(nextPosition)
+
+            this.SetSrc()
         )
 
 
-    member this.SetSrc(srcPos : float32 Vec2) =
+#if DEBUG
+        let pushed = asd.Engine.Keyboard.GetKeyState >> (=) asd.ButtonState.Push
 
-        let size = asd.Engine.WindowSize.To2DF() / this.Zoom
-        let size = size.To2DI()
+        if pushed asd.Keys.Num1 then
+            this.Zoom <- this.Zoom + 0.02f |> min 1.0f
+            this.SetSrc()
+        elif pushed asd.Keys.Num2 then
+            this.Zoom <- this.Zoom - 0.02f |> max 0.02f
+            this.SetSrc()
+        elif pushed asd.Keys.Num3 then
+            this.Zoom <- 0.5f
+            this.SetSrc()
+#endif
 
-        this.Src <- new asd.RectI(
-            (Vec2.toVector2DI (int <!> srcPos)) - size / 2
-            , size
+
+    member this.SetSrc() =
+        currentPosition |> ValueOption.iter (fun srcPos ->
+            let size = asd.Engine.WindowSize.To2DF() / this.Zoom
+            let size = size.To2DI()
+
+            this.Src <- new asd.RectI(
+                (Vec2.toVector2DI (int <!> srcPos)) - size / 2
+                , size
+            )
         )
 
     interface IObserver<ViewModel.CameraView list> with

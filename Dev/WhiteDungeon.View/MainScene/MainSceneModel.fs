@@ -85,19 +85,19 @@ let initModel (gameSetting : GameSetting) = {
     playerName = None
     selectOccupation = Seeker
 
-    gateCount = 4
+    gateCount = 3
     dungeonBuilder = {
         seed = 0
         roomCount = 200
 
         roomGeneratedRange = (60.0f, 60.0f)
 
-        minRoomSize = (6, 6)
-        maxRoomSize = (12, 12)
+        minRoomSize = (4, 6)
+        maxRoomSize = (8, 12)
 
         roomMoveRate = 0.2f
-        roomMeanThreshold = 1.28f
-        restoreEdgeRate = 0.11f
+        roomMeanThreshold = 1.25f
+        restoreEdgeRate = 0.12f
         corridorWidth = 3
     }
 
