@@ -298,7 +298,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
         // UI
         uiLayer.AddMouseButtonSelecter(uiMouse, "Mouse")
-        //uiLayer.AddObject(uiBackRect)
+        uiLayer.AddObject(uiBackRect)
         uiLayer.AddObject(gameUIWindows)
         uiLayer.AddObject(uiWindowMain)
 

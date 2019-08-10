@@ -117,8 +117,7 @@ module Update =
                             else
                                 { m with
                                     mode = Stair
-                                    lastCollidedGate = true
-                                    dungeonFloor = model.dungeonFloor + 1u }
+                                    lastCollidedGate = true  }
                         | false ->
                             { m with lastCollidedGate = false }
 
@@ -180,6 +179,7 @@ module Update =
                 dungeonBuilder = dungeonParams.dungeonBuilder
                 dungeonModel = dungeonParams.dungeonModel
                 dungeonGateCells = dungeonParams.gateCells
+                dungeonFloor = model.dungeonFloor + 1u
             }
             , Cmd.port ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
 

@@ -59,9 +59,9 @@ type MainScene(setting : AppSetting) =
             0, asd.Color()
         )
 
-    let textFont = createDynamicFont 30 ColorPalette.black
+    let textFont = createDynamicFont menuSetting.textSize ColorPalette.black
 
-    let buttonFont = createDynamicFont 30 ColorPalette.sakura
+    let buttonFont = createDynamicFont menuSetting.textSize ColorPalette.sakura
 
     let inputFont =
         asd.Engine.Graphics.CreateDynamicFont(
@@ -123,6 +123,7 @@ type MainScene(setting : AppSetting) =
                 itemMargin = 15.0f
 
                 centerPositionRate = Vec2.init 0.0f 0.5f
+                togglePositionRate = Vec2.init 0.0f 0.5f
                 windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
                 toggleDirection = UI.WindowSetting.ToggleDirection.X
             }
@@ -140,6 +141,7 @@ type MainScene(setting : AppSetting) =
             { windowSetting with
                 itemMargin = 30.0f
                 centerPositionRate = Vec2.init 1.0f 0.5f
+                togglePositionRate = Vec2.init 1.0f 0.5f
                 windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
                 toggleDirection = UI.WindowSetting.ToggleDirection.X
             }

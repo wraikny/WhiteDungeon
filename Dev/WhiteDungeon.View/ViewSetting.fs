@@ -110,6 +110,8 @@ type MainSceneSetting = {
     inputColor : ButtonColor
     inputFocusColor : ButtonColor
 
+    textSize : int
+
     inputFont : string
     inputFontColor : byte Vec3
     inputFontSize : int

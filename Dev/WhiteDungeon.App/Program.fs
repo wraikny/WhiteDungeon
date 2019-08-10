@@ -53,6 +53,7 @@ let appSetting : View.AppSetting = {
 
             inputFont = textFontPath
             inputFontSize = 30
+            textSize = 30
             inputFontColor = black
 
             windowWidthWRate = 0.8f
@@ -67,7 +68,7 @@ let appSetting : View.AppSetting = {
 
     gameViewSetting =
         let windowMargin = 0.02f /. windowRSizeUnit
-        let floorSize = (Vec2.init 0.06f 0.03f) / windowRSizeUnit
+        let floorSize = (Vec2.init 0.15f 0.03f) / windowRSizeUnit
         let playerStatusSize = (Vec2.init 0.2f 0.15f)
 
         {

@@ -76,6 +76,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
 
             toggleDirection = UI.WindowSetting.ToggleDirection.Y
             centerPositionRate = Vec2.init 0.0f 0.0f
+            togglePositionRate = Vec2.init 0.5f 0.0f
 
             frameColor = Vec4.toColor gameViewSetting.gameUIFrameColor
             rectColor = col
@@ -100,6 +101,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
                 windowSize = UI.WindowSetting.FixWidth(playerArea.Size.X)
                 toggleDirection = UI.WindowSetting.ToggleDirection.Y
                 centerPositionRate = Vec2.init 0.0f 1.0f
+                togglePositionRate = Vec2.init 0.5f 1.0f
             }
         new UI.MouseWindow(playerStatusSetting, mouse
             , Position = playerArea.Position
