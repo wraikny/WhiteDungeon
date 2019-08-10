@@ -312,6 +312,15 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
     override this.OnUpdated() =
         messenger.NotifyView()
 
+        (  uiWindowMain.IsToggleAnimating
+        || gameUIWindows.IsToggleAnimating
+        ) |> function
+        | true -> ()
+        | false ->
+            this.PlayerInput()
+
+
+    member this.PlayerInput() =
         gameMode |> function
         | Model.GameMode ->
             asd.Engine.Mouse.Position <- asd.Engine.WindowSize.To2DF() / 2.0f
@@ -319,10 +328,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             // Pause
             if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
                 messenger.Enqueue(Msg.SetGameMode Model.Pause)
-            
+        
             else
                 messenger.Enqueue(Msg.TimePasses)
-                
+            
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 

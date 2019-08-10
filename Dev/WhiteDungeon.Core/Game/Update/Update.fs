@@ -39,10 +39,8 @@ module Update =
         )
         |> Option.defaultValue model
 
-    let inline updateEachEnemy f (model : Model) : Model = {
-        model with
-            enemies = model.enemies |>> f
-    }
+    let inline updateEachEnemy f (model : Model) : Model =
+        { model with enemies = model.enemies |>> f }
 
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
@@ -61,7 +59,7 @@ module Update =
 
 
     let applySkills (model : Model) : Model =
-        let gameSetting = model.gameSetting
+        //let gameSetting = model.gameSetting
         let skillList = model.skillList
 
         { model with
