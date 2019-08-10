@@ -6,14 +6,16 @@ open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
-open WhiteDungeon.Core.Game
 open wraikny.MilleFeuille.Fs.Math
+open WhiteDungeon.Core.Game
+open WhiteDungeon.View
 
 open System
 
 open FSharpPlus
+open FSharpPlus.Math.Applicative
 
-type GameCamera() =
+type GameCamera(isMapChip) =
     inherit asd.CameraObject2D(
         Dst = new asd.RectI(
             new asd.Vector2DI(0, 0)
@@ -69,6 +71,8 @@ type GameCamera() =
 
     member this.SetSrc() =
         currentPosition |> ValueOption.iter (fun srcPos ->
+            let srcPos = if isMapChip then srcPos else (srcPos .% GameViewSetting.modForCulling)
+
             let size = asd.Engine.WindowSize.To2DF() / this.Zoom
             let size = size.To2DI()
 

@@ -58,18 +58,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             selectOccupation = x
             occupationListToggle = false }, Cmd.none
 
-    | SetDungeonParameters(count, minSize, maxSize, range, corridor, gateCount) ->
-        { model with
-            gateCount = gateCount
-            dungeonBuilder =
-                { model.dungeonBuilder with
-                    roomCount = count
-                    minRoomSize = (minSize, minSize)
-                    maxRoomSize = (maxSize, maxSize)
-                    roomGeneratedRange = (range, range)
-                    corridorWidth = corridor
-                }
-        }, Cmd.none
+    | SetDungeonParameters i ->
+        model |> Model.updateDungeonBuilder i
+        , Cmd.none
 
     | GenerateDungeon ->
         let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed

@@ -50,7 +50,7 @@ type Msg =
     | SelectOccupation of Occupation
     | InputName of string
 
-    | SetDungeonParameters of count:int * minSize:int * maxSize:int * range:float32 * corridor:int * gateCount:int
+    | SetDungeonParameters of int
 
     | GenerateDungeon
     | GeneratedGameModel of Game.Model.Dungeon.GeneratedDungeonParams
@@ -78,34 +78,52 @@ type Model = {
 }
 
 
-let initModel (gameSetting : GameSetting) = {
-    uiMode = Title
-    occupationListToggle = false
-
-    playerName = None
-    selectOccupation = Seeker
-
-    gateCount = 3
-    dungeonBuilder = {
-        seed = 0
-        roomCount = 200
-
-        roomGeneratedRange = (60.0f, 60.0f)
-
-        minRoomSize = (4, 6)
-        maxRoomSize = (8, 12)
-
-        roomMoveRate = 0.2f
-        roomMeanThreshold = 1.25f
-        restoreEdgeRate = 0.12f
-        corridorWidth = 3
+let updateDungeonBuilder i (model : Model) =
+    let i1 = i + 1
+    { model with
+        gateCount = i1
+        dungeonBuilder =
+            { model.dungeonBuilder with
+                roomCount = 100 * i
+                minRoomSize = (3 * i1, 2 * i1)
+                maxRoomSize = (6 * i1, 4 * i1)
+                roomGeneratedRange = (2.0f * 30.0f * float32 i, 1.0f * 30.0f * float32 i)
+                corridorWidth = i1
+            }
     }
 
-    gameSetting = gameSetting
 
-    bgmVolume = 5
+let initModel (gameSetting : GameSetting) =
+    {
+        uiMode = Title
+        occupationListToggle = false
 
-    prevModel = None
+        playerName = None
+        selectOccupation = Seeker
 
-    gameSceneRandomSeed = 0
-}
+        gateCount = zero
+        dungeonBuilder =
+            {
+                seed = 0
+                roomCount = zero
+
+                roomGeneratedRange = zero, zero
+
+                minRoomSize = zero, zero
+                maxRoomSize = zero, zero
+
+                roomMoveRate = 0.3f
+                roomMeanThreshold = 1.25f
+                restoreEdgeRate = 0.2f
+                corridorWidth = 3
+            }
+
+        gameSetting = gameSetting
+
+        bgmVolume = 5
+
+        prevModel = None
+
+        gameSceneRandomSeed = 0
+    }
+    |> updateDungeonBuilder 2

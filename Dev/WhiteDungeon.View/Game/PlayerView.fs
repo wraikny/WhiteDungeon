@@ -15,6 +15,7 @@ open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.View.Utils.Color
 
 open FSharpPlus
+open FSharpPlus.Math.Applicative
 
 
 type PlayerView(gameViewSetting) =
@@ -52,6 +53,14 @@ type PlayerView(gameViewSetting) =
 
     let moveAnimation = MoveAnimation(textureOjb)
 
+#if DEBUG
+    override this.OnUpdate() =
+        if asd.Engine.Keyboard.GetKeyState asd.Keys.Num4 = asd.ButtonState.Push then
+            printfn "lastPosition: %A" lastPosition
+        ()
+#endif
+
+
     member __.SizeView
         with get() = sizeView.IsDrawn
         and set(x) =
@@ -66,7 +75,9 @@ type PlayerView(gameViewSetting) =
             let area = objectBase.area
             let centerPos = Rect.centerPosition area
             lastPosition <- centerPos
-            this.Position <- Vec2.toVector2DF (map floor centerPos)
+
+            this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
+
 
             // Size
             lastSize <- area.size

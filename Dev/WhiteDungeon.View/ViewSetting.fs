@@ -89,6 +89,11 @@ type GameViewSetting = {
     bgms : string list
 }
 
+module GameViewSetting =
+    [<Literal>]
+    let modForCulling = 10000.0f
+
+
 open wraikny.MilleFeuille.Fs.UI
 
 type MainSceneSetting = {

@@ -61,9 +61,9 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                 update = Update.Update.update
             }
 
-    let port _ = ()
-    do
-        messenger.ViewMsg.Subscribe(port) |> ignore
+    //let port _ = ()
+    //do
+    //    messenger.ViewMsg.Subscribe(port) |> ignore
 
     let gameKeybaord =
         KeyboardBuilder.init()
@@ -128,22 +128,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     }))
         |> ignore
 
-    let dungeonCamera = new GameCamera()
-    let playerCamera = new GameCamera()
-    let skillEffectsCamera = new GameCamera()
-    //let minimapCamera =
-    //    new GameCamera(
-    //        Zoom = 3.0f
-    //        , Dst =(
-    //            let windowSize = asd.Engine.WindowSize
-    //            let size = windowSize / 8
-    //            let pos = new asd.Vector2DI(windowSize.X - 50, 50)
-    //            new asd.RectI(
-    //                pos - (new asd.Vector2DI(size.X, 0))
-    //                , size
-    //            )
-    //        )
-    //    )
+    let dungeonCamera = new GameCamera(true)
+    let playerCamera = new GameCamera(false)
+    let skillEffectsCamera = new GameCamera(false)
+
     do
         [
             dungeonCamera
@@ -305,12 +293,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
         // Dungeon
         dungeonLayer.AddObject(dungeonCellUpdater)
-        //this.AddDungeonView(gameModel)
 
         // Camera
         dungeonLayer.AddObject(dungeonCamera)
         playerLayer.AddObject(playerCamera)
-        // dungeonLayer.AddObject(minimapCamera)
         skillEffectsLayer.AddObject(skillEffectsCamera)
 
         // UI

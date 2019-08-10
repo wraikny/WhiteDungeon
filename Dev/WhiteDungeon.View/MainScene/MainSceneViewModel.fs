@@ -89,7 +89,7 @@ let selectUIChara (model : Model) : Msg MenuItem list =
             ]
             yield! (playerView model)
             yield Separator
-    
+
     } |> Seq.toList
 
 
@@ -109,13 +109,7 @@ let selectUIDungeon (model : Model) =
 
         yield! (dungeonView model)
         for i in 1..3 ->
-            Button(sprintf "サイズ%d" i,
-                SetDungeonParameters(
-                    100 * i,
-                    2 * (i + 1),
-                    4 * (i + 1),
-                    33.3f * float32 i, 1 + i,
-                    1 + i))
+            Button(sprintf "サイズ%d" i, SetDungeonParameters i)
         yield Separator
     }
     |> Seq.toList

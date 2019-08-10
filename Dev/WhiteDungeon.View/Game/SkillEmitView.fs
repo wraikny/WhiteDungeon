@@ -13,6 +13,7 @@ open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 open FSharpPlus
+open FSharpPlus.Math.Applicative
 
 type SkillEmitView(gameViewSetting) =
     inherit asd.GeometryObject2D()
@@ -64,7 +65,7 @@ type SkillEmitView(gameViewSetting) =
     member this.SetPosition(pos) =
         if pos <> lastPosition then
             lastPosition <- pos
-            this.Position <- Vec2.toVector2DF pos
+            this.Position <- Vec2.toVector2DF <| pos .% GameViewSetting.modForCulling
 
     member this.SetSize(size) =
         if size <> lastSize then
