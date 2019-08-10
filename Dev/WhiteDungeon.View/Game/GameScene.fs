@@ -32,20 +32,6 @@ open System.Reactive
 open System.Reactive.Linq
 
 
-type GameSceneArgs = {
-    windowSetting : UI.WindowSetting
-    headerFont : asd.Font
-    textFont : asd.Font
-    buttonFont : asd.Font
-
-    bgmVolume : float32
-
-    createMainScene : unit -> asd.Scene
-
-    randomSeed : int
-}
-
-
 [<Class>]
 type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
@@ -95,8 +81,6 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
     let uiBackRect =
         let rect = new asd.RectangleShape(DrawingArea = asd.RectF(asd.Vector2DF(), asd.Engine.WindowSize.To2DF()))
         new asd.GeometryObject2D(Shape = rect, IsUpdated = false)
-    do
-        uiLayer.AddObject(uiBackRect)
 
 
     do
@@ -173,6 +157,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
                 //| _ -> ()
             )
+
+    let gameUIWindows = new GameUI(gameViewSetting, gameSceneArgs)
+    do
+        messenger.ViewModel.Add(gameUIWindows.OnNext)
+    //let gameUIWindows = gameUIWindows :> UI.IToggleWindow
 
 
     let uiMouse =
@@ -271,6 +260,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                         uiWindowMain.Toggle(false, fun() ->
                             bgmPlayer.Resume()
                             uiBackRect.IsDrawn <- false
+
+                            (gameUIWindows :> UI.IToggleWindow).Toggle(true)
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -278,10 +269,16 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     if not uiWindowMain.IsToggleOn then
                         bgmPlayer.Pause()
 
-                        // TODO
-                        playSE(se_page)
-                        uiBackRect.IsDrawn <- true
-                        uiWindowMain.Toggle(true)
+                        let openUI() =
+                            // TODO
+                            playSE(se_page)
+                            uiBackRect.IsDrawn <- true
+                            uiWindowMain.Toggle(true)
+                            
+                        if (gameUIWindows :> UI.IToggleWindow).IsToggleOn then
+                            (gameUIWindows :> UI.IToggleWindow).Toggle(false, openUI)
+                        else
+                            openUI()
             )
 
         // Layer
@@ -301,6 +298,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
         // UI
         uiLayer.AddMouseButtonSelecter(uiMouse, "Mouse")
+        //uiLayer.AddObject(uiBackRect)
+        uiLayer.AddObject(gameUIWindows)
         uiLayer.AddObject(uiWindowMain)
 
         messenger.StartAsync() |> ignore

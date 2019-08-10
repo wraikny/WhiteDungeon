@@ -26,9 +26,14 @@ let sumire = Vec3.init 85uy 69uy 98uy
 
 let sakura = Vec3.init 250uy 219uy 224uy
 
+let windowSize = (Vec2.init 16 9) .* 75
+
+let windowRSizeUnit = (map float32 windowSize) ./ float32 windowSize.x
+
+let textFontPath = "Font/mplus-1c-light.ttf"
 
 let appSetting : View.AppSetting = {
-    windowSize = (Vec2.init 16 9) .* 75
+    windowSize = windowSize
 
     menuSceneSetting =
         let createButtonColor col x y z =
@@ -46,7 +51,7 @@ let appSetting : View.AppSetting = {
             inputColor = createButtonColor sakura 1.0f 0.8f 0.6f
             inputFocusColor = createButtonColor sakura 1.0f 1.0f 1.0f
 
-            inputFont = "Font/mplus-1c-light.ttf"
+            inputFont = textFontPath
             inputFontSize = 30
             inputFontColor = black
 
@@ -60,16 +65,31 @@ let appSetting : View.AppSetting = {
             #endif
         }
 
-    gameViewSetting = {
-        occupationImages = [
-            Model.Seeker, ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
-        ] |> Map.ofList
+    gameViewSetting =
+        let windowMargin = 0.02f /. windowRSizeUnit
+        let floorSize = (Vec2.init 0.06f 0.03f) / windowRSizeUnit
+        let playerStatusSize = (Vec2.init 0.2f 0.15f)
 
-        bgms = [
-            "bgm/gensei_no_rakuen.ogg"
-            "bgm/buriki_no_coffee_maker.ogg"
-        ]
-    }
+        {
+            occupationImages = [
+                Model.Seeker, ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+            ] |> Map.ofList
+
+            bgms = [
+                "bgm/gensei_no_rakuen.ogg"
+                "bgm/buriki_no_coffee_maker.ogg"
+            ]
+
+            gameUIFrameColor = Vec4.init sumire.x sumire.y sumire.z 255uy
+            gameUITextColor = sakura
+            gameUITextFont = textFontPath
+            gameUITextSize = 20
+            gameUIDungeonFloor = Rect.init windowMargin floorSize
+            gameUIPlayerArea =
+                Rect.init
+                    ( Vec2.init windowMargin.x (1.0f - windowMargin.y) )
+                    playerStatusSize
+        }
 
     gameSetting = {
         dungeonCellSize = Vec2.init 250.0f 250.0f

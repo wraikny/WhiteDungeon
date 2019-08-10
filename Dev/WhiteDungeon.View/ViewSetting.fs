@@ -87,6 +87,13 @@ module ActorImages =
 type GameViewSetting = {
     occupationImages : Map<Occupation, ActorImages<string, int Rect2>>
     bgms : string list
+
+    gameUIFrameColor : byte Vec4
+    gameUITextColor : byte Vec3
+    gameUITextFont : string
+    gameUITextSize : int 
+    gameUIDungeonFloor : float32 Rect2
+    gameUIPlayerArea : float32 Rect2
 }
 
 module GameViewSetting =

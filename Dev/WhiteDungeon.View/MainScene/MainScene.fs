@@ -91,8 +91,11 @@ type MainScene(setting : AppSetting) =
 
             rectColor = ColorPalette.sumire
 
+            centerPositionRate = Vec2.init 0.5f 0.5f
+            togglePositionRate = Vec2.init 0.5f 0.0f
             windowSize = UI.WindowSetting.WindowSize.FixWidth mainWindowWidth
-            toggleDirection = UI.WindowSetting.ToggleDirection.Center(UI.WindowSetting.Y)
+            //toggleDirection = UI.WindowSetting.ToggleDirection.Center(UI.WindowSetting.Y)
+            toggleDirection = UI.WindowSetting.ToggleDirection.Y
             buttonSize = UI.WindowSetting.ButtonSize.AutoFit(asd.Vector2DF(10.0f, 10.0f), 0.8f)
         }
 
@@ -118,8 +121,10 @@ type MainScene(setting : AppSetting) =
         let win2Setting =
             { windowSetting with
                 itemMargin = 15.0f
-                windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height))
-                toggleDirection = UI.WindowSetting.ToggleDirection.From(UI.WindowSetting.Direction.Left)
+
+                centerPositionRate = Vec2.init 0.0f 0.5f
+                windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
+                toggleDirection = UI.WindowSetting.ToggleDirection.X
             }
 
         new UI.MouseWindow(win2Setting, mouse,
@@ -134,8 +139,9 @@ type MainScene(setting : AppSetting) =
         let sideSetting =
             { windowSetting with
                 itemMargin = 30.0f
-                windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height))
-                toggleDirection = UI.WindowSetting.ToggleDirection.From(UI.WindowSetting.Direction.Right)
+                centerPositionRate = Vec2.init 1.0f 0.5f
+                windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
+                toggleDirection = UI.WindowSetting.ToggleDirection.X
             }
 
         new UI.MouseWindow(sideSetting, mouse,

@@ -30,13 +30,22 @@ module ObjectBaseView =
 
 
 type ActorView = {
+    statusCurrent : Model.ActorStatus
+    statusDefault : Model.ActorStatus
+
     objectBaseView : ObjectBaseView
 }
 
 module ActorView =
     let inline fromModel (actor : Actor.Actor) = {
+        statusCurrent = actor.statusCurrent
+        statusDefault = actor.statusDefault
+
         objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
     }
+
+    let inline hpRate (actorView : ActorView) =
+        float32 actorView.statusCurrent.hp / float32 actorView.statusDefault.hp
 
 
 type PlayerView = {
@@ -162,6 +171,7 @@ module UIItem =
 
 
 type ViewModel = {
+    dungeonFloor : uint32
     uiMode : GameSceneMode
 
     camera : CameraView list
@@ -182,6 +192,7 @@ module ViewModel =
     let inline getSkillAreaAll v = v.areaAll
 
     let view (model : Model) : ViewModel = {
+        dungeonFloor = model.dungeonFloor
         uiMode = model.mode
         camera =
             model.players
