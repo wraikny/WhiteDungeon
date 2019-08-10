@@ -4,6 +4,8 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model.Actor
 
+open FSharpPlus
+
 let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
     { actor with objectBase = objectBase }
 
@@ -45,11 +47,12 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
     let direction = direction |> Vector.normalize
 
     actor
+    |> fun x -> { x with currentMove = move }
     |> updateObjectBase(
         Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
-            (speed .* direction)
+            (speed *. direction)
         >> fst
     )
 
@@ -117,6 +120,9 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 //        actor
 //        |> setConditions conditions
 
+open WhiteDungeon.Core.Game.Update
+
 let inline update actor : Actor =
     actor
+    |> updateObjectBase ObjectBase.update
     //|> updateConditions

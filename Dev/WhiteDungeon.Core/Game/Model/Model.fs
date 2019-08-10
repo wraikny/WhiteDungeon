@@ -1,10 +1,23 @@
 ﻿namespace WhiteDungeon.Core.Game.Model
 
+open wraikny.Tart.Helper.Math
+
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Advanced
 
+open FSharpPlus
+
+type GameSceneMode =
+    | HowToControl
+    | Stair
+    | Pause
+    | GameMode
+    | WaitingGenerating
+    | ErrorUI of exn
+    //| GameOver
+    | GameFinished of back:bool
 
 
 type Model = {
@@ -17,10 +30,19 @@ type Model = {
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
+    dungeonGateCells : int Vec2 Set
 
     skillList : Skill.SkillList
 
     gameSetting : GameSetting
+
+    timePassed : bool
+
+    mode : GameSceneMode
+
+    lastCollidedGate : bool
+
+    dungeonFloor : uint32
 }
 
 
@@ -35,7 +57,7 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let inline init players dungeonBuilder dungeonModel gameSetting = {
+    let inline init players dungeonBuilder dungeonModel dungeonGateCells gameSetting = {
         count = 0u
 
         nextPlayerID = players |> Map.count |> uint32
@@ -47,6 +69,83 @@ module Model =
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
+        dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
 
         gameSetting = gameSetting
+
+        timePassed = false
+
+        mode = HowToControl
+
+        lastCollidedGate = false
+
+        dungeonFloor = 1u
     }
+
+open wraikny.Tart.Core
+open wraikny.Tart.Core.Libraries
+open wraikny.Tart.Advanced.Dungeon
+open wraikny.Tart.Helper.Geometry
+
+module Dungeon =
+    type GeneratedDungeonParams = {
+        dungeonBuilder : DungeonBuilder
+        dungeonModel : DungeonModel
+        gateCells : int Vec2 Set
+        initPosition : float32 Vec2
+    }
+
+    let generateTask gameSetting (dungeonBuilder : DungeonBuilder) gateCount : GeneratedDungeonParams TartTask =
+        monad {
+            let! seed = Random.int minValue<int> maxValue<int>
+            
+            let gen = (Random.int 0 (dungeonBuilder.roomCount - 1) )
+
+            let! roomIndex = gen
+            let gateCellsGen = Random.distinctList gateCount (Random.pair gen gen)
+
+            let! gateCellIndexs =
+                gateCellsGen
+                |> Random.until(List.map fst >> List.contains roomIndex >> not)
+
+            return (seed, roomIndex, gateCellIndexs)
+        }
+        |> TartTask.withEnv(fun (seed, roomIndex, gateCellIndexs) -> async {
+            let dungeonModel =
+                { dungeonBuilder with seed = seed }
+                |> DungeonBuilder.generate
+
+            let largeRooms = toList dungeonModel.largeRooms
+
+            let largeRoomsCount = length largeRooms
+
+            let initRoomIndex = roomIndex % largeRoomsCount
+
+            let initRoom = snd largeRooms.[initRoomIndex]
+
+            let fromCell =
+                gameSetting.dungeonCellSize
+                |> DungeonModel.cellToCoordinate
+
+            let initPosition =
+                initRoom.rect
+                |>> fromCell
+                |> Rect.centerPosition
+
+            let gateCells =
+                seq {
+                    for (a, b) in gateCellIndexs ->
+                        let room = snd largeRooms.[a % largeRoomsCount]
+                        let cells = room |> Space.cells
+                        let cell = fst cells.[ b % length cells]
+                        cell
+                }
+                |> Set.ofSeq
+
+            return {
+                dungeonBuilder = dungeonBuilder
+                dungeonModel = dungeonModel
+                gateCells = gateCells
+                initPosition = initPosition
+            }
+        })

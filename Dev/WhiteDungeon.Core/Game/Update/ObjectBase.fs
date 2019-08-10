@@ -9,6 +9,8 @@ open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+open FSharpPlus
+
 let inline setPosition position (obj : ObjectBase) = {
     obj with
         position = position
@@ -27,32 +29,49 @@ let inline addSize diff obj =
 let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
+
+let inline getCorners obj =
+    let area = obj |> ObjectBase.area
+    let lu, rd = area |> Rect.get_LU_RD
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+    [|lu; rd; ld; ru|]
+
+
+let collidedCell (gameSetting : GameSetting) (cell) obj =
+    GameSetting.collidedWithCell
+        gameSetting
+        cell
+        (getCorners obj)
+
+
+let collidedCells (gameSetting : GameSetting) (cells) obj =
+    GameSetting.collidedWiithCells
+        gameSetting
+        cells
+        (getCorners obj)
+
 let insideDungeon
     (gameSetting : GameSetting)
     (dungeonModel : Dungeon.DungeonModel) obj =
-    let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
-    
     GameSetting.insideDungeon
         gameSetting
         dungeonModel
-        [|lu; rd; ld; ru|]
+        (getCorners obj)
 
 open WhiteDungeon.Core.Utils
 
-let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
-    BinarySearch.vector
+let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
+    BinarySearch.binarySearch
         bsCount
         isInside
         currentPosition
         (currentPosition + diff)
 
-let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
+let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     let searchDiff =
         (+) currentPosition
         >>
-        BinarySearch.vector
+        BinarySearch.binarySearch
             bsCount
             isInside
             currentPosition
@@ -65,17 +84,17 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
         searchDiff { diff with x = 0.0f }
         |> Vec2.y
 
-    Vec2.init(diffX, diffY)
+    Vec2.init diffX diffY
 
 let private moveWithBS
     f
-    (gameSetting : Model.GameSetting)
+    (gameSetting : Game.Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
-    (diff) (obj : ObjectBase)
+    (diff0) (obj : ObjectBase)
     =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 
@@ -83,7 +102,7 @@ let private moveWithBS
 
     let isCollided =
         objectAreaPoints
-        |> Array.map ((+) diff)
+        |>> ((+) diff0)
         |> isInside
         |> not
 
@@ -93,17 +112,18 @@ let private moveWithBS
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
                     objectAreaPoints
-                    |> Array.map ((+) newDiff)
+                    |>> ((+) newDiff)
                     |> isInside
                 )
-                diff
+                diff0
                 obj.position
         else
-            diff
+            diff0
     
     obj
     |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff), isCollided
+    |> setDirection (MoveDirection.fromVector diff0)
+    |> fun x -> { x with isMoved = true }, isCollided
 
 let moveXYTogether = moveWithBS bsDiffXYTogether
 
@@ -116,3 +136,4 @@ let inline setVelocity velocity (obj : ObjectBase) =
 let inline update (obj : ObjectBase) =
     obj
     |> addPosition obj.velocity
+    |> fun x -> { x with isMoved = false }

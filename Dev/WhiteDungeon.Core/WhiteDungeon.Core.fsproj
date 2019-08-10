@@ -1,6 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>3186;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Utils\Math.fs" />
@@ -14,6 +17,7 @@
     <Compile Include="Game\Model\Actor\Player.fs" />
     <Compile Include="Game\Model\Actor\Enemy.fs" />
     <Compile Include="Game\Model\Skill\Skill.fs" />
+    <Compile Include="Game\Model\GameSetting.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />
@@ -24,30 +28,15 @@
     <Compile Include="Game\Update\Skill\Skill.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
-    <Compile Include="QuickPlay\Model.fs" />
-    <Compile Include="QuickPlay\Msg.fs" />
-    <Compile Include="QuickPlay\Update.fs" />
-    <Compile Include="QuickPlay\View.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FSharpPlus" Version="1.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Advanced\Tart.Advanced.fsproj">
-      <Name>Tart.Advanced</Name>
-      <Project>{ce58dc38-831b-4bd5-87cb-bf861687a3bf}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Core\Tart.Core.fsproj">
-      <Name>Tart.Core</Name>
-      <Project>{8c6e9ecf-5f33-47a3-ae3f-b9a77bd4f544}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Tart\Dev\Tart.Helper\Tart.Helper.fsproj">
-      <Name>Tart.Helper</Name>
-      <Project>{bf0abcce-5659-43b8-a783-6dd55180aacc}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj" />
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Core\Tart.Core.fsproj" />
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj" />
   </ItemGroup>
 </Project>

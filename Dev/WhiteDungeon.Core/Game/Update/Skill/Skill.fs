@@ -2,21 +2,21 @@
 
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Monad
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Update
 open WhiteDungeon.Core.Game.Model.Skill
 
+open FSharpPlus
+open wraikny.Tart.Helper.Extension
 
 module Effect =
-    let apply gameSetting (invoker : Actor.Actor) (effect : Effect) (actor : Actor.Actor) =
+    let apply (invoker : Actor.Actor) (effect : Effect) (actor : Actor.Actor) =
         effect |> function
         | Damage calc ->
             let damage =
                 calc
-                    gameSetting
                     invoker.statusCurrent
                     actor.statusCurrent
 
@@ -74,51 +74,51 @@ module AreaSkill =
 
 
 
-    let isCollided (areaSkill : AreaSkill) (actor : Actor.Actor) : bool =
+    let inline isCollided (areaSkill : AreaSkill) (actor : Actor.Actor) : bool =
         Rect.isCollided
             (actor.objectBase |> ObjectBase.area)
             (areaSkill.objectBase |> ObjectBase.area)
 
 
-    let checkCollision (actors : #seq<Actor.Actor>) (areaSkill : AreaSkill) : AreaSkill =
+    let inline checkCollision (actors : seq<Actor.Actor>) (areaSkill : AreaSkill) : AreaSkill =
         {
             areaSkill with
                 collidedActors =
                     actors
-                    |> Seq.filter(isCollided areaSkill)
-                    |> Seq.map(fun a -> a.id)
+                    |> filter (isCollided areaSkill)
+                    |>> (fun a -> a.id)
                     |> Set.ofSeq
         }
 
-    let private apply (gameSetting : GameSetting) (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor =
+    let private apply (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor =
         // TODO
         areaSkill.collidedActors
         |> Set.contains actor.id
         |> function
         | true ->
             areaSkill.skillBase.effects
-            |> Array.map(Effect.apply gameSetting areaSkill.skillBase.invokerActor)
-            |> Array.fold (|>) actor
+            |>> (Effect.apply areaSkill.skillBase.invokerActor)
+            |> fold (|>) actor
         | false ->
             actor
 
-    let getFoledSkills gameSetting =
-        Map.toSeq
-        >> Seq.map (snd >> apply gameSetting)
-        >> Seq.fold (>>) id
+    let getFoledSkills skillsMap =
+        skillsMap
+        |> Map.toSeq
+        |> map (snd >> apply)
+        |> fold (>>) id
 
     let applyToActorHolders
-        (gameSetting)
         (updater : (Actor.Actor -> Actor.Actor) -> 'a -> 'a)
         (skills : Map<_, AreaSkill>)
         (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
 
-        let foledSkills = getFoledSkills gameSetting skills
+        let foledSkills = getFoledSkills skills
 
         holders
-        |> Map.map (fun _ h -> updater foledSkills h)
+        |>> updater foledSkills
 
-    let hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
+    let inline hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
         if areaSkill.removeWhenHitActor && (areaSkill.emits |> Array.isEmpty |> not) then
             None
         else
@@ -135,47 +135,38 @@ module SkillEmit =
 
 module SkillList =
     let append skills skillList =
-        let skillsCount = skills |> Seq.length
+        let skillsCount = skills |> length
         {
             skillList with
                 nextID = skillList.nextID + uint32 skillsCount
                 waitings =
                     skillList.waitings
                     |> Map.toSeq
-                    |> Seq.append (
+                    |> (<|>) (
                         skills
-                        |> Seq.indexed
-                        |> Seq.map(fun (i, x) -> (skillList.nextID + uint32 i, x))
+                        |> mapi (fun i x -> (skillList.nextID + uint32 i, x))
                     )
                     |> Map.ofSeq
         }
 
     let inline mapArea f skillList =
         { skillList with
-            areaPlayer =
-                skillList.areaPlayer
-                |> Map.map(fun _ s -> f s)
-            areaEnemy =
-                skillList.areaEnemy
-                |> Map.map(fun _ s -> f s)
-            areaAll =
-                skillList.areaAll
-                |> Map.map(fun _ s -> f s)
+            areaPlayer = f <!> skillList.areaPlayer
+            areaEnemy = f <!> skillList.areaEnemy
+            areaAll = f <!> skillList.areaAll
         }
 
     let inline filterMapArea f skillList =
         let g =
-            Map.toSeq
-            >> Seq.filterMap(fun (id, x) -> maybe {
+            Map.toSeq >> filterMap(fun (id, x) -> monad{
                 let! x = f x
                 yield (id, x)
-            })
-            >> Map.ofSeq
+            }) >> Map.ofSeq
 
         { skillList with
             areaPlayer = g skillList.areaPlayer
             areaEnemy = g skillList.areaEnemy
-            areaAll = g skillList.areaAll
+            areaAll = g  skillList.areaAll
         }
 
     open System.Collections.Generic
@@ -218,32 +209,31 @@ module SkillList =
         let playerActors =
             players
             |> Map.toSeq
-            |> Seq.map (snd >> fun x -> x.actor)
+            |>> (snd >> fun x -> x.actor)
 
         let enemiesActor =
             enemies
             |> Map.toSeq
-            |> Seq.map (snd >> fun x -> x.actor)
+            |>> (snd >> fun x -> x.actor)
 
         { skillList with
             areaPlayer =
                 skillList.areaPlayer
-                |> Map.map(fun _ x -> x |> AreaSkill.checkCollision playerActors)
+                |>> AreaSkill.checkCollision playerActors
             areaEnemy =
                 skillList.areaEnemy
-                |> Map.map(fun _ x -> x |> AreaSkill.checkCollision enemiesActor)
+                |>> AreaSkill.checkCollision enemiesActor
             areaAll =
                 skillList.areaAll
-                |> Map.map(fun _ x -> x |> AreaSkill.checkCollision(Seq.append playerActors enemiesActor))
+                |>> AreaSkill.checkCollision(playerActors <|> enemiesActor)
         }
 
     let private appendGeneratedEmits skillList : SkillList =
         let f : Map<_, Skill.AreaSkill> -> _ =
             Map.toSeq
-            >> Seq.map snd
-            >> Seq.map(fun areaSkill ->
+            >> map(snd >> fun areaSkill ->
                 areaSkill.emits
-                |> Seq.map(AreaSkillBuilder.build areaSkill.skillBase.invokerActor >> Skill.Area)
+                |>> (AreaSkillBuilder.build areaSkill.skillBase.invokerActor >> Skill.Area)
             )
             >> Seq.concat
 

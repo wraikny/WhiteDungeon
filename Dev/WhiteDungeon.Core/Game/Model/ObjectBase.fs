@@ -5,6 +5,8 @@ open wraikny.Tart.Helper.Geometry
 
 open WhiteDungeon.Core.Model
 
+open FSharpPlus
+
 [<Struct>]
 type MoveDirection =
     | Front
@@ -56,8 +58,8 @@ module MoveDirection =
         | FrontLeft -> (-1, 1)
         | BackRight -> (1, -1)
         | BackLeft -> (-1, -1)
-        |> Vec2.init
-        |> Vec2.map float32
+        |> uncurry Vec2.init
+        |>> float32
         |> Vector.normalize
 
 
@@ -72,6 +74,8 @@ type ObjectBase = {
     velocity : float32 Vec2
 
     direction : MoveDirection
+
+    isMoved : bool
 }
 
 module ObjectBase =
@@ -87,7 +91,7 @@ module ObjectBase =
 
     let inline area (o : ObjectBase) : float32 Rect2 =
         {
-            position = o.position - (o.size *. 0.5f)
+            position = o.position - (o.size .* 0.5f)
             size = o.size
         }
 
@@ -95,6 +99,7 @@ module ObjectBase =
         size = size
         position = position
         lastPosition = position
-        velocity = Vector.zero()
+        velocity = zero
         direction = Front
+        isMoved = false
     }

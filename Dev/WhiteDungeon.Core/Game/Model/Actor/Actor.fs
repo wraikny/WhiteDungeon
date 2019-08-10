@@ -5,8 +5,14 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 type ActorID =
-    | Player of PlayerID
-    | Enemy of EnemyID
+    | OfPlayerID of PlayerID
+    | OfEnemyID of EnemyID
+
+
+[<Struct>]
+type ActorMove =
+    | Walk
+    | Dash
 
      
 type Actor = {
@@ -16,6 +22,7 @@ type Actor = {
     statusDefault : ActorStatus
     // skillEmits : Skill.SkillEmit list
     // conditions : Skill.Condition list
+    currentMove : ActorMove
 }
 
 module Actor =
@@ -37,4 +44,5 @@ module Actor =
         objectBase = ObjectBase.init size position
         // skillEmits = []
         // conditions = []
+        currentMove = Walk
     }

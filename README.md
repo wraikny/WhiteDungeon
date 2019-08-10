@@ -11,6 +11,9 @@ writtenknown@gmail.com
 * System.ValueTuple 4.5.0 : MIT (c) Microsoft Corporation.
   https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
 
+* FSharpPlus 1.0.0 : Apache License 2.0 (c) fsprojects
+  https://github.com/fsprojects/FSharpPlus/blob/master/LICENSE.txt
+
 * Tart latest : Apache License 2.0 (c) wraikny 2019
   https://github.com/wraikny/Tart/blob/master/LICENSE
 

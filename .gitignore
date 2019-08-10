@@ -3,3 +3,7 @@ Dev/Lib/*.dll
 Dev/Lib/*.xml
 Dev/Lib/*.dylib
 ! Dev/Lib/.gitkeep
+
+.ionide/*
+
+Resources/*
