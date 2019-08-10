@@ -30,7 +30,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     | UndoModel ->
         model.prevModel |> function
         | Some(x) ->
-            { x with prevModel = None }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
+            { x with prevModel = None; uiMode = Title }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
         | None ->
             model, Cmd.none
     | SetUIWithHistory uiMode ->

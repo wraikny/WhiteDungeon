@@ -112,9 +112,9 @@ let appSetting : View.AppSetting = {
                             removeWhenHitActor = true
 
                             move = seq {
-                                for _ in 1..10 -> Skill.Stay
-                                for _ in 1..60 -> Skill.Move(dir .* 5.0f)
-                                for _ in 1..60 -> Skill.Scale(one .* 5.0f)
+                                //for _ in 1..10 -> Skill.Stay
+                                for _ in 1..60 -> Skill.Move (dir .* 10.0f)
+                                for _ in 1..60 -> Skill.Scale(one .* 10.0f)
                             } |> toList
                         }
                     ]

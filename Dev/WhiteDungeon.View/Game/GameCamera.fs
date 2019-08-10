@@ -27,7 +27,7 @@ type GameCamera(isMapChip) =
     let mutable targetPosition = ValueNone
     let mutable currentPosition = ValueNone
 
-    member val Zoom = 0.5f with get, set
+    member val Zoom = 0.4f with get, set
     member val Speed = 0.2f with get, set
 
     override this.OnUpdate() =
@@ -77,7 +77,7 @@ type GameCamera(isMapChip) =
             let size = size.To2DI()
 
             this.Src <- new asd.RectI(
-                (Vec2.toVector2DI (int <!> srcPos)) - size / 2
+                (Vec2.toVector2DI (map int srcPos)) - size / 2
                 , size
             )
         )

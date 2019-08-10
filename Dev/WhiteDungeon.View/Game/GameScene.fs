@@ -133,11 +133,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
     let skillEffectsCamera = new GameCamera(false)
 
     do
-        [
+        [|
             dungeonCamera
             playerCamera
             skillEffectsCamera
-        ]
+        |]
         |>> fun o ->
             messenger.ViewModel
                 .Select(fun v -> ViewModel.ViewModel.getCameras v)
