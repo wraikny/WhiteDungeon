@@ -127,7 +127,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         |> ignore
 
     let dungeonCellUpdater = new MaptipsUpdater<_, _>({
-            create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize)
+            create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
         }, UpdatingOption = View.UpdatingOption.Updating)

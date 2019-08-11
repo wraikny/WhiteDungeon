@@ -94,6 +94,8 @@ type GameViewSetting = {
     gameUITextSize : int 
     gameUIDungeonFloor : float32 Rect2
     gameUIPlayerArea : float32 Rect2
+
+    dungeonCellTexture : string
 }
 
 module GameViewSetting =
