@@ -81,7 +81,7 @@ let appSetting : View.AppSetting = {
                 "bgm/buriki_no_coffee_maker.ogg"
             ]
 
-            gameUIFrameColor = Vec4.init sumire.x sumire.y sumire.z 255uy
+            gameUIFrameColor = Vec4.init sumire.x sumire.y sumire.z 240uy
             gameUITextColor = sakura
             gameUITextFont = textFontPath
             gameUITextSize = 20

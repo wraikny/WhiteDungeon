@@ -98,7 +98,7 @@ type GameViewSetting = {
 
 module GameViewSetting =
     [<Literal>]
-    let modForCulling = 10000.0f
+    let modForCulling = 40000.0f
 
 
 open wraikny.MilleFeuille.Fs.UI
