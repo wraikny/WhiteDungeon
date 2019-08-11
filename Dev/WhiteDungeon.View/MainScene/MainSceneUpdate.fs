@@ -70,71 +70,80 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             { model with uiMode = WaitingGenerating }, randomCmd
 
         | SetGameSceneRandomSeed x ->
-            Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
-            |> TartTask.perform (fun e ->
+            if model.uiMode = WaitingGenerating then
+                Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
+                |> TartTask.perform (fun e ->
     #if DEBUG
-                System.Console.WriteLine(e)
+                    System.Console.WriteLine(e)
     #endif
-                GenerateDungeon) GeneratedDungeonModel
-            |> fun cmd ->
-                { model with gameSceneRandomSeed = x }, cmd
+                    GenerateDungeon) GeneratedDungeonModel
+                |> fun cmd ->
+                    { model with gameSceneRandomSeed = x }, cmd
+            else
+                model, Cmd.none
 
         | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
-            let cmd =
-                Game.Model.Dungeon.generateDungeonParams
-                    model.gameSetting
-                    model.gateCount
-                    dungeonBuilder
-                    dungeonModel
-                    GeneratedDungeonParams
-            model, cmd
+            if model.uiMode = WaitingGenerating then
+                let cmd =
+                    Game.Model.Dungeon.generateDungeonParams
+                        model.gameSetting
+                        model.gateCount
+                        dungeonBuilder
+                        dungeonModel
+                        GeneratedDungeonParams
+                model, cmd
+            else
+                model, Cmd.none
 
         | GeneratedDungeonParams dungeonParams ->
-            let gameModel =
-                let size = model.gameSetting.characterSize
-                let players =
-                    [ model.playerName, model.selectOccupation ]
-                    |> Seq.indexed
-                    |> Seq.map(fun (index, (name, occupation)) ->
-                        let name = Option.defaultValue (sprintf "Player%d" index) name
+            if model.uiMode = WaitingGenerating then
+                let gameModel =
+                    let size = model.gameSetting.characterSize
+                    let players =
+                        [ model.playerName, model.selectOccupation ]
+                        |> Seq.indexed
+                        |> Seq.map(fun (index, (name, occupation)) ->
+                            let name = Option.defaultValue (sprintf "Player%d" index) name
 
-                        let status =
-                            model.gameSetting.occupationSettings
-                            |> Map.find occupation
-                            |> fun x -> x.status
+                            let status =
+                                model.gameSetting.occupationSettings
+                                |> Map.find occupation
+                                |> fun x -> x.status
 
-                        let character : Model.Character = {
-                            id = Model.CharacterID -index
-                            name = name
-                            currentOccupation = occupation
-                            occupations = [
-                                occupation, status
-                            ] |> Map.ofList
-                        }
+                            let character : Model.Character = {
+                                id = Model.CharacterID -index
+                                name = name
+                                currentOccupation = occupation
+                                occupations = [
+                                    occupation, status
+                                ] |> Map.ofList
+                            }
 
 
-                        let playerId = Game.Model.PlayerID (uint32 index)
+                            let playerId = Game.Model.PlayerID (uint32 index)
 
-                        let player =
-                            Game.Model.Actor.Player.init
-                                size
-                                (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
-                                status
-                                playerId
-                                character
+                            let player =
+                                Game.Model.Actor.Player.init
+                                    size
+                                    (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                                    status
+                                    playerId
+                                    character
 
-                        (playerId, player)
-                    )
-                    |> Map.ofSeq
+                            (playerId, player)
+                        )
+                        |> Map.ofSeq
 
-                Game.Model.Model.init
-                    players
-                    dungeonParams.dungeonBuilder
-                    dungeonParams.dungeonModel
-                    dungeonParams.gateCells
-                    model.gameSetting
+                    Game.Model.Model.init
+                        players
+                        dungeonParams.dungeonBuilder
+                        dungeonParams.dungeonModel
+                        dungeonParams.gateCells
+                        model.gameSetting
 
-            model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+                model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+            else
+                model, Cmd.none
 
         | CloseGameMsg ->
             model, Cmd.port CloseGame

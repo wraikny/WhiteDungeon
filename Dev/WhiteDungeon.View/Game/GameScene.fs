@@ -47,10 +47,6 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 update = Update.Update.update
             }
 
-    //let port _ = ()
-    //do
-    //    messenger.ViewMsg.Subscribe(port) |> ignore
-
     let gameKeybaord =
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
@@ -207,6 +203,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     override this.OnRegistered() =
+        GC.Collect()
+
         let convert (item : ViewModel.UIItem) =
             item |> function
             | ViewModel.HeaderText text ->
@@ -244,10 +242,9 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             | ViewModel.CloseButton(text) ->
                 UI.Button(text, fun() ->
                     // TODO
-                    playSE(se_button)
-
                     messenger.Dispose()
-                    bgmPlayer.FadeOut(0.5f)
+                    bgmPlayer.Stop()
+
                     uiWindowMain.Toggle(false, fun() ->
                         errorHandler.Clear()
                         asd.Engine.Close()
