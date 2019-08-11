@@ -89,7 +89,7 @@ let selectUIChara (model : Model) : Msg MenuItem list =
                 Separator
             ]
             yield! (playerView model)
-            yield Separator
+            //yield Separator
 
     } |> Seq.toList
 
@@ -111,7 +111,7 @@ let selectUIDungeon (model : Model) =
         yield! (dungeonView model)
         for i in 1..3 ->
             Button(sprintf "サイズ%d" i, SetDungeonParameters i)
-        yield Separator
+        //yield Separator
     }
     |> Seq.toList
 
@@ -128,7 +128,6 @@ let selectUICheck (model : Model) =
         [
             Separator
             Button("始める", GenerateDungeon)
-            Separator
         ]
     ] |> List.concat
 
@@ -149,7 +148,6 @@ let creditUIProj = [
     Text("Lepus Pluvia")
     WebsiteButton("Website", "http://LepusPluvia.com")
     WebsiteButton("Twitter", "http://twitter.com/LepusPluvia")
-    Separator
 ]
 
 
@@ -161,7 +159,6 @@ let creditUILibs = [
     WebsiteButton("Altseed", "http://altseed.github.io/")
     WebsiteButton("Tart", "https://github.com/wraikny/Tart")
     WebsiteButton("Mille Feuille", "https://github.com/wraikny/Mille-Feuille")
-    Separator
 ]
 
 
@@ -176,7 +173,6 @@ let creditUIBGM = [
     WebsiteButton("くらげ工匠", "http://www.kurage-kosho.info/")
     Text "ページめくり03"
     Text "ボタン47"
-    Separator
 ]
 
 let creditUIImage = [
@@ -187,15 +183,8 @@ let creditUIImage = [
     Separator
     HeaderText "ツール"
     WebsiteButton("グラフィック合成器", "http://www.silversecond.com/WolfRPGEditor/")
-    Separator
 ]
 
-//let creditUITool = [
-//    HeaderText "ツール"
-//    Separator
-//    WebsiteButton("グラフィック合成器", "http://www.silversecond.com/WolfRPGEditor/")
-//    Separator
-//]
 
 // https://twitter.com/intent/tweet?text=「九十九のラビリンス C96体験版」をプレイしました！ @LepusPluvia
 
@@ -262,12 +251,30 @@ let view (model : Model) : Msg ViewModel =
         ]
 
     | ErrorUI e ->
+        let url title body =
+            let encode : string -> string = System.Web.HttpUtility.UrlEncode
+            let title = encode title
+            let body = encode body
+            sprintf "https://github.com/wraikny/WhiteDungeon/issues/new?assignee=wraikny&labels=bug&title=%s&body=%s" title body
+        let title = sprintf "[不具合報告] C96体験版 MainScene, %A" <| e.GetType()
+
+        let text =
+            let msgs =
+                model.msgHistory |>> function
+                | SetUI x -> "SetUI" + x.ToString()
+                | x -> x.ToString()
+            sprintf "# Env\n%A\n# Msgs\n%A\n" model.env msgs
         Window1 [
             HeaderText "エラーが発生しました"
             Separator
             Text <| e.GetType().ToString()
             Text e.Message
-            Button("もどる", SetUI (Select CheckSettiing))
+            Separator
+            WebsiteButton(
+                "Githubで報告(ブラウザを開きます)",
+                url title (sprintf "# Error\n%A\n\n%s" e text))
+            //Button("もどる", SetUI (Select CheckSettiing))
+            Separator
         ]
 
 

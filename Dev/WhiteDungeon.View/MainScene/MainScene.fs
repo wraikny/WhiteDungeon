@@ -22,7 +22,7 @@ open WhiteDungeon.View.MainScene
 open WhiteDungeon.View.Utils.Color
 
 
-type MainScene(setting : AppSetting) =
+type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
     inherit Scene()
 
     let menuSetting = setting.menuSceneSetting
@@ -152,9 +152,10 @@ type MainScene(setting : AppSetting) =
                 , windowSize.y ))
 
     let messenger =
-        Messenger.build { seed = Random().Next() } {
+        let env = { seed = Random().Next() }
+        Messenger.build env {
             init =
-                let initModel = Model.initModel setting.gameSetting
+                let initModel = Model.initModel env setting.gameSetting
                 
                 initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update
@@ -198,7 +199,7 @@ type MainScene(setting : AppSetting) =
         | ViewModel.InputField(maxLength, placeHolder, current, msg) ->
             UI.InputField(maxLength, placeHolder, current, fun s -> messenger.Enqueue(msg s))
         | ViewModel.Separator ->
-            UI.Rect(5.0f, 0.8f)
+            UI.Rect(3.0f, 0.8f)
         | ViewModel.Space x ->
             UI.Space x
 
@@ -298,9 +299,10 @@ type MainScene(setting : AppSetting) =
                             buttonFont = buttonFont
                             bgmVolume = bgmVolume
                             randomSeed = randomSeed
-                            createMainScene = fun() -> new MainScene(setting) :> asd.Scene
+                            createMainScene = fun() -> new MainScene(errorHandler, setting) :> asd.Scene
                         }
-                        let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
+                        errorHandler.Clear()
+                        let gameScene = new Game.GameScene(errorHandler, gameModel, setting.gameViewSetting, uiFonts)
                         bgmPlayer.FadeOut(0.5f)
                         this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
                         |> ignore
@@ -327,6 +329,8 @@ type MainScene(setting : AppSetting) =
         uiWindowMain.Toggle(true)
 
         messenger.StartAsync()
+        errorHandler.CallBack <- fun e ->
+            messenger.Enqueue(Model.Msg.SetUI <| Model.ErrorUI e)
 
     override this.OnUpdated() =
         messenger.NotifyView()

@@ -39,6 +39,15 @@ type UIMode =
     | Setting of SettingMode
     | WaitingGenerating
     | ErrorUI of exn
+with
+    override x.ToString() =
+        x |> function
+        | Title -> "Title"
+        | Select a -> "Select " + a.ToString()
+        | Credit a -> "Credit " + a.ToString()
+        | Setting a -> "Setting " + a.ToString()
+        | WaitingGenerating -> "WaitingGenerating"
+        | ErrorUI e -> "ErrorUI " + e.GetType().ToString()
 
 
 type Msg =
@@ -59,24 +68,29 @@ type Msg =
     | AddBGMVolume of int
 
 
-type Model = {
-    uiMode : UIMode
-    occupationListToggle : bool
+type Model =
+    {
+        env : EnvironmentBuilder
 
-    playerName : string option
-    selectOccupation : Occupation
+        uiMode : UIMode
+        occupationListToggle : bool
 
-    gateCount : int
-    dungeonBuilder : DungeonBuilder
+        playerName : string option
+        selectOccupation : Occupation
 
-    gameSetting : GameSetting
+        gateCount : int
+        dungeonBuilder : DungeonBuilder
 
-    bgmVolume : int
+        gameSetting : GameSetting
 
-    prevModel : Model option
+        bgmVolume : int
 
-    gameSceneRandomSeed : int
-}
+        prevModel : Model option
+
+        gameSceneRandomSeed : int
+
+        msgHistory : Msg list
+    }
 
 
 let updateDungeonBuilder i (model : Model) =
@@ -94,8 +108,9 @@ let updateDungeonBuilder i (model : Model) =
     }
 
 
-let initModel (gameSetting : GameSetting) =
+let initModel env (gameSetting : GameSetting) =
     {
+        env = env
         uiMode = Title
         occupationListToggle = false
 
@@ -126,5 +141,7 @@ let initModel (gameSetting : GameSetting) =
         prevModel = None
 
         gameSceneRandomSeed = 0
+
+        msgHistory = []
     }
     |> updateDungeonBuilder 2

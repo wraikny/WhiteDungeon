@@ -165,14 +165,31 @@ let main _ =
 
             //let scene = new View.Title.TitleScene(viewSetting)
 
-            let scene = new MainScene.MainScene(appSetting)
+            let errorHandler = Utils.ErrorHandler()
+
+            let scene = new MainScene.MainScene(errorHandler, appSetting)
+
             asd.Engine.ChangeScene(scene)
 
-            while asd.Engine.DoEvents() do
-                asd.Engine.Update()
+            let rec loop n =
+                if n < 0 then
+                    System.Console.ReadLine() |> ignore
+                else
+                    try
+
+                        while asd.Engine.DoEvents() do
+                            asd.Engine.Update()
+                    with e ->
+                        errorHandler.CallBack(e)
+                        System.Console.WriteLine(e)
+
+                        loop (n - 1)
+
+            loop 1
 
             asd.Engine.Terminate()
     with e ->
         System.Console.WriteLine(e)
+        System.Console.ReadLine() |> ignore
 
     0

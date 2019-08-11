@@ -33,7 +33,7 @@ open System.Reactive.Linq
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
+type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
 
     let messenger : IMessenger<_, _, _> =
@@ -235,6 +235,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     let scene = gameSceneArgs.createMainScene()
 
                     uiWindowMain.Toggle(false, fun() ->
+                        errorHandler.Clear()
                         bgmPlayer.FadeOut(0.5f)
                         this.ChangeSceneWithTransition(scene, new asd.TransitionFade(0.5f, 0.5f))
                         |> ignore
@@ -248,6 +249,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     messenger.Dispose()
                     bgmPlayer.FadeOut(0.5f)
                     uiWindowMain.Toggle(false, fun() ->
+                        errorHandler.Clear()
                         asd.Engine.Close()
                     )
                 )
@@ -302,7 +304,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         uiLayer.AddObject(gameUIWindows)
         uiLayer.AddObject(uiWindowMain)
 
-        messenger.StartAsync() |> ignore
+        messenger.StartAsync()
+
+        errorHandler.CallBack <- fun e ->
+            messenger.Enqueue(Msg.SetGameMode <| Model.ErrorUI e)
 
 
     override this.OnDispose() =
