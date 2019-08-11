@@ -63,6 +63,8 @@ let appSetting : View.AppSetting = {
             bgm = "bgm/seirei_no_machi.ogg"
 
             #if !DEBUG
+            titleFont = "Font/titleFont.aff"
+            headerFont = "Font/headerFont.aff"
             #endif
         }
 
@@ -124,7 +126,7 @@ let appSetting : View.AppSetting = {
                                     delay = 0u
                                     effects = [|
                                         Skill.Damage(fun atk def ->
-                                            0.0f
+                                            (atk.level - def.level) |> max 1 |> ( * ) 5 |> float32
                                         )
                                     |]
                                 }
@@ -142,7 +144,47 @@ let appSetting : View.AppSetting = {
                             } |> toList
                         }
                     ]
-                skill2 = fun _ -> []
+                skill2 = fun actor ->
+                    let dir = 
+                        actor.objectBase.direction
+                        |> Model.MoveDirection.toVector
+
+                    let verticalDir =
+                        Vec2.init -dir.y dir.x
+
+                    let pos = actor.objectBase.position + (100.0f *. dir)
+
+                    let f dir =
+                        let dir = Vector.normalize dir
+                        Skill.AreaBuilder {
+                            skillBase =
+                                {
+                                    delay = 0u
+                                    effects = [|
+                                        Skill.Damage(fun atk def ->
+                                            0.0f
+                                        )
+                                    |]
+                                }
+                            objectBase = ObjectBase.init (one .* 100.0f) pos
+
+                            target = Skill.AreaTarget.Enemies
+
+                            removeWhenHitWall = true
+                            removeWhenHitActor = true
+
+                            move = seq {
+                                //for _ in 1..10 -> Skill.Stay
+                                for _ in 1..60 -> Skill.Move (dir .* 10.0f)
+                                for _ in 1..60 -> Skill.Scale(one .* 10.0f)
+                            } |> toList
+                        }
+
+                    [
+                        f dir
+                        f (dir + verticalDir .* 0.3f)
+                        f (dir - verticalDir .* 0.3f)
+                    ]
 
                 skill1CoolTime = 20us
                 skill2CoolTime = 120us
@@ -152,18 +194,26 @@ let appSetting : View.AppSetting = {
 }
 
 
+open System
+
 
 [<EntryPoint>]
 let main _ =
     try
         let windowSize = appSetting.windowSize |> Vec2.toVector2DI
-        asd.Engine.Initialize("九十九のラビリンス", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
+        asd.Engine.Initialize(
+            "九十九のラビリンス"
+            , windowSize.X, windowSize.Y
+            , new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering)
+        )
         |> function
         | false -> ()
         | true ->
+    #if DEBUG
             asd.Engine.File.AddRootDirectory("Resources")
-
-            //let scene = new View.Title.TitleScene(viewSetting)
+    #else
+            asd.Engine.File.AddRootPackageWithPassword("Resources.pack", "password")
+    #endif
 
             let errorHandler = Utils.ErrorHandler()
 
@@ -187,9 +237,14 @@ let main _ =
 
             loop 1
 
+            GC.Collect()
+
+            asd.Engine.Sound.StopAll()
+
             asd.Engine.Terminate()
+
     with e ->
-        System.Console.WriteLine(e)
-        System.Console.ReadLine() |> ignore
+        Console.WriteLine(e)
+        Console.ReadLine() |> ignore
 
     0
