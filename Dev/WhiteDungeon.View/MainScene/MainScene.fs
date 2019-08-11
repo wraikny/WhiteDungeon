@@ -169,7 +169,12 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
         }
 
     do
+        #if DEBUG
         messenger.OnError.Add(Console.WriteLine)
+        #endif
+        messenger.OnError.Add(fun e ->
+            messenger.Enqueue(Model.SetUI <| Model.ErrorUI e)
+        )
 
     let bgmPlayer =
         new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ],
