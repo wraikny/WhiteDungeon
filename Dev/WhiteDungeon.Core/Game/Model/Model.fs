@@ -115,39 +115,42 @@ module Dungeon =
             gameSetting.dungeonCellSize
             |> DungeonModel.cellToCoordinate
 
-        monad {
-            let gen = Random.int 0 (largeRoomsCount - 1)
+        let rec loop() = monad {
+            try
+                let gen = Random.int 0 (largeRoomsCount - 1)
 
-            let! roomIndex = gen
+                let! roomIndex = gen
 
-            let! gateCellIndexs =
-                Random.distinctList gateCount (Random.pair gen gen)
-                |> Random.until(List.map fst >> List.contains roomIndex >> not)
+                let! gateCellIndexs =
+                    Random.distinctList gateCount (Random.pair gen gen)
+                    |> Random.until(List.map fst >> List.contains roomIndex >> not)
 
-            let initRoomIndex = roomIndex % largeRoomsCount
+                let initRoomIndex = roomIndex % largeRoomsCount
 
-            let initRoom = snd largeRooms.[initRoomIndex]
+                let initRoom = snd largeRooms.[initRoomIndex]
 
-            let initPosition =
-                initRoom.rect
-                |>> fromCell
-                |> Rect.centerPosition
+                let initPosition =
+                    initRoom.rect
+                    |>> fromCell
+                    |> Rect.centerPosition
 
-            let gateCells =
-                seq {
-                    for (a, b) in gateCellIndexs ->
-                        let room = snd largeRooms.[a % largeRoomsCount]
-                        let cells = room |> Space.cells
-                        let cell = fst cells.[ b % length cells]
-                        cell
+                let gateCells =
+                    seq {
+                        for (a, b) in gateCellIndexs ->
+                            let room = snd largeRooms.[a % largeRoomsCount]
+                            let cells = room |> Space.cells
+                            let cell = fst cells.[ b % length cells]
+                            cell
+                    }
+                    |> Set.ofSeq
+
+                return {
+                    dungeonBuilder = dungeonBuilder
+                    dungeonModel = dungeonModel
+                    gateCells = gateCells
+                    initPosition = initPosition
                 }
-                |> Set.ofSeq
-
-            return {
-                dungeonBuilder = dungeonBuilder
-                dungeonModel = dungeonModel
-                gateCells = gateCells
-                initPosition = initPosition
-            }
+            with _ -> return! loop()
         }
-        |> flip Random.generate
+
+        flip Random.generate (loop())

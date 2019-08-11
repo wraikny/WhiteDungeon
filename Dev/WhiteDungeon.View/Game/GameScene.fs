@@ -47,7 +47,12 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 update = Update.Update.update
             }
     do
+        #if DEBUG
         messenger.OnError.Add(Console.WriteLine)
+        #endif
+        messenger.OnError.Add(fun e ->
+            messenger.Enqueue(Msg.SetGameMode <| Model.ErrorUI e)
+        )
 
     let gameKeybaord =
         KeyboardBuilder.init()
