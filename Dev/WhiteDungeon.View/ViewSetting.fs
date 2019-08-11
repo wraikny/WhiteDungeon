@@ -124,8 +124,7 @@ type MainSceneSetting = {
     
 #if !DEBUG
     titleFont : string
-    buttonFont : string
-    textFont : string
+    headerFont : string
 #endif
 }
 

@@ -41,7 +41,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
             Color = Vec3.toColor menuSetting.backColor
         )
 
-    #if DEBUG
+#if DEBUG
     let createFont size color =
         asd.Engine.Graphics.CreateDynamicFont(
             "C:\Windows\Fonts\UtsukushiFONT.otf",
@@ -50,7 +50,13 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
     let titleFont = createFont 80 ColorPalette.black
     let headerFont = createFont 50 ColorPalette.black
-    #endif
+#else
+    let createFont path =
+        asd.Engine.Graphics.CreateFont path
+
+    let titleFont = createFont menuSetting.titleFont
+    let headerFont = createFont menuSetting.headerFont
+#endif
 
     let createDynamicFont size color =
         asd.Engine.Graphics.CreateDynamicFont(
@@ -101,7 +107,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
 
     let mouse =
-        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = false)
+        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = true)
         new UI.MouseButtonSelecter(mouse)
 
 
