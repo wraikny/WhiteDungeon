@@ -15,28 +15,26 @@ type ActorMove =
     | Dash
 
      
-type Actor = {
-    id : ActorID
-    objectBase : ObjectBase
-    statusCurrent : ActorStatus
-    statusDefault : ActorStatus
-    // skillEmits : Skill.SkillEmit list
-    // conditions : Skill.Condition list
-    currentMove : ActorMove
-}
+type Actor =
+    {
+        id : ActorID
+        objectBase : ObjectBase
+        statusCurrent : ActorStatus
+        statusDefault : ActorStatus
+        // skillEmits : Skill.SkillEmit list
+        // conditions : Skill.Condition list
+        currentMove : ActorMove
+    }
+with
+    member inline x.actor = x
+
+    static member inline SetActor (_ : Actor, y : Actor) = y
+
+    static member inline SetObjectBase (x, y) =
+        { x with objectBase = y }
+
 
 module Actor =
-    let inline statusCurrent (actor : Actor) = actor.statusCurrent
-
-    let inline statusDefault (actor : Actor) = actor.statusDefault
-
-    let inline objectBase (actor : Actor) = actor.objectBase
-
-    let inline stateRate (f : ActorStatus -> ^a) (actor : Actor) =
-        let currentStatus = actor.statusCurrent
-        let maxStatus = actor.statusDefault
-        f currentStatus / f maxStatus
-
     let inline init size position id actorStatus = {
         id = id
         statusCurrent = actorStatus
@@ -46,3 +44,20 @@ module Actor =
         // conditions = []
         currentMove = Walk
     }
+
+    let inline get (x : ^a) : Actor =
+        (^a : (member actor : _) x)
+
+    let inline set (a : Actor) (x : ^a) : ^a =
+        (^a : (static member SetActor : _*_->_) (x, a))
+
+    let inline map f x = set (f (get x)) x
+
+    let inline statusCurrent x = (get x).statusCurrent
+
+    let inline statusDefault x = (get x).statusDefault
+
+    let inline statusRate f x =
+        let c = statusCurrent x
+        let d = statusDefault x
+        f c / f d

@@ -60,13 +60,17 @@ module PlayerInput =
         actorMove, direction
 
 
+open wraikny.Tart.Advanced.Dungeon
+
+
 type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
     | PlayerSkill of PlayerID * Actor.SkillKind
     | GenerateNewDungeon
-    | GeneratedDungeon of Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonModel of DungeonBuilder * DungeonModel
+    | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
     //#if DEBUG
     ///// for Debug
     //| AppendSkillEmits

@@ -15,7 +15,6 @@ type ActorStatus = {
     walkSpeed : Speed
     dashSpeed : Speed
 } with
-
     static member (+) (a, b) = {
         level = a.level + b.level
         hp = a.hp + b.hp

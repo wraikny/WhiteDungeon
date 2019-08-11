@@ -77,22 +77,27 @@ type EmitMove =
     | Generate of (AreaSkill -> AreaSkillBuilder [])
 
 
-and AreaSkill = {
-    skillBase : SkillBase
-    objectBase : ObjectBase
+and AreaSkill =
+    {
+        skillBase : SkillBase
+        objectBase : ObjectBase
 
-    target : AreaTarget
-    removeWhenHitWall : bool
-    removeWhenHitActor : bool
+        target : AreaTarget
+        removeWhenHitWall : bool
+        removeWhenHitActor : bool
 
-    move : EmitMove list
+        move : EmitMove list
 
-    emits : AreaSkillBuilder []
-    collidedActors : Set<Actor.ActorID>
+        emits : AreaSkillBuilder []
+        collidedActors : Set<Actor.ActorID>
 
-    frame : uint32
-    frameFirst : uint32
-}
+        frame : uint32
+        frameFirst : uint32
+    }
+with
+    static member inline SetObjectBase (x : AreaSkill, y : ObjectBase) =
+        { x with objectBase = y }
+
 
 and AreaSkillBuilder = {
     skillBase : SkillBaseBuilder

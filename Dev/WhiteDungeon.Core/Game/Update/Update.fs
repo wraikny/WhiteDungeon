@@ -39,10 +39,8 @@ module Update =
         )
         |> Option.defaultValue model
 
-    let inline updateEachEnemy f (model : Model) : Model = {
-        model with
-            enemies = model.enemies |>> f
-    }
+    let inline updateEachEnemy f (model : Model) : Model =
+        { model with enemies = model.enemies |>> f }
 
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
@@ -61,24 +59,17 @@ module Update =
 
 
     let applySkills (model : Model) : Model =
-        let gameSetting = model.gameSetting
         let skillList = model.skillList
+                
+        let inline f x = Skill.AreaSkill.applyToActorHolders x
 
         { model with
             players =
-                let f =
-                    Skill.AreaSkill.applyToActorHolders
-                        Actor.Player.updateActor
-
                 model.players
                 |> f skillList.areaPlayer
                 |> f skillList.areaAll
 
             enemies =
-                let f =
-                    Skill.AreaSkill.applyToActorHolders
-                        Actor.Enemy.updateActor
-
                 model.enemies
                 |> f skillList.areaEnemy
                 |> f skillList.areaAll
@@ -91,37 +82,35 @@ module Update =
         | SetGameMode mode ->
             { model with mode = mode }, Cmd.none
         | TimePasses ->
-            let model =
-                model
-                |> updateEachPlayer Actor.Player.update
-                |> updateEachEnemy Actor.Enemy.update
-                |> fun x -> updateSkillList (Skill.SkillList.update x) x
-                |> applySkills
-                |> fun m -> { m with timePassed = true }
-                |> fun m ->
+            model
+            |> updateEachPlayer Actor.Player.update
+            |> updateEachEnemy Actor.Enemy.update
+            |> fun x -> updateSkillList (Skill.SkillList.update x) x
+            |> applySkills
+            |> fun m -> { m with timePassed = true }
+            |> fun m ->
+                m.players
+                |> Map.toSeq
+                |>> snd
+                |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+                |> function
+                | false -> { m with mode = GameFinished false }
+                | true ->
                     m.players
                     |> Map.toSeq
-                    |>> snd
-                    |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+                    |>> ( snd >> ObjectBase.get )
+                    |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
                     |> function
-                    | false -> { m with mode = GameFinished false }
                     | true ->
-                        m.players
-                        |> Map.toSeq
-                        |>> ( snd >> (fun p -> p.actor.objectBase) )
-                        |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
-                        |> function
-                        | true ->
-                            if m.lastCollidedGate then
-                                { m with lastCollidedGate = true }
-                            else
-                                { m with
-                                    mode = Stair
-                                    lastCollidedGate = true  }
-                        | false ->
-                            { m with lastCollidedGate = false }
-
-            model, Cmd.none
+                        if m.lastCollidedGate then
+                            { m with lastCollidedGate = true }
+                        else
+                            { m with
+                                mode = Stair
+                                lastCollidedGate = true  }
+                    | false ->
+                        { m with lastCollidedGate = false }
+            |> fun model -> model, Cmd.none
 
         | PlayerInputs (playerId, inputSet) ->
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
@@ -133,7 +122,7 @@ module Update =
                     model.dungeonModel
                     move
                     direction
-                |> Update.Actor.Player.updateActor
+                |> Actor.map
                 |> updatePlayerOf playerId
             )
             , Cmd.none
@@ -155,23 +144,34 @@ module Update =
             , Cmd.none
 
         | GenerateNewDungeon ->
-            Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
+            //Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
+            Dungeon.generateDungeonModel model.dungeonBuilder
             |> TartTask.perform (fun e ->
 #if DEBUG
                 System.Console.WriteLine(e)
 #endif
-                GenerateNewDungeon) GeneratedDungeon
+                GenerateNewDungeon) GeneratedDungeonModel
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
 
-        | GeneratedDungeon dungeonParams ->
+        | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
+            let cmd =
+                Dungeon.generateDungeonParams
+                    model.gameSetting
+                    (length model.dungeonGateCells)
+                    dungeonBuilder
+                    dungeonModel
+                    GeneratedDungeonParams
+            model, cmd
+
+        | GeneratedDungeonParams dungeonParams ->
             let size = model.gameSetting.characterSize
             let model =
                 model
                 |> updateEachPlayer (fun p ->
                     let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * size)
                     
-                    Actor.Player.updateObjectBase (ObjectBase.setPosition pos) p
+                    ObjectBase.map (ObjectBase.mapPosition <| fun _ -> pos) p
                 )
 
             { model with

@@ -69,7 +69,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
         let col = Vec3.toColor gameViewSetting.gameUITextColor
         { gameSceneArgs.windowSetting with
             itemMargin = 10.0f
-            itemAlignment = UI.WindowSetting.Alignment.Left (0.02f * ws.X)
+            itemAlignment = UI.WindowSetting.Alignment.Right (0.02f * ws.X)
             
             //windowSize = UI.WindowSetting.Fixed(dungeonFloorArea.Size, true)
             windowSize = UI.WindowSetting.FixWidth(dungeonFloorArea.Size.X)
@@ -134,7 +134,8 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
             let hpCurrent = int playerVM.actorView.statusCurrent.hp
             let hpDefault = int playerVM.actorView.statusDefault.hp
             playerStatusWindow.UIContents <- [
-                UI.Text (sprintf "%s/%A" playerVM.character.name playerVM.character.currentOccupation)
+                UI.Text (sprintf "%s / %A" playerVM.character.name playerVM.character.currentOccupation)
+                UI.Text (sprintf "Level: %d" playerVM.actorView.statusCurrent.level)
                 UI.Text (sprintf "HP: %d/%d" hpCurrent hpDefault)
                 UI.Rect (5.0f, 0.8f * ViewModel.ActorView.hpRate playerVM.actorView)
             ]

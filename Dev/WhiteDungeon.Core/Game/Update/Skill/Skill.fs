@@ -46,28 +46,28 @@ module AreaSkill =
             x |> function
             | Stay -> Some areaSkill
             | Move diff ->
-                let newObj, isCollided =
-                    areaSkill.objectBase
+                let nextAreaSkill, isCollided =
+                    areaSkill
                     |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
 
                 if areaSkill.removeWhenHitWall && isCollided then
                     None
                 else
-                    Some { areaSkill with objectBase = newObj }
+                    Some nextAreaSkill
 
             | Scale diff ->
-                let newObj = ObjectBase.addSize diff areaSkill.objectBase
+                let newAreaSkill = areaSkill |> ObjectBase.mapSize ((+) diff)
 
                 let inline insideDungeon () =
                     ObjectBase.insideDungeon
                         gameSetting
                         dungeonModel
-                        newObj
+                        newAreaSkill
 
                 if areaSkill.removeWhenHitWall && (not <| insideDungeon()) then
                     None
                 else
-                    Some { areaSkill with objectBase = newObj }
+                    Some newAreaSkill
 
             | Generate emits ->
                 Some { areaSkill with emits = emits areaSkill }
@@ -108,15 +108,14 @@ module AreaSkill =
         |> map (snd >> apply)
         |> fold (>>) id
 
-    let applyToActorHolders
-        (updater : (Actor.Actor -> Actor.Actor) -> 'a -> 'a)
+    let inline applyToActorHolders
         (skills : Map<_, AreaSkill>)
-        (holders : Map<'ID, 'a>) : Map<'ID, 'a> =
+        (holders : Map<'ID, ^a>) : Map<'ID, ^a> =
 
         let foledSkills = getFoledSkills skills
 
         holders
-        |>> updater foledSkills
+        |>> Actor.Actor.map foledSkills
 
     let inline hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
         if areaSkill.removeWhenHitActor && (areaSkill.emits |> Array.isEmpty |> not) then

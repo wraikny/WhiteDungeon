@@ -33,7 +33,7 @@ open System.Reactive.Linq
 
 
 [<Class>]
-type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
+type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
 
     let messenger : IMessenger<_, _, _> =
@@ -46,10 +46,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
-
-    //let port _ = ()
-    //do
-    //    messenger.ViewMsg.Subscribe(port) |> ignore
+    do
+        messenger.OnError.Add(Console.WriteLine)
 
     let gameKeybaord =
         KeyboardBuilder.init()
@@ -129,7 +127,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         |> ignore
 
     let dungeonCellUpdater = new MaptipsUpdater<_, _>({
-            create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize)
+            create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
         }, UpdatingOption = View.UpdatingOption.Updating)
@@ -175,7 +173,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         )
 
     let bgmPlayer =
-        new Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = gameSceneArgs.bgmVolume, FadeSeconds = 0.5f)
+        Utils.BGMPlayer<_>("BGM", gameViewSetting.bgms, Volume = gameSceneArgs.bgmVolume, FadeSeconds = 0.5f)
     do
         base.AddComponent(bgmPlayer, bgmPlayer.Name)
 
@@ -207,6 +205,8 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
 
 
     override this.OnRegistered() =
+        GC.Collect()
+
         let convert (item : ViewModel.UIItem) =
             item |> function
             | ViewModel.HeaderText text ->
@@ -235,6 +235,7 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
                     let scene = gameSceneArgs.createMainScene()
 
                     uiWindowMain.Toggle(false, fun() ->
+                        errorHandler.Clear()
                         bgmPlayer.FadeOut(0.5f)
                         this.ChangeSceneWithTransition(scene, new asd.TransitionFade(0.5f, 0.5f))
                         |> ignore
@@ -243,11 +244,11 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             | ViewModel.CloseButton(text) ->
                 UI.Button(text, fun() ->
                     // TODO
-                    playSE(se_button)
-
                     messenger.Dispose()
                     bgmPlayer.FadeOut(0.5f)
+
                     uiWindowMain.Toggle(false, fun() ->
+                        errorHandler.Clear()
                         asd.Engine.Close()
                     )
                 )
@@ -302,7 +303,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
         uiLayer.AddObject(gameUIWindows)
         uiLayer.AddObject(uiWindowMain)
 
-        messenger.StartAsync() |> ignore
+        messenger.StartAsync()
+
+        errorHandler.CallBack <- fun e ->
+            messenger.Enqueue(Msg.SetGameMode <| Model.ErrorUI e)
 
 
     override this.OnDispose() =
@@ -312,6 +316,15 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
     override this.OnUpdated() =
         messenger.NotifyView()
 
+        (  uiWindowMain.IsToggleAnimating
+        || gameUIWindows.IsToggleAnimating
+        ) |> function
+        | true -> ()
+        | false ->
+            this.PlayerInput()
+
+
+    member this.PlayerInput() =
         gameMode |> function
         | Model.GameMode ->
             asd.Engine.Mouse.Position <- asd.Engine.WindowSize.To2DF() / 2.0f
@@ -319,10 +332,10 @@ type GameScene(gameModel : Model.Model, gameViewSetting : GameViewSetting, gameS
             // Pause
             if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
                 messenger.Enqueue(Msg.SetGameMode Model.Pause)
-            
+        
             else
                 messenger.Enqueue(Msg.TimePasses)
-                
+            
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 

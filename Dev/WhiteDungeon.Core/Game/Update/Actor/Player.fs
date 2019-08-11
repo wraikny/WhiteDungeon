@@ -13,21 +13,8 @@ let inline decrCoolTimes player =
     |> Player.mapCoolTime Skill1 decr
     |> Player.mapCoolTime Skill2 decr
 
-let inline setActor actor (player : Player) =
-    { player with actor = actor }
-
-
-let inline updateActor f (player : Player) =
-    player
-    |> setActor (f player.actor)
-
-
-let inline updateObjectBase f (player : Player) =
-    player
-    |> setActor (player.actor |> Actor.updateObjectBase f)
-
-
 let inline update player : Player =
     player
-    |> updateActor Actor.update
+    |> Actor.map Actor.update
     |> decrCoolTimes
+

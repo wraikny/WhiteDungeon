@@ -22,7 +22,7 @@ open WhiteDungeon.View.MainScene
 open WhiteDungeon.View.Utils.Color
 
 
-type MainScene(setting : AppSetting) =
+type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
     inherit Scene()
 
     let menuSetting = setting.menuSceneSetting
@@ -41,7 +41,7 @@ type MainScene(setting : AppSetting) =
             Color = Vec3.toColor menuSetting.backColor
         )
 
-    #if DEBUG
+#if DEBUG
     let createFont size color =
         asd.Engine.Graphics.CreateDynamicFont(
             "C:\Windows\Fonts\UtsukushiFONT.otf",
@@ -50,7 +50,13 @@ type MainScene(setting : AppSetting) =
 
     let titleFont = createFont 80 ColorPalette.black
     let headerFont = createFont 50 ColorPalette.black
-    #endif
+#else
+    let createFont path =
+        asd.Engine.Graphics.CreateFont path
+
+    let titleFont = createFont menuSetting.titleFont
+    let headerFont = createFont menuSetting.headerFont
+#endif
 
     let createDynamicFont size color =
         asd.Engine.Graphics.CreateDynamicFont(
@@ -77,7 +83,7 @@ type MainScene(setting : AppSetting) =
     let windowSetting =
         { UI.WindowSetting.Default(textFont) with
             animationFrame = 20u
-            itemMargin = 20.0f
+            itemMargin = 15.0f
             itemAlignment = UI.WindowSetting.Center
 
             textFont = textFont
@@ -101,7 +107,7 @@ type MainScene(setting : AppSetting) =
 
 
     let mouse =
-        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = false)
+        let mouse = new Input.CollidableMouse(5.0f, ColliderVisible = true)
         new UI.MouseButtonSelecter(mouse)
 
 
@@ -147,21 +153,23 @@ type MainScene(setting : AppSetting) =
             }
 
         new UI.MouseWindow(sideSetting, mouse,
-            Position = asd.Vector2DF(
-                windowSize.x - mainWindowWidth + width * 2.0f,
-                windowSize.y
-            ) / 2.0f
-        )
+            Position = 0.5f * asd.Vector2DF(
+                windowSize.x - mainWindowWidth + width * 2.0f
+                , windowSize.y ))
 
     let messenger =
-        Messenger.build { seed = Random().Next() } {
+        let env = { seed = Random().Next() }
+        Messenger.build env {
             init =
-                let initModel = Model.initModel setting.gameSetting
+                let initModel = Model.initModel env setting.gameSetting
                 
                 initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update
             view = ViewModel.view
         }
+
+    do
+        messenger.OnError.Add(Console.WriteLine)
 
     let bgmPlayer =
         new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ],
@@ -200,7 +208,7 @@ type MainScene(setting : AppSetting) =
         | ViewModel.InputField(maxLength, placeHolder, current, msg) ->
             UI.InputField(maxLength, placeHolder, current, fun s -> messenger.Enqueue(msg s))
         | ViewModel.Separator ->
-            UI.Rect(5.0f, 0.8f)
+            UI.Rect(3.0f, 0.8f)
         | ViewModel.Space x ->
             UI.Space x
 
@@ -300,9 +308,10 @@ type MainScene(setting : AppSetting) =
                             buttonFont = buttonFont
                             bgmVolume = bgmVolume
                             randomSeed = randomSeed
-                            createMainScene = fun() -> new MainScene(setting) :> asd.Scene
+                            createMainScene = fun() -> new MainScene(errorHandler, setting) :> asd.Scene
                         }
-                        let gameScene = new Game.GameScene(gameModel, setting.gameViewSetting, uiFonts)
+                        errorHandler.Clear()
+                        let gameScene = new Game.GameScene(errorHandler, gameModel, setting.gameViewSetting, uiFonts)
                         bgmPlayer.FadeOut(0.5f)
                         this.ChangeSceneWithTransition(gameScene, new asd.TransitionFade(0.5f, 0.5f))
                         |> ignore
@@ -329,6 +338,8 @@ type MainScene(setting : AppSetting) =
         uiWindowMain.Toggle(true)
 
         messenger.StartAsync()
+        errorHandler.CallBack <- fun e ->
+            messenger.Enqueue(Model.Msg.SetUI <| Model.ErrorUI e)
 
     override this.OnUpdated() =
         messenger.NotifyView()

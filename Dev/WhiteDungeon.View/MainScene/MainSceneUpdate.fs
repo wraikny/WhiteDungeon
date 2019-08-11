@@ -26,102 +26,126 @@ let bgmToFloat bgmVolume = float32 bgmVolume / 100.0f
 
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
-    msg |> function
-    | UndoModel ->
-        model.prevModel |> function
-        | Some(x) ->
-            { x with prevModel = None; uiMode = Title }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
-        | None ->
-            model, Cmd.none
-    | SetUIWithHistory uiMode ->
-        { model with
-            uiMode = uiMode
-            occupationListToggle = false
-            prevModel = Some { model with prevModel = None } }, Cmd.none
-    | SetUI uiMode ->
-        { model with
-            uiMode = uiMode
-            occupationListToggle = false }, Cmd.none
+    try
+        let model = { model with msgHistory = msg::model.msgHistory }
 
-    | AddBGMVolume i ->
-        let v = model.bgmVolume + i |> min 10 |> max 0 
-        { model with bgmVolume = v}, Cmd.port(SetBGMVolume (bgmToFloat v))
+        msg |> function
+        | UndoModel ->
+            model.prevModel |> function
+            | Some(x) ->
+                { x with prevModel = None; uiMode = Title }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
+            | None ->
+                model, Cmd.none
+        | SetUIWithHistory uiMode ->
+            { model with
+                uiMode = uiMode
+                occupationListToggle = false
+                prevModel = Some { model with prevModel = None } }, Cmd.none
+        | SetUI uiMode ->
+            { model with
+                uiMode = uiMode
+                occupationListToggle = false }, Cmd.none
 
-    | OccupationListToggle x ->
-        { model with occupationListToggle = x }, Cmd.none
+        | AddBGMVolume i ->
+            let v = model.bgmVolume + i |> min 10 |> max 0 
+            { model with bgmVolume = v}, Cmd.port(SetBGMVolume (bgmToFloat v))
 
-    | InputName s ->
-        { model with playerName = if s = "" then None else Some s }, Cmd.none
+        | OccupationListToggle x ->
+            { model with occupationListToggle = x }, Cmd.none
 
-    | SelectOccupation x ->
-        { model with
-            selectOccupation = x
-            occupationListToggle = false }, Cmd.none
+        | InputName s ->
+            { model with playerName = if s = "" then None else Some s }, Cmd.none
 
-    | SetDungeonParameters i ->
-        model |> Model.updateDungeonBuilder i
-        , Cmd.none
+        | SelectOccupation x ->
+            { model with
+                selectOccupation = x
+                occupationListToggle = false }, Cmd.none
 
-    | GenerateDungeon ->
-        let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
-        { model with uiMode = WaitingGenerating }, randomCmd
+        | SetDungeonParameters i ->
+            model |> Model.updateDungeonBuilder i
+            , Cmd.none
 
-    | SetGameSceneRandomSeed x ->
-        Game.Model.Dungeon.generateTask model.gameSetting model.dungeonBuilder model.gateCount
-        |> TartTask.perform (fun e ->
-#if DEBUG
-            System.Console.WriteLine(e)
-#endif
-            GenerateDungeon) GeneratedGameModel
-        |> fun cmd ->
-            { model with gameSceneRandomSeed = x }, cmd
+        | GenerateDungeon ->
+            let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
+            { model with uiMode = WaitingGenerating }, randomCmd
 
-    | GeneratedGameModel dungeonParams ->
-        let gameModel =
-            let size = model.gameSetting.characterSize
-            let players =
-                [ model.playerName, model.selectOccupation ]
-                |> Seq.indexed
-                |> Seq.map(fun (index, (name, occupation)) ->
-                    let name = Option.defaultValue (sprintf "Player%d" index) name
+        | SetGameSceneRandomSeed x ->
+            if model.uiMode = WaitingGenerating then
+                Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
+                |> TartTask.perform (fun e ->
+    #if DEBUG
+                    System.Console.WriteLine(e)
+    #endif
+                    GenerateDungeon) GeneratedDungeonModel
+                |> fun cmd ->
+                    { model with gameSceneRandomSeed = x }, cmd
+            else
+                model, Cmd.none
 
-                    let status =
-                        model.gameSetting.occupationSettings
-                        |> Map.find occupation
-                        |> fun x -> x.status
+        | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
+            if model.uiMode = WaitingGenerating then
+                let cmd =
+                    Game.Model.Dungeon.generateDungeonParams
+                        model.gameSetting
+                        model.gateCount
+                        dungeonBuilder
+                        dungeonModel
+                        GeneratedDungeonParams
+                model, cmd
+            else
+                model, Cmd.none
 
-                    let character : Model.Character = {
-                        id = Model.CharacterID -index
-                        name = name
-                        currentOccupation = occupation
-                        occupations = [
-                            occupation, status
-                        ] |> Map.ofList
-                    }
+        | GeneratedDungeonParams dungeonParams ->
+            if model.uiMode = WaitingGenerating then
+                let gameModel =
+                    let size = model.gameSetting.characterSize
+                    let players =
+                        [ model.playerName, model.selectOccupation ]
+                        |> Seq.indexed
+                        |> Seq.map(fun (index, (name, occupation)) ->
+                            let name = Option.defaultValue (sprintf "Player%d" index) name
+
+                            let status =
+                                model.gameSetting.occupationSettings
+                                |> Map.find occupation
+                                |> fun x -> x.status
+
+                            let character : Model.Character = {
+                                id = Model.CharacterID -index
+                                name = name
+                                currentOccupation = occupation
+                                occupations = [
+                                    occupation, status
+                                ] |> Map.ofList
+                            }
 
 
-                    let playerId = Game.Model.PlayerID (uint32 index)
+                            let playerId = Game.Model.PlayerID (uint32 index)
 
-                    let player =
-                        Game.Model.Actor.Player.init
-                            size
-                            (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
-                            status
-                            playerId
-                            character
+                            let player =
+                                Game.Model.Actor.Player.init
+                                    size
+                                    (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                                    status
+                                    playerId
+                                    character
 
-                    (playerId, player)
-                )
-                |> Map.ofSeq
+                            (playerId, player)
+                        )
+                        |> Map.ofSeq
 
-            Game.Model.Model.init
-                players
-                dungeonParams.dungeonBuilder
-                dungeonParams.dungeonModel
-                dungeonParams.gateCells
-                model.gameSetting
+                    Game.Model.Model.init
+                        players
+                        dungeonParams.dungeonBuilder
+                        dungeonParams.dungeonModel
+                        dungeonParams.gateCells
+                        model.gameSetting
 
-        model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+                model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+            else
+                model, Cmd.none
 
-    | CloseGameMsg ->
-        model, Cmd.port CloseGame
+        | CloseGameMsg ->
+            model, Cmd.port CloseGame
+    with e ->
+        { model with uiMode = ErrorUI e }, Cmd.none

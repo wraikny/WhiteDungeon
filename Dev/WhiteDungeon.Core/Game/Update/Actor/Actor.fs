@@ -2,17 +2,10 @@
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
-
-let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
-    { actor with objectBase = objectBase }
-
-
-let inline updateObjectBase f (actor : Actor) =
-    actor
-    |> setObjectBase (f actor.objectBase)
 
 
 let inline setActorStatusCurrent status actor : Actor =
@@ -48,13 +41,11 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 
     actor
     |> fun x -> { x with currentMove = move }
-    |> updateObjectBase(
-        Update.ObjectBase.moveXYAnother
+    |> Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
             (speed *. direction)
-        >> fst
-    )
+    |> fst
 
 //let calcStatusCurrent (actor : Actor) =
 //    let rec applyCorrection corrections result =
@@ -124,5 +115,5 @@ open WhiteDungeon.Core.Game.Update
 
 let inline update actor : Actor =
     actor
-    |> updateObjectBase ObjectBase.update
+    |> ObjectBase.map ObjectBase.update
     //|> updateConditions

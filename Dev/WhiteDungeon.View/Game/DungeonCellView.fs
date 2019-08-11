@@ -44,12 +44,11 @@ module DungeonCellKind =
         | Dungeon.Large _ -> LargeRoom
 
 
-type DungeonCellView(cellSize : float32 Vec2) =
+type DungeonCellView(cellSize : float32 Vec2, path : string) =
     inherit asd.Chip2D()
 
     do
-        //base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Debug/empty200x200white.png")
-        base.Texture <- asd.Engine.Graphics.CreateTexture2D("Image/Game/cotton-c.png")
+        base.Texture <- asd.Engine.Graphics.CreateTexture2D(path)
 
     interface IUpdatee<int Vec2 * DungeonCellKind> with
         member this.Update(viewModel) =

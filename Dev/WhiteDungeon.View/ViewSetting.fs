@@ -94,11 +94,13 @@ type GameViewSetting = {
     gameUITextSize : int 
     gameUIDungeonFloor : float32 Rect2
     gameUIPlayerArea : float32 Rect2
+
+    dungeonCellTexture : string
 }
 
 module GameViewSetting =
     [<Literal>]
-    let modForCulling = 10000.0f
+    let modForCulling = 40000.0f
 
 
 open wraikny.MilleFeuille.Fs.UI
@@ -124,8 +126,7 @@ type MainSceneSetting = {
     
 #if !DEBUG
     titleFont : string
-    buttonFont : string
-    textFont : string
+    headerFont : string
 #endif
 }
 

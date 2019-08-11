@@ -122,7 +122,7 @@ module UIItem =
         HeaderText "操作方法"
         Separator
         Text "移動: WASDキー"
-        Text "攻撃: マウス左クリック"
+        Text "攻撃: マウスクリック"
         Text "一時停止: Escキー"
         Separator
         Text "黒いマスに触れて階層を移動できます"
@@ -158,14 +158,26 @@ module UIItem =
         Separator
     ]
 
-    let errorUI (e : exn) = [
-        HeaderText "エラーが発生しました"
-        Separator
-        Text <| e.GetType().ToString()
-        Text e.Message
-        TitleButton("タイトルに戻る")
-        Separator
-    ]
+    let errorUI (model : Model) (e : exn) =
+        let url title body =
+            let encode : string -> string = System.Web.HttpUtility.UrlEncode
+            let title = encode title
+            let body = encode body
+            sprintf "https://github.com/wraikny/WhiteDungeon/issues/new?assignee=wraikny&labels=bug&title=%s&body=%s" title body
+        let title = sprintf "[不具合報告] C96体験版 GameScene, %A" <| e.GetType()
+
+        [
+            HeaderText "エラーが発生しました"
+            Separator
+            Text <| e.GetType().ToString()
+            Text e.Message
+            Separator
+            URLButton(
+                "Githubで報告(ブラウザを開きます)",
+                url title (sprintf "# Error\n%A\n" e))
+            //TitleButton("タイトルに戻る")
+            Separator
+        ]
 
 
 
@@ -222,7 +234,7 @@ module ViewModel =
             | Stair -> Some UIItem.stair
             | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
             | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
-            | ErrorUI e -> Some <| UIItem.errorUI e
+            | ErrorUI e -> Some <| UIItem.errorUI model e
             | WaitingGenerating ->
                 Some [
                     Separator

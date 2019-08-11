@@ -4,6 +4,7 @@ open wraikny.MilleFeuille.Core
 
 open FSharpPlus
 
+[<Sealed>]
 type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
     inherit SceneComponent<'T>(name)
 
@@ -24,7 +25,7 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
     let mutable fadeSeconds = ValueNone
 
     let mutable bgmId = ValueNone
-    let mutable index = 0
+    let mutable index = System.Random().Next(0, count - 1)
 
     
     let play() =
@@ -59,16 +60,23 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
             bgmId <- ValueNone
         )
 
+    let bgmIter f = bgmId |> ValueOption.iter f
+
+    override this.OnUpdated() = update()
+
     member __.Start() =
         bgmId |> function
         | ValueNone -> play()
         | _ -> ()
 
+    member __.Stop() =
+        bgmIter asd.Engine.Sound.Stop
+
     member __.Pause() =
-        bgmId |> ValueOption.iter (asd.Engine.Sound.Pause)
+        bgmIter asd.Engine.Sound.Pause
 
     member __.Resume() =
-        bgmId |> ValueOption.iter (asd.Engine.Sound.Resume)
+        bgmIter asd.Engine.Sound.Resume
 
     member __.FadeOut(sec) =
         bgmId
