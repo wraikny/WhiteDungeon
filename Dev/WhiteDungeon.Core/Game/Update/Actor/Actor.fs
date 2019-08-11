@@ -41,13 +41,11 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 
     actor
     |> fun x -> { x with currentMove = move }
-    |> ObjectBase.map (
-        Update.ObjectBase.moveXYAnother
+    |> Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
             (speed *. direction)
-        >> fst
-    )
+    |> fst
 
 //let calcStatusCurrent (actor : Actor) =
 //    let rec applyCorrection corrections result =

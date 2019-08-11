@@ -11,26 +11,12 @@ open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 
-let inline setPosition position (obj : ObjectBase) = {
-    obj with
-        position = position
-        lastPosition = obj.position
-}
-
-let inline addPosition diff (obj : ObjectBase) =
-    obj |> setPosition (diff + obj.position)
-
-let inline setSize size (obj : ObjectBase) =
-    { obj with size = size }
-
-let inline addSize diff obj =
-    obj |> setSize (obj.size + diff)
 
 let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
 
-let inline getCorners obj =
+let inline getCorners (obj : ObjectBase) =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
@@ -50,13 +36,13 @@ let collidedCells (gameSetting : GameSetting) (cells) obj =
         cells
         (getCorners obj)
 
-let insideDungeon
+let inline insideDungeon
     (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel) obj =
+    (dungeonModel : Dungeon.DungeonModel) x =
     GameSetting.insideDungeon
         gameSetting
         dungeonModel
-        (getCorners obj)
+        (getCorners (ObjectBase.get x))
 
 open WhiteDungeon.Core.Utils
 
@@ -67,7 +53,7 @@ let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosi
         currentPosition
         (currentPosition + diff)
 
-let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
+let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     let searchDiff =
         (+) currentPosition
         >>
@@ -86,12 +72,13 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : f
 
     Vec2.init diffX diffY
 
-let private moveWithBS
+let inline private moveWithBS
     f
     (gameSetting : Game.Model.GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
-    (diff0) (obj : ObjectBase)
+    (diff0) (x : ^a)
     =
+    let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
@@ -120,14 +107,16 @@ let private moveWithBS
         else
             diff0
     
-    obj
-    |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff0)
-    |> fun x -> { x with isMoved = true }, isCollided
+    x
+    |> ObjectBase.map(
+        ObjectBase.mapPosition ((+) diff)
+        >> setDirection (MoveDirection.fromVector diff0)
+        >> fun x -> { x with isMoved = true }
+    ), isCollided
 
-let moveXYTogether = moveWithBS bsDiffXYTogether
+let inline moveXYTogether a = moveWithBS bsDiffXYTogether a
 
-let moveXYAnother = moveWithBS bsDiffXYAnother
+let inline moveXYAnother a = moveWithBS bsDiffXYAnother a
 
 
 let inline setVelocity velocity (obj : ObjectBase) =
@@ -135,5 +124,5 @@ let inline setVelocity velocity (obj : ObjectBase) =
 
 let inline update (obj : ObjectBase) =
     obj
-    |> addPosition obj.velocity
+    |> ObjectBase.mapPosition ( (+) obj.velocity )
     |> fun x -> { x with isMoved = false }

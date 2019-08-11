@@ -99,7 +99,7 @@ module Update =
                     | true ->
                         m.players
                         |> Map.toSeq
-                        |>> ( snd >> (fun p -> p.actor.objectBase) )
+                        |>> ( snd >> ObjectBase.get )
                         |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
                         |> function
                         | true ->
@@ -173,7 +173,7 @@ module Update =
                 |> updateEachPlayer (fun p ->
                     let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * size)
                     
-                    ObjectBase.map (ObjectBase.setPosition pos) p
+                    ObjectBase.map (ObjectBase.mapPosition <| fun _ -> pos) p
                 )
 
             { model with

@@ -19,20 +19,17 @@ type Player =
     }
 
 with
-    static member inline objectBase (x : Player) =
+    member inline x.objectBase =
         x.actor.objectBase
 
-    static member inline MapActor (x : Player, f) =
-        { x with actor = f x.actor }
+    static member inline SetActor (x : Player, y) =
+        { x with actor = y }
 
-    static member inline MapObjectBase (x : Player, f) =
-        x |> Actor.map (ObjectBase.map f)
-
+    static member inline SetObjectBase (x : Player, y) =
+        Actor.map (ObjectBase.set y) x
 
 
 module Player =
-    let inline actor (player : Player) = player.actor
-
     let inline id (player : Player) = player.id
 
     let inline character (player : Player) = player.character

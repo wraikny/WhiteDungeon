@@ -46,28 +46,28 @@ module AreaSkill =
             x |> function
             | Stay -> Some areaSkill
             | Move diff ->
-                let newObj, isCollided =
-                    areaSkill.objectBase
+                let nextAreaSkill, isCollided =
+                    areaSkill
                     |> ObjectBase.moveXYTogether gameSetting dungeonModel diff
 
                 if areaSkill.removeWhenHitWall && isCollided then
                     None
                 else
-                    Some { areaSkill with objectBase = newObj }
+                    Some nextAreaSkill
 
             | Scale diff ->
-                let newObj = ObjectBase.addSize diff areaSkill.objectBase
+                let newAreaSkill = areaSkill |> ObjectBase.mapSize ((+) diff)
 
                 let inline insideDungeon () =
                     ObjectBase.insideDungeon
                         gameSetting
                         dungeonModel
-                        newObj
+                        newAreaSkill
 
                 if areaSkill.removeWhenHitWall && (not <| insideDungeon()) then
                     None
                 else
-                    Some { areaSkill with objectBase = newObj }
+                    Some newAreaSkill
 
             | Generate emits ->
                 Some { areaSkill with emits = emits areaSkill }
