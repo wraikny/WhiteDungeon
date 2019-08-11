@@ -55,7 +55,9 @@ let main _ =
 
     with
     | e ->
-        // System.Exception: 未開放のインスタンスが2個存在します。
+        // わからん……
+        // n : 1 ~ 3
+        // System.Exception: 未開放のインスタンスがn個存在します。 
         // 場所 asd.Particular.Helper.ThrowUnreleasedInstanceException(Int32 count)
         // 場所 asd.Engine.Terminate()
         

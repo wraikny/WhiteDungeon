@@ -164,7 +164,7 @@ let appSetting : View.AppSetting = {
                                     delay = 0u
                                     effects = [|
                                         Skill.Damage(fun atk def ->
-                                            0.0f
+                                            (atk.level - def.level) |> max 1 |> ( * ) 5 |> float32
                                         )
                                     |]
                                 }
@@ -189,7 +189,7 @@ let appSetting : View.AppSetting = {
                     ]
 
                 skill1CoolTime = 20us
-                skill2CoolTime = 120us
+                skill2CoolTime = 60us
             }
         ]
     }

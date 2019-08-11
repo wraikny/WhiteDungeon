@@ -122,7 +122,7 @@ module UIItem =
         HeaderText "操作方法"
         Separator
         Text "移動: WASDキー"
-        Text "攻撃: マウス左クリック"
+        Text "攻撃: マウスクリック"
         Text "一時停止: Escキー"
         Separator
         Text "黒いマスに触れて階層を移動できます"
