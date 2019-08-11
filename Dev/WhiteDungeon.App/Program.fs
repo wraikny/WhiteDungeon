@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.App.Program
+module WhiteDungeon.App.Program
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
@@ -236,10 +236,6 @@ let main _ =
                         loop (n - 1)
 
             loop 1
-
-            GC.Collect()
-
-            asd.Engine.Sound.StopAll()
 
             asd.Engine.Terminate()
 
