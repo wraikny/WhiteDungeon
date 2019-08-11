@@ -245,7 +245,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 UI.Button(text, fun() ->
                     // TODO
                     messenger.Dispose()
-                    bgmPlayer.Stop()
+                    bgmPlayer.FadeOut(0.5f)
 
                     uiWindowMain.Toggle(false, fun() ->
                         errorHandler.Clear()
