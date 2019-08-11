@@ -103,3 +103,9 @@ module ObjectBase =
         direction = Front
         isMoved = false
     }
+
+    let inline get (x : ^a) =
+        (^a : (static member objectBase : ^a -> ObjectBase) x)
+
+    let inline map f (x : ^a) =
+        (^a : (static member MapObjectBase : ^a * (ObjectBase -> ObjectBase) -> ^b) (x, f))

@@ -59,24 +59,17 @@ module Update =
 
 
     let applySkills (model : Model) : Model =
-        //let gameSetting = model.gameSetting
         let skillList = model.skillList
+                
+        let inline f x = Skill.AreaSkill.applyToActorHolders x
 
         { model with
             players =
-                let f =
-                    Skill.AreaSkill.applyToActorHolders
-                        Actor.Player.updateActor
-
                 model.players
                 |> f skillList.areaPlayer
                 |> f skillList.areaAll
 
             enemies =
-                let f =
-                    Skill.AreaSkill.applyToActorHolders
-                        Actor.Enemy.updateActor
-
                 model.enemies
                 |> f skillList.areaEnemy
                 |> f skillList.areaAll
@@ -131,7 +124,7 @@ module Update =
                     model.dungeonModel
                     move
                     direction
-                |> Update.Actor.Player.updateActor
+                |> Actor.map
                 |> updatePlayerOf playerId
             )
             , Cmd.none
@@ -180,7 +173,7 @@ module Update =
                 |> updateEachPlayer (fun p ->
                     let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * size)
                     
-                    Actor.Player.updateObjectBase (ObjectBase.setPosition pos) p
+                    ObjectBase.map (ObjectBase.setPosition pos) p
                 )
 
             { model with

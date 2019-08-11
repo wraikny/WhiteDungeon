@@ -3,18 +3,32 @@
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+
 type SkillKind = Skill1 | Skill2
 
 
-type Player = {
-    actor : Actor
+type Player =
+    {
+        actor : Actor
 
-    id : PlayerID
-    character : Character
+        id : PlayerID
+        character : Character
 
-    skill1CoolTime : uint16
-    skill2CoolTime : uint16
-}
+        skill1CoolTime : uint16
+        skill2CoolTime : uint16
+    }
+
+with
+    static member inline objectBase (x : Player) =
+        x.actor.objectBase
+
+    static member inline MapActor (x : Player, f) =
+        { x with actor = f x.actor }
+
+    static member inline MapObjectBase (x : Player, f) =
+        x |> Actor.map (ObjectBase.map f)
+
+
 
 module Player =
     let inline actor (player : Player) = player.actor
@@ -22,8 +36,6 @@ module Player =
     let inline id (player : Player) = player.id
 
     let inline character (player : Player) = player.character
-
-    let inline objectBase (player : Player) = player.actor.objectBase
 
     let inline init size position actorStatus id character = {
         actor = Actor.Actor.init size position (Actor.OfPlayerID id) actorStatus

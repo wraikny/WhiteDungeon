@@ -96,7 +96,7 @@ module Dungeon =
     }
 
     let generateDungeonModel (dungeonBuilder : DungeonBuilder) =
-        (Random.int minValue<int> maxValue<int>)
+        Random.int minValue<int> maxValue<int>
         |> TartTask.withEnv(fun seed -> async {
             let builder = { dungeonBuilder with seed = seed }
             return(
