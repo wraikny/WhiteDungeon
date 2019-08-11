@@ -34,6 +34,7 @@ type 'Msg ViewModel =
 let titleUI = [
     TitleText "九十九のラビリンス"
     Text "C96体験版 / Lepus Pluvia"
+    Text "ボタンをクリック"
     Separator
     Button("始める", SetUIWithHistory <| Select CharacterSelect)
     Button("設定", SetUIWithHistory <| Setting SoundVolume)

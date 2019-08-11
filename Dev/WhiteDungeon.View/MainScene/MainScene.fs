@@ -77,7 +77,7 @@ type MainScene(setting : AppSetting) =
     let windowSetting =
         { UI.WindowSetting.Default(textFont) with
             animationFrame = 20u
-            itemMargin = 20.0f
+            itemMargin = 15.0f
             itemAlignment = UI.WindowSetting.Center
 
             textFont = textFont
@@ -147,11 +147,9 @@ type MainScene(setting : AppSetting) =
             }
 
         new UI.MouseWindow(sideSetting, mouse,
-            Position = asd.Vector2DF(
-                windowSize.x - mainWindowWidth + width * 2.0f,
-                windowSize.y
-            ) / 2.0f
-        )
+            Position = 0.5f * asd.Vector2DF(
+                windowSize.x - mainWindowWidth + width * 2.0f
+                , windowSize.y ))
 
     let messenger =
         Messenger.build { seed = Random().Next() } {

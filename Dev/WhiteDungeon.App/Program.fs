@@ -85,7 +85,10 @@ let appSetting : View.AppSetting = {
             gameUITextColor = sakura
             gameUITextFont = textFontPath
             gameUITextSize = 20
-            gameUIDungeonFloor = Rect.init windowMargin floorSize
+            gameUIDungeonFloor =
+                Rect.init
+                    ( Vec2.init (1.0f - windowMargin.x - floorSize.x) windowMargin.y )
+                    floorSize
             gameUIPlayerArea =
                 Rect.init
                     ( Vec2.init windowMargin.x (1.0f - windowMargin.y) )
