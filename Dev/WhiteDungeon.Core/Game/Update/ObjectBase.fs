@@ -108,7 +108,7 @@ let inline private moveWithBS
             diff0
     
     x
-    |> ObjectBase.map(
+    |> ObjectBase.map (
         ObjectBase.mapPosition ((+) diff)
         >> setDirection (MoveDirection.fromVector diff0)
         >> fun x -> { x with isMoved = true }

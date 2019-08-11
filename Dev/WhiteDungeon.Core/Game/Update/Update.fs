@@ -82,37 +82,35 @@ module Update =
         | SetGameMode mode ->
             { model with mode = mode }, Cmd.none
         | TimePasses ->
-            let model =
-                model
-                |> updateEachPlayer Actor.Player.update
-                |> updateEachEnemy Actor.Enemy.update
-                |> fun x -> updateSkillList (Skill.SkillList.update x) x
-                |> applySkills
-                |> fun m -> { m with timePassed = true }
-                |> fun m ->
+            model
+            |> updateEachPlayer Actor.Player.update
+            |> updateEachEnemy Actor.Enemy.update
+            |> fun x -> updateSkillList (Skill.SkillList.update x) x
+            |> applySkills
+            |> fun m -> { m with timePassed = true }
+            |> fun m ->
+                m.players
+                |> Map.toSeq
+                |>> snd
+                |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+                |> function
+                | false -> { m with mode = GameFinished false }
+                | true ->
                     m.players
                     |> Map.toSeq
-                    |>> snd
-                    |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+                    |>> ( snd >> ObjectBase.get )
+                    |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
                     |> function
-                    | false -> { m with mode = GameFinished false }
                     | true ->
-                        m.players
-                        |> Map.toSeq
-                        |>> ( snd >> ObjectBase.get )
-                        |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
-                        |> function
-                        | true ->
-                            if m.lastCollidedGate then
-                                { m with lastCollidedGate = true }
-                            else
-                                { m with
-                                    mode = Stair
-                                    lastCollidedGate = true  }
-                        | false ->
-                            { m with lastCollidedGate = false }
-
-            model, Cmd.none
+                        if m.lastCollidedGate then
+                            { m with lastCollidedGate = true }
+                        else
+                            { m with
+                                mode = Stair
+                                lastCollidedGate = true  }
+                    | false ->
+                        { m with lastCollidedGate = false }
+            |> fun model -> model, Cmd.none
 
         | PlayerInputs (playerId, inputSet) ->
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
