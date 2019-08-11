@@ -157,7 +157,7 @@ let appSetting : View.AppSetting = {
 let main _ =
     try
         let windowSize = appSetting.windowSize |> Vec2.toVector2DI
-        asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
+        asd.Engine.Initialize("九十九のラビリンス", windowSize.X, windowSize.Y, new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering))
         |> function
         | false -> ()
         | true ->

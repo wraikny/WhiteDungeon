@@ -260,9 +260,17 @@ let view (model : Model) : Msg ViewModel =
 
         let text =
             let msgs =
-                model.msgHistory |>> function
-                | SetUI x -> "SetUI" + x.ToString()
-                | x -> x.ToString()
+                let n = 20
+                (
+                if model.msgHistory.Length > n then
+                    take n model.msgHistory
+                else
+                    model.msgHistory
+                )
+                |>> function
+                    | SetUI x -> "SetUI" + x.ToString()
+                    | x -> x.ToString()
+
             sprintf "# Env\n%A\n# Msgs\n%A\n" model.env msgs
         Window1 [
             HeaderText "エラーが発生しました"
