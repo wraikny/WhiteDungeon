@@ -223,7 +223,6 @@ let main _ =
 
             let rec loop n =
                 if n < 0 then
-                    //System.Console.ReadLine() |> ignore
                     ()
                 else
                     try
@@ -240,7 +239,14 @@ let main _ =
 
             asd.Engine.Terminate()
 
-    with e ->
+    with
+    | e ->
+        // System.Exception: 未開放のインスタンスが2個存在します。
+        // 場所 asd.Particular.Helper.ThrowUnreleasedInstanceException(Int32 count)
+        // 場所 asd.Engine.Terminate()
+        // 場所 WhiteDungeon.App.Program.main(String[] _arg1)
+        // 場所 C:\Users\binar\source\repos\WhiteDungeon\Dev\WhiteDungeon.App\Program.fs:行 241
+        
         Console.WriteLine(e)
         Console.ReadLine() |> ignore
 
