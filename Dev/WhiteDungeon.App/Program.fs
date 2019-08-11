@@ -223,7 +223,8 @@ let main _ =
 
             let rec loop n =
                 if n < 0 then
-                    System.Console.ReadLine() |> ignore
+                    //System.Console.ReadLine() |> ignore
+                    ()
                 else
                     try
 

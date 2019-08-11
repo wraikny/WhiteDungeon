@@ -246,6 +246,7 @@ let view (model : Model) : Msg ViewModel =
             Separator
             Space 100.0f
             HeaderText("迷宮生成中……")
+            Space 50.0f
             Button ("戻る", SetUI <| Select CheckSettiing)
             Space 100.0f
             Separator

@@ -4,6 +4,7 @@ open wraikny.MilleFeuille.Core
 
 open FSharpPlus
 
+[<Sealed>]
 type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
     inherit SceneComponent<'T>(name)
 
@@ -60,6 +61,8 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
         )
 
     let bgmIter f = bgmId |> ValueOption.iter f
+
+    override this.OnUpdated() = update()
 
     member __.Start() =
         bgmId |> function

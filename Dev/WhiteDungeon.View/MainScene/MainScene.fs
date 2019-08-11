@@ -168,6 +168,9 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
             view = ViewModel.view
         }
 
+    do
+        messenger.OnError.Add(Console.WriteLine)
+
     let bgmPlayer =
         new Utils.BGMPlayer<_>("BGM", [ setting.menuSceneSetting.bgm ],
             FadeSeconds = 1.0f, Volume = 0.05f)

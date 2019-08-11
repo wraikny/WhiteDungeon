@@ -46,6 +46,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
+    do
+        messenger.OnError.Add(Console.WriteLine)
 
     let gameKeybaord =
         KeyboardBuilder.init()
