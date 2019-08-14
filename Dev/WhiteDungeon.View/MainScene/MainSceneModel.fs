@@ -70,7 +70,7 @@ type Msg =
 
 type Model =
     {
-        env : EnvironmentBuilder
+        env : TartEnvBuilder
 
         uiMode : UIMode
         occupationListToggle : bool
