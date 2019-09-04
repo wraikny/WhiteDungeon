@@ -65,6 +65,19 @@ module PlayerView =
             (id.Value, fromModel player)
         )
 
+type EnemyView = {
+    actorView : ActorView
+}
+
+module EnemyView =
+    let inline fromModel (enemy : Actor.Enemy) = {
+        actorView = enemy.actor |> ActorView.fromModel
+    }
+
+    let enemiesView =
+        Map.toList
+        >> map(fun (id : EnemyID, enemy) -> (id.Value, fromModel enemy) )
+
 
 type AreaSkillEmitView = {
    baseView : ObjectBaseView
@@ -188,6 +201,7 @@ type ViewModel = {
 
     camera : CameraView list
     players : UpdaterViewModel<PlayerView>
+    enemies : UpdaterViewModel<EnemyView>
     areaPlayer : UpdaterViewModel<AreaSkillEmitView>
     areaEnemy : UpdaterViewModel<AreaSkillEmitView>
     areaAll : UpdaterViewModel<AreaSkillEmitView>
@@ -199,6 +213,7 @@ type ViewModel = {
 module ViewModel =
     let inline getCameras v = v.camera
     let inline getPlayers v = v.players
+    let inline getEnemies v = v.enemies
     let inline getSkillAreaPlayer v = v.areaPlayer
     let inline getSkillAreaEnemy v = v.areaEnemy
     let inline getSkillAreaAll v = v.areaAll
@@ -211,9 +226,12 @@ module ViewModel =
             |> CameraView.fromPlayers
 
         players =
-            model
-            |> Model.players
+            model.players
             |> PlayerView.playersView
+
+        enemies =
+            model.enemies
+            |> EnemyView.enemiesView
 
         areaPlayer =
             model.skillList.areaPlayer

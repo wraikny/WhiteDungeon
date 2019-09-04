@@ -9,7 +9,6 @@
     <Compile Include="Utils\Math.fs" />
     <Compile Include="Model\Alias.fs" />
     <Compile Include="Model\GameObject.fs" />
-    <Compile Include="Model\GameSetting.fs" />
     <Compile Include="Model\SavedData.fs" />
     <Compile Include="Game\Model\Alias.fs" />
     <Compile Include="Game\Model\ObjectBase.fs" />

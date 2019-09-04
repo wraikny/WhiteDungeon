@@ -139,6 +139,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         dungeonParams.dungeonBuilder
                         dungeonParams.dungeonModel
                         dungeonParams.gateCells
+                        dungeonParams.enemyCells
                         model.gameSetting
 
                 model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))

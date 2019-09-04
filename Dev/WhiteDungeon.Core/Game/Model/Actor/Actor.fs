@@ -21,8 +21,6 @@ type Actor =
         objectBase : ObjectBase
         statusCurrent : ActorStatus
         statusDefault : ActorStatus
-        // skillEmits : Skill.SkillEmit list
-        // conditions : Skill.Condition list
         currentMove : ActorMove
     }
 with
@@ -40,8 +38,6 @@ module Actor =
         statusCurrent = actorStatus
         statusDefault = actorStatus
         objectBase = ObjectBase.init size position
-        // skillEmits = []
-        // conditions = []
         currentMove = Walk
     }
 

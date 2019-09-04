@@ -89,14 +89,25 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     do
         // Players
         messenger.ViewModel
-            .Select(fun v -> ViewModel.ViewModel.getPlayers v)
+            .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
                 ActorsUpdater<_, _>(playerLayer, {
                     create = fun () -> new PlayerView(gameViewSetting)
                     onError = raise
-                    onCompleted = fun () -> printfn "Completed PlayersUpdater"
+                    onCompleted = fun () -> printfn "Completed Players Updater"
                 }))
         |> ignore
+
+        // Enemies
+        messenger.ViewModel
+            .Select(ViewModel.ViewModel.getEnemies)
+            .Subscribe(
+                ActorsUpdater<_, _>(playerLayer, {
+                    create = fun () -> new EnemyView(gameViewSetting)
+                    onError = raise
+                    onCompleted = fun () -> printfn "Completed Enemies Updater"
+                }))
+            |> ignore
 
         // SkillEffects
         [
@@ -158,6 +169,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                     }
                     |> toList
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
+
+                    GC.Collect()
                 //| _ -> ()
             )
 
@@ -268,6 +281,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                             uiBackRect.IsDrawn <- false
 
                             (gameUIWindows :> UI.IToggleWindow).Toggle(true)
+                            GC.Collect()
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -285,6 +299,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                             (gameUIWindows :> UI.IToggleWindow).Toggle(false, openUI)
                         else
                             openUI()
+
+                    GC.Collect()
             )
 
         // Layer

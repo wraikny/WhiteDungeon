@@ -176,6 +176,7 @@ module Update =
 
             { model with
                 mode = GameSceneMode.GameMode
+                enemies = Model.cellsToEnemies dungeonParams.enemyCells model.gameSetting.dungeonCellSize
                 dungeonBuilder = dungeonParams.dungeonBuilder
                 dungeonModel = dungeonParams.dungeonModel
                 dungeonGateCells = dungeonParams.gateCells

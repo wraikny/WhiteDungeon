@@ -111,8 +111,8 @@ let appSetting : View.AppSetting = {
                     {
                         Model.ActorStatus.level = 1
                         hp = 100.0f
-                        walkSpeed = 6.0f
-                        dashSpeed = 12.0f
+                        walkSpeed = 12.0f
+                        dashSpeed = 18.0f
                     }
                 skill1 = fun actor ->
                     let dir = 

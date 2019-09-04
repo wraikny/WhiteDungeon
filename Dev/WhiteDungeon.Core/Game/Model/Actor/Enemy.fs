@@ -20,3 +20,10 @@ with
 
     static member inline SetObjectBase (x : Enemy, y) =
         Actor.map (ObjectBase.set y) x
+
+
+module Enemy =
+    let init size position id actorStatus = {
+        actor = Actor.Actor.init size position (Actor.OfEnemyID id) actorStatus
+        id = id
+    }
