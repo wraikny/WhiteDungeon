@@ -100,7 +100,7 @@ let appSetting : View.AppSetting = {
         }
 
     gameSetting = {
-        dungeonCellSize = Vec2.init 250.0f 250.0f
+        Model.GameSetting.dungeonCellSize = Vec2.init 250.0f 250.0f
         minPlayerCount = 1
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
@@ -114,7 +114,7 @@ let appSetting : View.AppSetting = {
                         walkSpeed = 12.0f
                         dashSpeed = 18.0f
                     }
-                skill1 = fun actor ->
+                skill1 = fun model actor ->
                     let dir = 
                         actor.objectBase.direction
                         |> Model.MoveDirection.toVector
@@ -146,7 +146,7 @@ let appSetting : View.AppSetting = {
                             } |> toList
                         }
                     ]
-                skill2 = fun actor ->
+                skill2 = fun model actor ->
                     let dir = 
                         actor.objectBase.direction
                         |> Model.MoveDirection.toVector

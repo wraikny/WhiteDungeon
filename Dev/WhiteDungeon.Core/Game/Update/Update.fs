@@ -139,7 +139,7 @@ module Update =
             model
             |> ifThen (player |> Player.coolTime kind = 0us) (
                 updatePlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
-                >> appendSkills player.actor skill
+                >> appendSkills player.actor (skill model)
             )
             , Cmd.none
 

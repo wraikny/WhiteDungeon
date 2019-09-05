@@ -37,7 +37,7 @@ type Model = {
 
     skillList : Skill.SkillList
 
-    gameSetting : GameSetting
+    gameSetting : Model GameSetting_
 
     timePassed : bool
 
@@ -47,7 +47,6 @@ type Model = {
 
     dungeonFloor : uint32
 }
-
 
 module Model =
     let inline count (model : Model) = model.count
@@ -102,6 +101,35 @@ module Model =
 
         dungeonFloor = 1u
     }
+
+type GameSetting = Model GameSetting_
+
+module GameSetting =
+    open wraikny.Tart.Advanced
+    open wraikny.Tart.Helper.Collections
+
+    let inline collidedWithCell (gameSetting) cell =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> (=) cell
+        |> Seq.exists
+
+    let collidedWiithCells (gameSetting : _ GameSetting_) cells =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> flip Set.contains cells
+        |> Seq.exists
+
+    let insideCells (gameSetting : _ GameSetting_) cells =
+        Dungeon.DungeonModel.coordinateToCell
+            gameSetting.dungeonCellSize
+        >> flip HashMap.containsKey cells
+        |> Seq.forall
+
+    let inline insideDungeon 
+        (gameSetting : _ GameSetting_)
+        (dungeonModel : Dungeon.DungeonModel) =
+        insideCells gameSetting dungeonModel.cells
 
 module Dungeon =
     type GeneratedDungeonParams = {

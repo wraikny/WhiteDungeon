@@ -74,7 +74,7 @@ let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosit
 
 let inline private moveWithBS
     f
-    (gameSetting : Game.Model.GameSetting)
+    (gameSetting : GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
     (diff0) (x : ^a)
     =
