@@ -114,20 +114,20 @@ module GameSetting =
         >> (=) cell
         |> Seq.exists
 
-    let collidedWiithCells (gameSetting : _ GameSetting_) cells =
+    let collidedWiithCells (gameSetting : GameSetting) cells =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip Set.contains cells
         |> Seq.exists
 
-    let insideCells (gameSetting : _ GameSetting_) cells =
+    let insideCells (gameSetting : GameSetting) cells =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip HashMap.containsKey cells
         |> Seq.forall
 
     let inline insideDungeon 
-        (gameSetting : _ GameSetting_)
+        (gameSetting : GameSetting)
         (dungeonModel : Dungeon.DungeonModel) =
         insideCells gameSetting dungeonModel.cells
 
