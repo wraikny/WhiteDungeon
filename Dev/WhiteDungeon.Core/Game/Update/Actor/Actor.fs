@@ -113,7 +113,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 
 open WhiteDungeon.Core.Game.Update
 
-let inline update actor : Actor =
+let inline update (actor : ^a) =
     actor
-    |> ObjectBase.map ObjectBase.update
+    |> ObjectBase.update
     //|> updateConditions

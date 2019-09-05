@@ -7,4 +7,4 @@ open WhiteDungeon.Core.Game.Update.Actor
 
 let inline update enemy : Enemy =
     enemy
-    |> Actor.map Actor.update
+    |> Actor.update

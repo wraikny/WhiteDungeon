@@ -15,6 +15,6 @@ let inline decrCoolTimes player =
 
 let inline update player : Player =
     player
-    |> Actor.map Actor.update
+    |> Actor.update
     |> decrCoolTimes
 

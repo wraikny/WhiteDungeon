@@ -122,7 +122,7 @@ let inline moveXYAnother a = moveWithBS bsDiffXYAnother a
 let inline setVelocity velocity (obj : ObjectBase) =
     { obj with velocity = velocity }
 
-let inline update (obj : ObjectBase) =
-    obj
-    |> ObjectBase.mapPosition ( (+) obj.velocity )
-    |> fun x -> { x with isMoved = false }
+let inline update (o : ^a) =
+    o
+    |> ObjectBase.mapPosition ( (+) (ObjectBase.velocity o))
+    |> ObjectBase.map( fun x -> { x with isMoved = false } )
