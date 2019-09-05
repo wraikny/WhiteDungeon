@@ -18,30 +18,9 @@ open FSharpPlus
 open FSharpPlus.Math.Applicative
 
 type EnemyView(gameViewSetting) =
-    inherit asd.GeometryObject2D()
-
-    let gameViewSetting : GameViewSetting = gameViewSetting
-    
-    let mutable lastPosition = zero
-    let mutable lastSize = zero
-
-    let rect = new asd.RectangleShape()
-    do
-        base.Shape <- rect
+    inherit ActorView<unit>(gameViewSetting, Map.empty)
 
     interface IUpdatee<Game.ViewModel.EnemyView> with
         member this.Update(viewModel) =
-            let objectBase = viewModel.actorView.objectBaseView
-            
-            // Position
-            let area = objectBase.area
-            let centerPos = Rect.centerPosition area
-            lastPosition <- centerPos
-            
-            this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
-
-            // Size
-            lastSize <- area.size
-            let size = Vec2.toVector2DF area.size
-
-            rect.DrawingArea <- asd.RectF(-size/2.0f, size)
+            this.UpdateActorView(viewModel.actorView)
+            //this.SetAnimationTextures()
