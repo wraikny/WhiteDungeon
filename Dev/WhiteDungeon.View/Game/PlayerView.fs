@@ -32,7 +32,11 @@ type PlayerView(gameViewSetting) =
 
     let sizeViewRect = new asd.RectangleShape()
     let sizeView =
+        #if DEBUG
+        let enabled = true
+        #else
         let enabled = false
+        #endif
         new asd.GeometryObject2D(
             Shape = sizeViewRect,
             Color = asd.Color(0, 0, 255, 50),
@@ -73,9 +77,11 @@ type PlayerView(gameViewSetting) =
 
             // Position
             let area = objectBase.area
-            let centerPos = Rect.centerPosition area
-            lastPosition <- centerPos
-
+            let lu, rd = Rect.get_LU_RD area
+            let centerPos = (lu + rd) ./ 2.0f
+            let bottom = Vec2.init centerPos.x rd.y
+            lastPosition <- bottom
+            
             this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
 
 
@@ -90,13 +96,12 @@ type PlayerView(gameViewSetting) =
 
             if changedDir || objectBase.isMoved || textureOjb.Texture = null then
                 moveAnimation.Next()
-
+                
                 let texSize = textureOjb.Src.Size
                 let scale = size.X / texSize.X
                 textureOjb.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
-
-                textureOjb.Position <- -texSize * scale / 2.0f
-
+                textureOjb.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
+                textureOjb.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
 
 
     member __.SetOccupation(occupation) =

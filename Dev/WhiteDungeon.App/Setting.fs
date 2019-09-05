@@ -104,7 +104,7 @@ let appSetting : View.AppSetting = {
         minPlayerCount = 1
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
-        characterSize = Vec2.init 100.0f 200.0f
+        characterSize = Vec2.init 100.0f 100.0f
         occupationSettings = Map.ofList [
             Model.Seeker, {
                 status =

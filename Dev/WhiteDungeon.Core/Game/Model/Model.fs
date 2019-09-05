@@ -114,11 +114,17 @@ module Dungeon =
 
     let generateDungeonModel (dungeonBuilder : DungeonBuilder) =
         Random.int minValue<int> maxValue<int>
-        |> TartTask.withEnv(fun seed -> async {
-            let builder = { dungeonBuilder with seed = seed }
-            return
-                ( builder, (DungeonBuilder.generate builder) )
-        })
+        |> TartTask.withEnv(fun seed ->
+            let rec loop n = async {
+                let builder = { dungeonBuilder with seed = seed + n }
+                let dungeon = DungeonBuilder.generate builder
+                if length dungeon.largeRooms > 2 then
+                    return ( builder, dungeon )
+                else
+                    return! loop(n + 1)
+                }
+            loop 0
+        )
 
     let generateDungeonParams gameSetting gateCount dungeonBuilder (dungeonModel : DungeonModel) =
         let largeRooms = toList dungeonModel.largeRooms
