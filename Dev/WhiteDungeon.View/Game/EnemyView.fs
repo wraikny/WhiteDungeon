@@ -18,9 +18,13 @@ open FSharpPlus
 open FSharpPlus.Math.Applicative
 
 type EnemyView(gameViewSetting) =
-    inherit ActorView<unit>(gameViewSetting, Map.empty)
+    inherit ActorView<unit>(Map.empty
+        #if DEBUG
+        , EnabledSizeView = true
+        #endif
+    )
 
     interface IUpdatee<Game.ViewModel.EnemyView> with
         member this.Update(viewModel) =
-            this.UpdateActorView(viewModel.actorView)
             //this.SetAnimationTextures()
+            this.UpdateActorView(viewModel.actorView)

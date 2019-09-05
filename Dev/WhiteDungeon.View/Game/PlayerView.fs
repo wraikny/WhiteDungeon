@@ -20,9 +20,14 @@ open FSharpPlus.Math.Applicative
 
 type PlayerView(gameViewSetting) =
     // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
-    inherit ActorView<Model.Occupation>(gameViewSetting, gameViewSetting.occupationImages)
+    inherit ActorView<Model.Occupation>(
+        gameViewSetting.occupationImages
+        #if DEBUG
+        , EnabledSizeView = true
+        #endif
+    )
 
     interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
-            this.UpdateActorView(viewModel.actorView)
             this.SetAnimationTextures(viewModel.character.currentOccupation)
+            this.UpdateActorView(viewModel.actorView)
