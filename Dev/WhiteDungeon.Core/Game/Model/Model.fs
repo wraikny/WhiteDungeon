@@ -116,11 +116,8 @@ module Dungeon =
         Random.int minValue<int> maxValue<int>
         |> TartTask.withEnv(fun seed -> async {
             let builder = { dungeonBuilder with seed = seed }
-            return(
-                builder,
-                { dungeonBuilder with seed = seed }
-                |> DungeonBuilder.generate
-            )
+            return
+                ( builder, (DungeonBuilder.generate builder) )
         })
 
     let generateDungeonParams gameSetting gateCount dungeonBuilder (dungeonModel : DungeonModel) =
@@ -136,12 +133,19 @@ module Dungeon =
 
         let rec loop() = monad {
             try
+                let gen = Random.int minValue<int> maxValue<int>
+                let genNatural = Random.int 0 maxValue<int>
                 let smallRoomGen = Random.int 0 (smallRoomsCount - 1)
-                let largeRoomGen = Random.int 0 (largeRoomsCount - 1)
+                //let largeRoomGen = Random.int 0 (largeRoomsCount - 1)
 
-                let! roomIndex = largeRoomGen
+                let! largeRoomRnds = Random.list largeRoomsCount genNatural
+                let largeRoomValues =
+                    largeRoomRnds
+                    |> Seq.indexed
+                    |> Seq.sortBy snd
+                    |> Seq.toList
 
-                let initRoomIndex = roomIndex % largeRoomsCount
+                let initRoomIndex = fst largeRoomValues.[0]
 
                 let initRoom = snd largeRooms.[initRoomIndex]
 
@@ -150,19 +154,32 @@ module Dungeon =
                     |>> fromCell
                     |> Rect.centerPosition
 
-                let! gateCellIndexs =
-                    Random.distinctList gateCount (Random.pair largeRoomGen largeRoomGen)
-                    |> Random.until(List.map fst >> List.contains roomIndex >> not)
 
-                let gateCells =
+                let toLargeRoomCells values =
                     seq {
-                        for (a, b) in gateCellIndexs ->
-                            let room = snd largeRooms.[a % largeRoomsCount]
+                        for (i, v) in values ->
+                            let room = snd largeRooms.[i]
                             let cells = room |> Space.cells
-                            let cell = fst cells.[ b % length cells]
+                            let cell = fst cells.[ v % length cells]
                             cell
                     }
+
+                let gateCells =
+                    (toLargeRoomCells largeRoomValues.[1..gateCount])
                     |> Set.ofSeq
+
+                (*
+                let itemCells =
+                    (getCells largeRoomValues.[(gateCount + 1)..])
+                    |> toList
+
+                let! itemRnds = Random.list (length itemCells) genNatural
+
+                let items =
+                    Seq.zip itemCells itemRnds
+                    |> Seq.toList
+                *)
+
 
                 let! enemyCellIndexs=
                     Random.list smallRoomsCount smallRoomGen
@@ -184,7 +201,9 @@ module Dungeon =
                     enemyCells = enemyCells
                     initPosition = initPosition
                 }
-            with _ -> return! loop()
+            with e ->
+                printfn "%A" e
+                return! loop()
         }
 
         flip Random.generate (loop())
