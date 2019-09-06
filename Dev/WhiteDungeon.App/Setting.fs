@@ -12,7 +12,7 @@ open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
-open WhiteDungeon.Core.Game.Model.Skill
+open WhiteDungeon.Core.Game.Model
 
 open WhiteDungeon.App.GameSetting
 open WhiteDungeon.App.GameViewSetting

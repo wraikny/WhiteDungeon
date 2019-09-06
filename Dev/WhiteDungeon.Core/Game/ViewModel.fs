@@ -9,6 +9,7 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
 
@@ -86,9 +87,9 @@ type AreaSkillEmitView = {
 }
 
 module AreaSkillEmitView =
-    open WhiteDungeon.Core.Game.Model.Skill
+    open WhiteDungeon.Core.Game.Model.Actor.Skill
 
-    let inline fromModel (areaSkill : Model.Skill.AreaSkill) =
+    let inline fromModel (areaSkill : AreaSkill) =
         {
             baseView = ObjectBaseView.fromModel areaSkill.objectBase
             frameCurrent = areaSkill.frame

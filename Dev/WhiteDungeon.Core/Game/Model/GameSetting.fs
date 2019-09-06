@@ -6,6 +6,7 @@ open wraikny.Tart.Helper.Geometry
 open FSharpPlus
 
 open WhiteDungeon.Core.Model
+open WhiteDungeon.Core.Game.Model.Actor
 // open WhiteDungeon.Core.Model
 
 //type Calcs =

@@ -51,7 +51,6 @@ let selectUISide (_ : Model) = [
     Button("始める", SetUI <| Select CheckSettiing)
 ]
 
-
 let playerView (model : Model) =
     let x = model.selectOccupation
 

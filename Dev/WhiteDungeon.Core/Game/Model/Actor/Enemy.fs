@@ -4,6 +4,29 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 
+type AfterLoseSight =
+    | Stop
+    | LookAround
+    | ChaseLosePoint
+
+
+type ChaseKind =
+    | Losable of AfterLoseSight
+
+
+
+type 'Model EnemySetting =
+    {
+        actorStatus : ActorStatus
+        skill : 'Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+
+        visionAngle : float32
+        visionDistance : float32
+        lookAroundAfterLoseSight : bool
+        chaseKind : ChaseKind
+    }
+
+
 type Enemy =
     {
         actor : Actor

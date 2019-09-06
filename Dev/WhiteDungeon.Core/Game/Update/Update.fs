@@ -7,7 +7,6 @@ open wraikny.Tart.Core.Libraries
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
-open WhiteDungeon.Core.Game.Model.Skill
 
 open WhiteDungeon.Core.Game.Update
 open WhiteDungeon.Core.Game.Update.Skill
@@ -51,7 +50,7 @@ module Update =
 
 
     let appendSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) (model : Model) : Model =
-        model |> SkillList.map(
+        model |> Skill.SkillList.map(
             skills actor
             |>> Skill.SkillEmitBuilder.build actor
             |> Skill.SkillList.append

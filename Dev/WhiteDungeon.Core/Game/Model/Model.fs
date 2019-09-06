@@ -4,6 +4,7 @@ open wraikny.Tart.Helper.Math
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 
 open wraikny.Tart.Advanced
 open wraikny.Tart.Core
@@ -28,9 +29,9 @@ type Model =
         count : uint32
 
         nextPlayerID : uint32
-        players : Map<PlayerID, Actor.Player>
+        players : Map<PlayerID, Player>
 
-        enemies : Map<EnemyID, Actor.Enemy>
+        enemies : Map<EnemyID, Enemy>
 
         dungeonBuilder: Dungeon.DungeonBuilder
         dungeonModel : Dungeon.DungeonModel

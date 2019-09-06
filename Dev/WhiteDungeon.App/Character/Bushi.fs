@@ -6,14 +6,15 @@ open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 
-open WhiteDungeon.Core.Game.Model.Skill
+open WhiteDungeon.Core.Game.Model.Actor.Skill
 open WhiteDungeon.View
 
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
-let setting = {
+let setting : Model OccupationSetting = {
     status =
         {
             Model.ActorStatus.level = 1

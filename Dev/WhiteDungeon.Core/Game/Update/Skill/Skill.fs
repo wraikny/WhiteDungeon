@@ -6,7 +6,8 @@ open wraikny.Tart.Helper.Collections
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Update
-open WhiteDungeon.Core.Game.Model.Skill
+open WhiteDungeon.Core.Game.Model.Actor
+open WhiteDungeon.Core.Game.Model.Actor.Skill
 
 open FSharpPlus
 open wraikny.Tart.Helper.Extension
@@ -14,7 +15,7 @@ open wraikny.Tart.Helper.Extension
 module Effect =
     let apply
         (gameSetting : GameSetting)
-        (invoker : Actor.Actor)
+        (invoker : Actor)
         (effect : Effect)
         (actor : Actor.Actor)
         : (Actor.Actor * SkillEmit [])
@@ -207,7 +208,7 @@ module SkillList =
         for (id, emit) in skillList.waitings |> Map.toSeq do
             if emit |> SkillEmit.delay = 0u then
                 emit |> function
-                | Skill.Area area ->
+                | Area area ->
                     area.target |> function
                     | Players ->
                         areaPlayer.Add(id, area)
@@ -256,7 +257,7 @@ module SkillList =
         }
 
     let private appendGeneratedEmits skillList : SkillList =
-        let f : Map<_, Skill.AreaSkill> -> _ =
+        let f : Map<_, AreaSkill> -> _ =
             Map.toSeq
             >> map(snd >> fun areaSkill ->
                 areaSkill.emits

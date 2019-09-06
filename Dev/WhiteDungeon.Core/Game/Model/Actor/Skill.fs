@@ -1,9 +1,10 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Skill
+﻿namespace WhiteDungeon.Core.Game.Model.Actor.Skill
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
@@ -31,8 +32,8 @@ type Effect =
     // | AddConditions of Condition list
     | Damage of float32
     | AddHP of float32
-    | DamageF of (Actor.Actor -> Actor.Actor -> float32)
-    | F of (Actor.Actor -> Actor.Actor -> (Actor.Actor * SkillEmit []))
+    | DamageF of (Actor -> Actor -> float32)
+    | F of (Actor -> Actor -> (Actor * SkillEmit []))
 
 
 

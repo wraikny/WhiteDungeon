@@ -11,7 +11,7 @@ open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 
 open WhiteDungeon.View
-open WhiteDungeon.Core.Game.Model.Skill
+open WhiteDungeon.Core.Game.Model.Actor.Skill
 
 open FSharpPlus.Math.Applicative
 open FSharpPlus
