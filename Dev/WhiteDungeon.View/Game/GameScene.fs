@@ -80,6 +80,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
     let dungeonLayer = new asd.Layer2D()
     let actorLayer = new asd.Layer2D()
+    let hpLayer = new asd.Layer2D()
     //let skillEffectsLayer = new asd.Layer2D()
     let uiLayer = new asd.Layer2D()
 
@@ -97,7 +98,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new PlayerView(playersImagesMap)
+                    create = fun () -> new PlayerView(playersImagesMap, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
                 }))
@@ -110,7 +111,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             .Select(ViewModel.ViewModel.getEnemies)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new EnemyView(gameModel.gameSetting, gameViewSetting)
+                    create = fun () -> new EnemyView(gameModel.gameSetting, gameViewSetting, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Enemies Updater"
                 }))
@@ -134,13 +135,15 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         |> ignore
 
     let dungeonCamera = new GameCamera(true)
-    let playerCamera = new GameCamera(false)
+    let actorCamera = new GameCamera(false)
+    let hpCamera = new GameCamera(false)
     let skillEffectsCamera = new GameCamera(false)
 
     do
         [|
             dungeonCamera
-            playerCamera
+            actorCamera
+            hpCamera
             skillEffectsCamera
         |]
         |>> fun o ->
@@ -314,6 +317,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
         this.AddLayer(actorLayer)
+        this.AddLayer(hpLayer)
         //this.AddLayer(skillEffectsLayer)
         this.AddLayer(uiLayer)
 
@@ -322,7 +326,9 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
         // Camera
         dungeonLayer.AddObject(dungeonCamera)
-        actorLayer.AddObject(playerCamera)
+        actorLayer.AddObject(actorCamera)
+        hpLayer.AddObject(hpCamera)
+
         //skillEffectsLayer.AddObject(skillEffectsCamera)
 
         // UI

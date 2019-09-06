@@ -52,36 +52,8 @@ module Update =
 
     let appendSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) (model : Model) : Model =
         model |> Skill.SkillList.map(
-            skills actor
-            |>> Skill.SkillEmitBuilder.build actor
-            |> Skill.SkillList.append
+            SkillList.appendActorSkills actor skills
         )
-
-
-    let applySkills (model : Model) : Model =
-        let skillList = model.skillList
-                
-        let inline f x = Skill.AreaSkill.applyToActorHolders model.gameSetting x
-
-        let chain f (a, b) =
-            let x, y = f a
-            (x, Array.append y b)
-
-        let players, emits =
-            (model.players, empty)
-            |> chain (f skillList.areaPlayer)
-            |> chain (f skillList.areaAll)
-
-        let enemies, emits =
-            (model.enemies, emits)
-            |> chain (f skillList.areaEnemy)
-            |> chain (f skillList.areaAll)
-
-        { model with
-            players = players
-            enemies = enemies
-        }
-        |> Skill.SkillList.map(Skill.SkillList.append (emits))
 
 
     let updateEnemies model =
@@ -91,15 +63,23 @@ module Update =
             |>> (fun (_, p) -> ObjectBase.position p)
             |> toList
 
-        model
-        |> mapEnemy (fun enemy ->
-            let pos = ObjectBase.position enemy
-            let d = model.gameSetting.enemyUpdateDistance
-            enemy
-            |> ifThen
-                (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d ))
-                (Actor.Enemy.update model)
-        )
+        let enemies =
+            seq {
+                for (id, enemy) in (Map.toSeq model.enemies) do
+                    let pos = ObjectBase.position enemy
+                    let d = model.gameSetting.enemyUpdateDistance
+
+                    if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
+                        
+                        let enemy = (Actor.Enemy.update model) enemy
+                        let pos = ObjectBase.position enemy
+                        if (Actor.statusCurrent enemy).hp > 0.0f && not(pos.x = nanf || pos.y = nanf) then
+                            yield (id, enemy)
+                    elif not(pos.x = nanf || pos.y = nanf) then
+                        yield (id, enemy)
+            }
+
+        { model with enemies = Map.ofSeq enemies }
 
     let checkGateCollision model =
         model.players
@@ -128,7 +108,6 @@ module Update =
             |> updateEachPlayer Actor.Player.update
             |> updateEnemies
             |> Skill.SkillList.update
-            |> applySkills
             |> fun m -> { m with timePassed = true }
             |> fun m ->
                 m.players

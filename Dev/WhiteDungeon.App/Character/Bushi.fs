@@ -48,7 +48,7 @@ let setting : OccupationSetting = {
                     {
                         delay = delay
                         effects = [|
-                            Skill.Damage damage
+                            Skill.Damage (damage / 60.0f)
                         |]
                     }
                 objectBase =
@@ -58,8 +58,8 @@ let setting : OccupationSetting = {
 
                 target = Skill.AreaTarget.Enemies
 
-                removeWhenHitWall = true
-                removeWhenHitActor = true
+                removeWhenHitWall = false
+                removeWhenHitActor = false
 
                 move = seq {
                     //for _ in 1..20 -> Skill.Move (dir .* 3.0f)
@@ -70,7 +70,7 @@ let setting : OccupationSetting = {
 
         let posDiff = 70.0f
         let size1, size2 = 100.0f, 120.0f
-        let damage1, damage2 = 5.0f, 10.0f
+        let damage1, damage2 = 10.0f, 20.0f
         let delay = 5u
 
         [

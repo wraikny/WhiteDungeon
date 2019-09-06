@@ -112,7 +112,7 @@ module ObjectBase =
     let inline direction x = (get x).direction
     let inline area x : float32 Rect2 =
         {
-            position = position x - (size x .* 0.5f)
+            position = position x - ( (size x) ./ 2.0f)
             size = size x
         }
 

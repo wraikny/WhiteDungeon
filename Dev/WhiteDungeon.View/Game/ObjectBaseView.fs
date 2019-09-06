@@ -52,8 +52,13 @@ type ObjectBaseView< 'a
     
     let moveAnimation = MoveAnimation(textureObj)
 
+    let mutable texViewSize = asd.Vector2DF(0.0f, 0.0f)
+
     member __.SizeView with get() = sizeView
     member __.TextureView with get() = textureObj
+
+    member __.LastSize with get() = lastSize
+    member __.ViewSize with get() = texViewSize
 
     member __.EnabledSizeView
         with get() = sizeView.IsDrawn
@@ -75,6 +80,7 @@ type ObjectBaseView< 'a
         let bottom = Vec2.init centerPos.x rd.y
         lastPosition <- bottom
         
+        // centerPos
         this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
 
         this.DrawingPriority <- int bottom.y
@@ -94,6 +100,9 @@ type ObjectBaseView< 'a
                 textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
                 textureObj.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
                 textureObj.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
+                texViewSize <- texSize * scale
+        else
+            texViewSize <- size
 
     member __.SetAnimationTextures(textureKind) =
         if lastTextureKind <> Some textureKind then

@@ -163,11 +163,9 @@ let inline moveReflectable
                 let dir = Vector.normalize diff
                 (2.0f * (Vector.dot dir tangent) *. tangent) - dir
 
-
             let restLength = Vector.length diff - Vector.length diff0
 
-
-            diff + restLength *. reflectedDir
+            diff + ( reflectedDir .* (if restLength < 1.0f then 1.0f else restLength) )
             , Some reflectedDir
         else
             diff0, None

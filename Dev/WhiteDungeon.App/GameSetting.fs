@@ -38,7 +38,7 @@ let gameSetting : Model.GameSetting = {
         Model.EnemyKind.Slime, {
             EnemySetting.actorStatus = {
                 Model.ActorStatus.level = 1
-                hp = 30.0f
+                hp = 200.0f
                 walkSpeed = 2.0f
                 dashSpeed = 4.0f
             }
@@ -49,7 +49,7 @@ let gameSetting : Model.GameSetting = {
             chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
             freeMove = FreeMove.Forward
 
-            attackDistance = 200.0f
+            attackDistance = 50.0f
         }
     ]
 }
