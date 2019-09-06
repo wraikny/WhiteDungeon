@@ -124,7 +124,7 @@ module Update =
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
 
             model
-            |> ifThen (direction <> zero) (
+            |> ifThen (Vector.squaredLength direction > 0.1f) (
                 Update.Actor.Actor.move
                     model.gameSetting
                     model.dungeonModel

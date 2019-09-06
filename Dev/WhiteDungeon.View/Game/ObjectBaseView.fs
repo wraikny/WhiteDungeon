@@ -86,7 +86,7 @@ type ObjectBaseView< 'a
 
         if textureObj.IsDrawn then
             let changedDir = moveAnimation.SetDirection(objectBaseView.direction)
-            if changedDir || objectBaseView.isMoved || textureObj.Texture = null then
+            if changedDir || objectBaseView.isMoved then
                 moveAnimation.Next()
             
                 let texSize = textureObj.Src.Size
