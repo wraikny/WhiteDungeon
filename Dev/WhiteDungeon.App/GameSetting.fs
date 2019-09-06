@@ -39,8 +39,8 @@ let gameSetting : Model.GameSetting = {
             EnemySetting.actorStatus = {
                 Model.ActorStatus.level = 1
                 hp = 30.0f
-                walkSpeed = 4.0f
-                dashSpeed = 6.0f
+                walkSpeed = 2.0f
+                dashSpeed = 4.0f
             }
             skill = fun model actor -> []
 

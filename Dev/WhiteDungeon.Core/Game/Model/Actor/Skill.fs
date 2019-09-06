@@ -65,7 +65,6 @@ and AreaSkill =
         move : EmitMove list
 
         emits : AreaSkillBuilder []
-        collidedActors : Set<Actor.ActorID>
 
         frame : uint32
         frameFirst : uint32
@@ -138,7 +137,6 @@ module AreaSkillBuilder =
             move = builder.move
 
             emits = Array.empty
-            collidedActors = Set.empty
 
             frame = frame
             frameFirst = frame

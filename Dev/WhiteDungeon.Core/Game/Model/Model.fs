@@ -132,22 +132,19 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let cellsToEnemies (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
+    let cellsToEnemies (enemySettings : HashMap<EnemyKind, EnemySetting>) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
+            let kind = EnemyKind.FromInt ei.kind
             enemyId
             , Actor.Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
-                {   ActorStatus.level = 1
-                    hp = 100.0f
-                    walkSpeed = 10.0f
-                    dashSpeed = 16.0f
-                }
-                (EnemyKind.FromInt ei.kind)
+                (enemySettings |> HashMap.find kind).actorStatus
+                kind
                 ei.lookAngleRadian
         )
         |> Map.ofSeq
@@ -159,7 +156,11 @@ module Model =
         nextPlayerID = players |> Map.count |> uint32
         players = players
 
-        enemies = cellsToEnemies enemyCells gameSetting.dungeonCellSize
+        enemies =
+            cellsToEnemies
+                gameSetting.enemySettings
+                enemyCells
+                gameSetting.dungeonCellSize
 
         skillList = Skill.SkillList.init()
 

@@ -77,6 +77,8 @@ type ObjectBase =
         direction : MoveDirection
 
         isMoved : bool
+
+        radius : float32
     }
 with
     member inline x.objectBase = x
@@ -91,6 +93,8 @@ module ObjectBase =
         velocity = zero
         direction = Front
         isMoved = false
+
+        radius = (Vector.length size) * 0.5f
     }
 
     let inline get (x : ^a) : ObjectBase =
