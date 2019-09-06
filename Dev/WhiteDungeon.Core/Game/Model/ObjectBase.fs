@@ -120,3 +120,6 @@ module ObjectBase =
                 lastPosition = o.position
             })
 
+    let inline mapVelocity f x =
+        x |> map (fun o -> { o with velocity = f o.velocity })
+

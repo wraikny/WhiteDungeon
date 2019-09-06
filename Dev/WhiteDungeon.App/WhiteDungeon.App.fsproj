@@ -74,6 +74,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Character\Bushi.fs" />
+    <Compile Include="GameSetting.fs" />
+    <Compile Include="GameViewSetting.fs" />
     <Compile Include="Setting.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

@@ -63,10 +63,8 @@ module ActorStatus =
 
 
 type Occupation =
-    //#if DEBUG
-    //| DebugOccupation
-    //#endif
     | Seeker
+    | Bushi
 
 
 [<Struct>]

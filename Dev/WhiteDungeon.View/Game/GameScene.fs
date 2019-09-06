@@ -376,6 +376,17 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                         )
                 )
 
+                [|
+                    asd.Keys.J, Model.Actor.Skill1
+                    asd.Keys.K, Model.Actor.Skill2
+                |]
+                |> iter(fun (k, s) ->
+                    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
+                        messenger.Enqueue(
+                            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                        )
+                )
+
         | Model.HowToControl
         | Model.Pause
         | Model.GameFinished true ->

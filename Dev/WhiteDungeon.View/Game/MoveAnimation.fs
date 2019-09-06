@@ -21,13 +21,13 @@ open FSharpPlus
 
 
 type MoveAnimation(owner : asd.TextureObject2D) =
-    let load =
-        Seq.map(fun (path, area, angle) ->
-            asd.Engine.Graphics.CreateTexture2D(path),
-            (Rect.toRectI area).ToF(),
-            angle
-        )
-        >> Seq.toList
+    //let load =
+    //    Seq.map(fun (path, area, angle) ->
+    //        asd.Engine.Graphics.CreateTexture2D(path),
+    //        (Rect.toRectI area).ToF(),
+    //        angle
+    //    )
+    //    >> Seq.toList
 
     let mutable images = ActorImages.empty
 
