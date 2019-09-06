@@ -36,9 +36,12 @@ let gameViewSetting : View.GameViewSetting =
     let playerStatusSize = (Vec2.init 0.2f 0.15f)
 
     {
-        occupationImages = [
-            Model.Seeker, ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
-            Model.Bushi, Character.Bushi.images
+        //occupationImages = [
+        //    Model.Seeker, ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+        //    Model.Bushi, Character.Bushi.images
+        //] |> Map.ofList
+        occupationSetting = [
+            Model.Bushi, Character.Bushi.viewSetting
         ] |> Map.ofList
 
         bgms = [

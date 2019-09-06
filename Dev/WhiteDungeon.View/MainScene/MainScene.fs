@@ -161,7 +161,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
         let env = { seed = Random().Next() }
         Messenger.build env {
             init =
-                let initModel = Model.initModel env setting.gameSetting
+                let initModel = Model.initModel env setting
                 
                 initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update

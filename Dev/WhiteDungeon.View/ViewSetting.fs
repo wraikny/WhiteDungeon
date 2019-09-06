@@ -84,8 +84,15 @@ module ActorImages =
             backRight = textures 1 3
         }
 
+type OccupationViewSetting =
+    {
+        name : string
+        characterImages : ActorImages<string, int Rect2>
+    }
+
 type GameViewSetting = {
-    occupationImages : Map<Occupation, ActorImages<string, int Rect2>>
+    occupationSetting : Map<Occupation, OccupationViewSetting>
+    //occupationImages : Map<Occupation, ActorImages<string, int Rect2>>
     bgms : string list
 
     gameUIFrameColor : byte Vec4

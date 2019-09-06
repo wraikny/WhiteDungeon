@@ -86,7 +86,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             if model.uiMode = WaitingGenerating then
                 let cmd =
                     Game.Model.Dungeon.generateDungeonParams
-                        model.gameSetting
+                        model.setting.gameSetting
                         model.gateCount
                         dungeonBuilder
                         dungeonModel
@@ -98,7 +98,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | GeneratedDungeonParams dungeonParams ->
             if model.uiMode = WaitingGenerating then
                 let gameModel =
-                    let size = model.gameSetting.characterSize
+                    let size = model.setting.gameSetting.characterSize
                     let players =
                         [ model.playerName, model.selectOccupation ]
                         |> Seq.indexed
@@ -106,7 +106,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let name = Option.defaultValue (sprintf "Player%d" index) name
 
                             let status =
-                                model.gameSetting.occupationSettings
+                                model.setting.gameSetting.occupationSettings
                                 |> Map.find occupation
                                 |> fun x -> x.status
 
@@ -140,7 +140,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         dungeonParams.dungeonModel
                         dungeonParams.gateCells
                         dungeonParams.enemyCells
-                        model.gameSetting
+                        model.setting.gameSetting
 
                 model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
             else

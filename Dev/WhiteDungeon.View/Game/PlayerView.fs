@@ -21,7 +21,7 @@ open FSharpPlus.Math.Applicative
 type PlayerView(gameViewSetting) =
     // inherit asd.GeometryObject2D(Color = ColorPalette.sumire)
     inherit ActorView<Model.Occupation>(
-        gameViewSetting.occupationImages
+        gameViewSetting.occupationSetting
         #if DEBUG
         , EnabledSizeView = true
         #endif

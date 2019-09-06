@@ -122,3 +122,9 @@ let setting = {
 }
 
 let images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+
+let viewSetting =
+    {
+        name = "武士"
+        characterImages = images
+    }

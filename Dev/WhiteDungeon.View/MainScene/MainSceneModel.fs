@@ -11,6 +11,7 @@ open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon
 
 open FSharpPlus
 
@@ -81,7 +82,7 @@ type Model =
         gateCount : int
         dungeonBuilder : DungeonBuilder
 
-        gameSetting : GameSetting
+        setting : View.AppSetting
 
         bgmVolume : int
 
@@ -108,14 +109,14 @@ let updateDungeonBuilder i (model : Model) =
     }
 
 
-let initModel env (gameSetting : GameSetting) =
+let initModel env (setting : View.AppSetting) =
     {
         env = env
         uiMode = Title
         occupationListToggle = false
 
         playerName = None
-        selectOccupation = Seeker
+        selectOccupation = Occupation.DefaultValue
 
         gateCount = zero
         dungeonBuilder =
@@ -134,7 +135,7 @@ let initModel env (gameSetting : GameSetting) =
                 corridorWidth = 3
             }
 
-        gameSetting = gameSetting
+        setting = setting
 
         bgmVolume = 5
 

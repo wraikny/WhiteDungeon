@@ -54,10 +54,15 @@ let selectUISide (_ : Model) = [
 
 let playerView (model : Model) =
     let x = model.selectOccupation
-    let status = (model.gameSetting.occupationSettings |> Map.find x).status
+
+    let occupationName =
+        model.setting.gameViewSetting.occupationSetting
+        |> Map.find x
+        |> fun x -> x.name
+    let status = (model.setting.gameSetting.occupationSettings |> Map.find x).status
     [
         Text(sprintf "名前: %s" <| Option.defaultValue "Player1" model.playerName)
-        Text(sprintf "キャラクター: %A" x)
+        Text(sprintf "キャラクター: %s" occupationName)
         Text(sprintf "レベル: %d" status.level)
         Text(sprintf "体力: %.1f" status.hp)
         Text(sprintf "速さ: %.1f / %.1f" status.walkSpeed status.dashSpeed)
@@ -70,10 +75,10 @@ let selectUIChara (model : Model) : Msg MenuItem list =
 
         if model.occupationListToggle then
             yield!
-                model.gameSetting.occupationSettings
+                model.setting.gameViewSetting.occupationSetting
                 |> Map.toSeq
-                |> Seq.map(fun (x, _) ->
-                    Button(string x, SelectOccupation x)
+                |> Seq.map(fun (x, characterSetting) ->
+                    Button(characterSetting.name, SelectOccupation x)
                 )
 
             yield! [

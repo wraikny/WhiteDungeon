@@ -63,8 +63,10 @@ module ActorStatus =
 
 
 type Occupation =
-    | Seeker
+    //| Seeker
     | Bushi
+with
+    static member DefaultValue = Bushi
 
 
 [<Struct>]
