@@ -61,19 +61,27 @@ module Update =
     let applySkills (model : Model) : Model =
         let skillList = model.skillList
                 
-        let inline f x = Skill.AreaSkill.applyToActorHolders x
+        let inline f x = Skill.AreaSkill.applyToActorHolders model.gameSetting x
+
+        let chain f (a, b) =
+            let x, y = f a
+            (x, Array.append y b)
+
+        let players, emits =
+            (model.players, empty)
+            |> chain (f skillList.areaPlayer)
+            |> chain (f skillList.areaAll)
+
+        let enemies, emits =
+            (model.enemies, emits)
+            |> chain (f skillList.areaEnemy)
+            |> chain (f skillList.areaAll)
 
         { model with
-            players =
-                model.players
-                |> f skillList.areaPlayer
-                |> f skillList.areaAll
-
-            enemies =
-                model.enemies
-                |> f skillList.areaEnemy
-                |> f skillList.areaAll
+            players = players
+            enemies = enemies
         }
+        |> updateSkillList(Skill.SkillList.append emits)
 
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         let model = { model with timePassed = false }

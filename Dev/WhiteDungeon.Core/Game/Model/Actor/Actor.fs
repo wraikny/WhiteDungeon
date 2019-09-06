@@ -57,3 +57,6 @@ module Actor =
         let c = statusCurrent x
         let d = statusDefault x
         f c / f d
+
+    let inline mapStatus f x =
+        map (fun a -> { a with statusCurrent = f (statusCurrent x)}) x

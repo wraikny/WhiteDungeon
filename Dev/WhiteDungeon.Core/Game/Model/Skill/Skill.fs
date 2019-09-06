@@ -23,7 +23,9 @@ open WhiteDungeon.Core.Game.Model
 
 type Effect =
     // | AddConditions of Condition list
-    | Damage of (ActorStatus -> ActorStatus -> float32)
+    | Damage of float32
+    | ConstantDamage of float32
+    | DamageF of (Actor.Actor -> Actor.Actor -> float32)
 
 
 type SkillBase = {

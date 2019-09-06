@@ -12,15 +12,29 @@ open FSharpPlus
 open wraikny.Tart.Helper.Extension
 
 module Effect =
-    let apply (invoker : Actor.Actor) (effect : Effect) (actor : Actor.Actor) =
+    let apply
+        (gameSetting : GameSetting)
+        (invoker : Actor.Actor)
+        (effect : Effect)
+        (actor : Actor.Actor)
+        : (Actor.Actor * SkillEmit [])
+        =
         effect |> function
-        | Damage calc ->
+        | Damage v ->
             let damage =
-                calc
-                    invoker.statusCurrent
-                    actor.statusCurrent
+                gameSetting.damageCalculation
+                    v
+                    invoker
+                    actor
 
-            Actor.Actor.addHP damage actor
+            Actor.Actor.addHP damage actor, empty
+
+        | ConstantDamage v ->
+            Actor.Actor.addHP v actor, empty
+
+        | DamageF f ->
+            let damage = f invoker actor
+            Actor.Actor.addHP damage actor, empty
 
 
 //module IDSkill =
@@ -90,32 +104,44 @@ module AreaSkill =
                     |> Set.ofSeq
         }
 
-    let private apply (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor =
+    let private apply (gameSetting) (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor * SkillEmit [] =
         // TODO
         areaSkill.collidedActors
         |> Set.contains actor.id
         |> function
         | true ->
             areaSkill.skillBase.effects
-            |>> (Effect.apply areaSkill.skillBase.invokerActor)
-            |> fold (|>) actor
+            |>> (Effect.apply gameSetting areaSkill.skillBase.invokerActor)
+            |> fold (fun (a, s) f ->
+                let a, s_ = f a
+                (a, Array.append s s_)
+            ) (actor, empty)
         | false ->
-            actor
+            actor, empty
 
-    let getFoledSkills skillsMap =
+    let getFoledSkills gameSetting skillsMap actor =
         skillsMap
         |> Map.toSeq
-        |> map (snd >> apply)
-        |> fold (>>) id
+        |> map (snd >> apply gameSetting)
+        |> fold (fun (a, s) f ->
+            let a, s_ = f a
+            (a, Array.append s s_)
+        ) (actor, empty)
 
     let inline applyToActorHolders
+        gameSetting
         (skills : Map<_, AreaSkill>)
-        (holders : Map<'ID, ^a>) : Map<'ID, ^a> =
+        (holders : Map<'ID, ^a>) : Map<'ID, ^a> * SkillEmit [] =
 
-        let foledSkills = getFoledSkills skills
+        let foledSkills = getFoledSkills gameSetting skills
 
-        holders
-        |>> Actor.Actor.map foledSkills
+        let rec f targets actors emits =
+            targets |> function
+            | [] -> (Map.ofList actors, emits)
+            | (id, x)::xs ->
+                let a, e = foledSkills (Actor.Actor.get x)
+                f xs ((id, Actor.Actor.set a x)::actors) (Array.append e emits)
+        f (Map.toList holders) empty empty
 
     let inline hitActorsFilter (areaSkill : AreaSkill) : AreaSkill option =
         if areaSkill.removeWhenHitActor && (areaSkill.emits |> Array.isEmpty |> not) then

@@ -7,22 +7,18 @@ open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
 
-
-let inline setActorStatusCurrent status actor : Actor =
-    { actor with statusCurrent = status }
-
 let inline updateActorStatusCurrent f actor : Actor =
     { actor with statusCurrent = f actor.statusCurrent }
 
 
-let addHP damage (actor : Actor) =
+let addHP diff (actor : Actor) =
     let hp =
-        (actor.statusCurrent.hp + damage)
+        (actor.statusCurrent.hp + diff)
         |> max 0.0f
         |> min actor.statusDefault.hp
 
     actor
-    |> updateActorStatusCurrent(fun status ->
+    |> Actor.mapStatus (fun status ->
         { status with hp = hp }
     )
 

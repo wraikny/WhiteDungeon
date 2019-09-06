@@ -105,6 +105,9 @@ let appSetting : View.AppSetting = {
         maxPlayerCount = 1
         binarySearchCountMovingOnWall = 4
         characterSize = Vec2.init 100.0f 100.0f
+        damageCalculation = fun v invoker target ->
+            v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
+
         occupationSettings = Map.ofList [
             Model.Seeker, {
                 status =
@@ -127,9 +130,7 @@ let appSetting : View.AppSetting = {
                                 {
                                     delay = 0u
                                     effects = [|
-                                        Skill.Damage(fun atk def ->
-                                            (atk.level - def.level) |> max 1 |> ( * ) 5 |> float32
-                                        )
+                                        Skill.Damage 10.0f
                                     |]
                                 }
                             objectBase = ObjectBase.init (one .* 100.0f) pos
@@ -163,9 +164,7 @@ let appSetting : View.AppSetting = {
                                 {
                                     delay = 0u
                                     effects = [|
-                                        Skill.Damage(fun atk def ->
-                                            (atk.level - def.level) |> max 1 |> ( * ) 5 |> float32
-                                        )
+                                        Skill.Damage 10.0f
                                     |]
                                 }
                             objectBase = ObjectBase.init (one .* 100.0f) pos

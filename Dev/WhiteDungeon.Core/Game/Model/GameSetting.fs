@@ -37,5 +37,6 @@ type 'Model GameSetting_ = {
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
     characterSize : float32 Vec2
+    damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : Map<Occupation, 'Model OccupationSetting>
 }
