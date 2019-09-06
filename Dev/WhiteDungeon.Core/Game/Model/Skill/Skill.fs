@@ -26,9 +26,11 @@ type Effect =
     | Damage of float32
     | ConstantDamage of float32
     | DamageF of (Actor.Actor -> Actor.Actor -> float32)
+    | F of (Actor.Actor -> Actor.Actor -> (Actor.Actor * SkillEmit []))
 
 
-type SkillBase = {
+
+and SkillBase = {
     invokerActor : Actor.Actor
 
     delay : uint32
@@ -36,7 +38,7 @@ type SkillBase = {
 }
 
 
-type 'ID IDSkill when 'ID : comparison = {
+and 'ID IDSkill when 'ID : comparison = {
     skillBase : SkillBase
 
     targetIDs : 'ID Set
@@ -45,21 +47,13 @@ type 'ID IDSkill when 'ID : comparison = {
 }
 
 
-type SkillBaseBuilder = {
+and SkillBaseBuilder = {
     delay : uint32
     effects : Effect []
 }
 
-module SkillBaseBuilder =
-    let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
-        {
-            invokerActor = invoker
-            delay = builder.delay
-            effects = builder.effects
-        }
 
-
-type IDSkillBuilder = {
+and IDSkillBuilder = {
     skillBase : SkillBaseBuilder
     
     targetIDs : Actor.ActorID Set
@@ -67,12 +61,12 @@ type IDSkillBuilder = {
 }
 
 
-type AreaTarget =
+and AreaTarget =
     | Players
     | Enemies
     | All
 
-type EmitMove =
+and EmitMove =
     | Stay
     | Move of float32 Vec2
     | Scale of float32 Vec2
@@ -112,6 +106,20 @@ and AreaSkillBuilder = {
     move : EmitMove list
 }
 
+
+and SkillEmit =
+    // | IDPlayer of PlayerID IDSkill
+    // | IDEnemy of EnemyID IDSkill
+    | Area of AreaSkill
+
+module SkillBaseBuilder =
+    let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
+        {
+            invokerActor = invoker
+            delay = builder.delay
+            effects = builder.effects
+        }
+
 module AreaSkillBuilder =
     let build (invoker) (builder : AreaSkillBuilder) : AreaSkill =
         let frame = builder.move |> List.length |> uint32
@@ -134,12 +142,6 @@ module AreaSkillBuilder =
             frame = frame
             frameFirst = frame
         }
-
-
-type SkillEmit =
-    // | IDPlayer of PlayerID IDSkill
-    // | IDEnemy of EnemyID IDSkill
-    | Area of AreaSkill
 
 module SkillEmit =
     let inline skillBase s =

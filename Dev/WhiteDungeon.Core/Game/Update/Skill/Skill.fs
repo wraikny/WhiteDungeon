@@ -36,6 +36,8 @@ module Effect =
             let damage = f invoker actor
             Actor.Actor.addHP damage actor, empty
 
+        | F f -> f invoker actor
+
 
 //module IDSkill =
 //    let count (idSkill : 'ID IDSkill) : 'ID IDSkill option =
