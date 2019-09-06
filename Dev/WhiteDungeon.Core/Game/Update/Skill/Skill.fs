@@ -267,10 +267,11 @@ module SkillList =
         |> append (f skillList.areaEnemy)
         |> append (f skillList.areaAll)
 
-    let update (model : Model) skillList =
-        skillList
-        |> popWaitingSkills
-        |> filterMapArea (AreaSkill.hitActorsFilter)
-        |> filterMapArea (AreaSkill.move model.gameSetting model.dungeonModel)
-        |> checkCollision model.players model.enemies
-        |> appendGeneratedEmits
+    let update (model : Model) =
+        SkillList.map(
+            popWaitingSkills
+            >> filterMapArea (AreaSkill.hitActorsFilter)
+            >> filterMapArea (AreaSkill.move model.gameSetting model.dungeonModel)
+            >> checkCollision model.players model.enemies
+            >> appendGeneratedEmits
+        ) model

@@ -10,6 +10,7 @@ open WhiteDungeon.Core.Game.Model.Actor
 open WhiteDungeon.Core.Game.Model.Skill
 
 open WhiteDungeon.Core.Game.Update
+open WhiteDungeon.Core.Game.Update.Skill
 
 open FSharpPlus
 open FSharpPlus.Math.Applicative
@@ -21,7 +22,7 @@ module Update =
     let inline setPlayers players model =
         { model with players = players }
 
-    let inline updatePlayers f (model : Model) : Model =
+    let inline mapPlayers f (model : Model) : Model =
         { model with players = f model.players }
 
 
@@ -30,16 +31,16 @@ module Update =
         |> setPlayers(f <!> model.players)
 
 
-    let updatePlayerOf id f (model : Model) =
+    let mapPlayerOf id f (model : Model) =
         model.players
         |> Map.tryFind id
         |>> (fun player ->
             model
-            |> updatePlayers (Map.add id (f player))
+            |> mapPlayers (Map.add id (f player))
         )
         |> Option.defaultValue model
 
-    let inline updateEachEnemy f (model : Model) : Model =
+    let inline mapEnemy f (model : Model) : Model =
         { model with enemies = model.enemies |>> f }
 
     open wraikny.Tart.Helper.Math
@@ -50,8 +51,7 @@ module Update =
 
 
     let appendSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) (model : Model) : Model =
-        model
-        |> updateSkillList (
+        model |> SkillList.map(
             skills actor
             |>> Skill.SkillEmitBuilder.build actor
             |> Skill.SkillList.append
@@ -81,7 +81,7 @@ module Update =
             players = players
             enemies = enemies
         }
-        |> updateSkillList(Skill.SkillList.append emits)
+        |> Skill.SkillList.map(Skill.SkillList.append (emits))
 
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         let model = { model with timePassed = false }
@@ -92,8 +92,8 @@ module Update =
         | TimePasses ->
             model
             |> updateEachPlayer Actor.Player.update
-            |> updateEachEnemy Actor.Enemy.update
-            |> fun x -> updateSkillList (Skill.SkillList.update x) x
+            |> mapEnemy Actor.Enemy.update
+            |> Skill.SkillList.update
             |> applySkills
             |> fun m -> { m with timePassed = true }
             |> fun m ->
@@ -131,7 +131,7 @@ module Update =
                     move
                     direction
                 |> Actor.map
-                |> updatePlayerOf playerId
+                |> mapPlayerOf playerId
             )
             , Cmd.none
 
@@ -146,7 +146,7 @@ module Update =
 
             model
             |> ifThen (player |> Player.coolTime kind = 0us) (
-                updatePlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
+                mapPlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
                 >> appendSkills player.actor (skill model)
             )
             , Cmd.none

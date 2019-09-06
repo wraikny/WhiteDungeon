@@ -23,30 +23,35 @@ type GameSceneMode =
     | GameFinished of back:bool
 
 
-type Model = {
-    count : uint32
+type Model =
+    {
+        count : uint32
 
-    nextPlayerID : uint32
-    players : Map<PlayerID, Actor.Player>
+        nextPlayerID : uint32
+        players : Map<PlayerID, Actor.Player>
 
-    enemies : Map<EnemyID, Actor.Enemy>
+        enemies : Map<EnemyID, Actor.Enemy>
 
-    dungeonBuilder: Dungeon.DungeonBuilder
-    dungeonModel : Dungeon.DungeonModel
-    dungeonGateCells : int Vec2 Set
+        dungeonBuilder: Dungeon.DungeonBuilder
+        dungeonModel : Dungeon.DungeonModel
+        dungeonGateCells : int Vec2 Set
 
-    skillList : Skill.SkillList
+        skillList : Skill.SkillList
 
-    gameSetting : Model GameSetting_
+        gameSetting : Model GameSetting_
 
-    timePassed : bool
+        timePassed : bool
 
-    mode : GameSceneMode
+        mode : GameSceneMode
 
-    lastCollidedGate : bool
+        lastCollidedGate : bool
 
-    dungeonFloor : uint32
-}
+        dungeonFloor : uint32
+    }
+with
+    static member SetSkillList (x, s) =
+        { x with skillList = s }
+
 
 module Model =
     let inline count (model : Model) = model.count

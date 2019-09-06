@@ -188,3 +188,12 @@ module SkillList =
             areaEnemy = m
             areaAll = m
         }
+
+    let inline get (x : ^a) : SkillList =
+        (^a : (member skillList : _) x)
+
+    let inline set skillList (x : ^a) : ^a =
+        (^a : (static member SetSkillList : _*_->_) (x, skillList))
+
+    let inline map f x =
+        set (f (get x)) x
