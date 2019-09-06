@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
@@ -27,6 +28,12 @@ type SkillEmitView(gameViewSetting : GameViewSetting) =
         member this.Update(viewModel) =
             this.SetFrame(viewModel.frameCurrent, viewModel.frameFirst)
             this.UpdateObjectBaseView(viewModel.baseView)
+
+            this.DrawingPriority <-
+                viewModel.baseView.area
+                |> Rect.centerPosition
+                |> Vector.y
+                |> int
 
 
     member private this.SetFrame(frameCurrent, frameFirst) =

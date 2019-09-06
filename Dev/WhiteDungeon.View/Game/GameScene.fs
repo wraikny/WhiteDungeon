@@ -77,8 +77,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     let dungeonLayer = new asd.Layer2D()
-    let playerLayer = new asd.Layer2D()
-    let skillEffectsLayer = new asd.Layer2D()
+    let actorLayer = new asd.Layer2D()
+    //let skillEffectsLayer = new asd.Layer2D()
     let uiLayer = new asd.Layer2D()
 
     let uiBackRect =
@@ -91,7 +91,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
-                ActorsUpdater<_, _>(playerLayer, {
+                ActorsUpdater<_, _>(actorLayer, {
                     create = fun () -> new PlayerView(gameViewSetting)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
@@ -102,7 +102,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getEnemies)
             .Subscribe(
-                ActorsUpdater<_, _>(playerLayer, {
+                ActorsUpdater<_, _>(actorLayer, {
                     create = fun () -> new EnemyView(gameViewSetting)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Enemies Updater"
@@ -119,7 +119,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             messenger.ViewModel
                 .Select(fun v -> s v)
                 .Subscribe(
-                    ActorsUpdater<_, _>(skillEffectsLayer, {
+                    ActorsUpdater<_, _>(actorLayer, {
                             create = fun () -> new SkillEmitView(gameViewSetting)
                             onError = raise
                             onCompleted = fun () -> printfn "Completed %A" s
@@ -306,8 +306,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
-        this.AddLayer(playerLayer)
-        this.AddLayer(skillEffectsLayer)
+        this.AddLayer(actorLayer)
+        //this.AddLayer(skillEffectsLayer)
         this.AddLayer(uiLayer)
 
         // Dungeon
@@ -315,8 +315,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
         // Camera
         dungeonLayer.AddObject(dungeonCamera)
-        playerLayer.AddObject(playerCamera)
-        skillEffectsLayer.AddObject(skillEffectsCamera)
+        actorLayer.AddObject(playerCamera)
+        //skillEffectsLayer.AddObject(skillEffectsCamera)
 
         // UI
         uiLayer.AddMouseButtonSelecter(uiMouse, "Mouse")

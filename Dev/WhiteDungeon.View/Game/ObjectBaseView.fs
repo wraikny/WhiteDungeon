@@ -77,6 +77,8 @@ type ObjectBaseView< 'a
         
         this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
 
+        this.DrawingPriority <- int bottom.y
+
         // Size
         lastSize <- area.size
         let size = Vec2.toVector2DF area.size
