@@ -69,13 +69,13 @@ module PlayerView =
 
 type EnemyView = {
     actorView : ActorView
-    kind : EnemyKind
+    enemy : Enemy
 }
 
 module EnemyView =
     let inline fromModel (enemy : Actor.Enemy) = {
         actorView = enemy.actor |> ActorView.fromModel
-        kind = enemy.kind
+        enemy = enemy
     }
 
     let enemiesView =

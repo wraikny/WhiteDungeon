@@ -100,5 +100,5 @@ type ObjectBaseView< 'a
             lastTextureKind <- Some textureKind
 
             imagesMap
-            |> Map.find textureKind
-            |> moveAnimation.SetAnimationTextures
+            |> Map.tryFind textureKind
+            |> iter moveAnimation.SetAnimationTextures

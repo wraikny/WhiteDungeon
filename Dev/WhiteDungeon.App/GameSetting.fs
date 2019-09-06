@@ -21,7 +21,11 @@ let gameSetting : Model.GameSetting = {
     minPlayerCount = 1
     maxPlayerCount = 1
     binarySearchCountMovingOnWall = 4
+
+    enemyUpdateDistance = 20000.0f
+
     characterSize = Vec2.init 100.0f 100.0f
+
     damageCalculation = fun v invoker target ->
         v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
 
@@ -39,9 +43,9 @@ let gameSetting : Model.GameSetting = {
             }
             skill = fun model actor -> []
 
-            visionAngle = 360.0f
+            visionAngleRate = 0.125f
             visionDistance = 1000.0f
-            chaseKind = Model.Actor.ChaseKind.Losable Actor.AfterLoseSight.ChaseLosePoint
+            chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
 
             attackDistance = 200.0f
         }

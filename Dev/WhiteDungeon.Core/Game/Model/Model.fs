@@ -24,6 +24,18 @@ type GameSceneMode =
     | GameFinished of back:bool
 
 
+type AfterLoseSight =
+    | Stop
+    | LookAround
+    | ChaseLosePoint
+
+
+type ChaseKind =
+    | Losable of AfterLoseSight
+    | ChaseTrace of time:float32
+
+
+
 type OccupationSetting =
     {
         status : ActorStatus
@@ -40,7 +52,7 @@ and EnemySetting =
         actorStatus : ActorStatus
         skill : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
 
-        visionAngle : float32
+        visionAngleRate : float32
         visionDistance : float32
         chaseKind : ChaseKind
 
@@ -53,6 +65,7 @@ and GameSetting = {
     minPlayerCount : int
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
+    enemyUpdateDistance : float32
     characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : Map<Occupation, OccupationSetting>
@@ -180,6 +193,11 @@ module GameSetting =
         insideCells gameSetting dungeonModel.cells
 
 module Dungeon =
+    type EnemyInits = {
+        kind : int
+        lookAngle : float32 // 0.0f ~ 1.0f
+    }
+
     type GeneratedDungeonParams = {
         dungeonBuilder : DungeonBuilder
         dungeonModel : DungeonModel

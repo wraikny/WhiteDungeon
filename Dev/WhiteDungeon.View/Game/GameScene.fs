@@ -47,7 +47,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 update = Update.Update.update
             }
     do
-        messenger.SleepTime <- 0u
+        //messenger.SleepTime <- 0u
 
         #if DEBUG
         messenger.OnError.Add(Console.WriteLine)

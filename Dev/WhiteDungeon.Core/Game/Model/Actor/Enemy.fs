@@ -1,19 +1,9 @@
 ﻿namespace WhiteDungeon.Core.Game.Model.Actor
 
+
+open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
-
-
-type AfterLoseSight =
-    | Stop
-    | LookAround
-    | ChaseLosePoint
-
-
-type ChaseKind =
-    | Losable of AfterLoseSight
-    | ChaseTrace of time:float32
-
 
 type Enemy =
     {
@@ -21,6 +11,8 @@ type Enemy =
         id : EnemyID
 
         kind : EnemyKind
+
+        lookAngle : float32
     }
 
 with
@@ -39,4 +31,6 @@ module Enemy =
         actor = Actor.Actor.init size position (Actor.OfEnemyID id) actorStatus
         id = id
         kind = kind
+
+        lookAngle = Angle.pi * 0.5f
     }

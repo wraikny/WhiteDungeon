@@ -91,7 +91,22 @@ module Update =
         | TimePasses ->
             model
             |> updateEachPlayer Actor.Player.update
-            |> mapEnemy Actor.Enemy.update
+            |> fun model ->
+                let playerPoses =
+                    model.players
+                    |> Map.toSeq
+                    |>> (fun (_, p) -> ObjectBase.position p)
+                    |> toList
+
+                model
+                |> mapEnemy (fun enemy ->
+                    let pos = ObjectBase.position enemy
+                    let d = model.gameSetting.enemyUpdateDistance
+                    enemy
+                    |> ifThen
+                        (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d ))
+                        Actor.Enemy.update
+                )
             |> Skill.SkillList.update
             |> applySkills
             |> fun m -> { m with timePassed = true }
