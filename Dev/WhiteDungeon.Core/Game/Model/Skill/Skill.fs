@@ -21,6 +21,12 @@ open WhiteDungeon.Core.Game.Model
 //    let priority c = c.priority
 
 
+type AreaTarget =
+    | Players
+    | Enemies
+    | All
+
+
 type Effect =
     // | AddConditions of Condition list
     | Damage of float32
@@ -46,33 +52,6 @@ and 'ID IDSkill when 'ID : comparison = {
     frame : uint32
 }
 
-
-and SkillBaseBuilder = {
-    delay : uint32
-    effects : Effect []
-}
-
-
-and IDSkillBuilder = {
-    skillBase : SkillBaseBuilder
-    
-    targetIDs : Actor.ActorID Set
-    frame : uint32
-}
-
-
-and AreaTarget =
-    | Players
-    | Enemies
-    | All
-
-and EmitMove =
-    | Stay
-    | Move of float32 Vec2
-    | Scale of float32 Vec2
-    | Generate of (AreaSkill -> AreaSkillBuilder [])
-
-
 and AreaSkill =
     {
         skillBase : SkillBase
@@ -95,6 +74,26 @@ with
         { x with objectBase = y }
 
 
+
+and SkillEmit =
+    // | IDPlayer of PlayerID IDSkill
+    // | IDEnemy of EnemyID IDSkill
+    | Area of AreaSkill
+
+
+and SkillBaseBuilder = {
+    delay : uint32
+    effects : Effect []
+}
+
+
+and IDSkillBuilder = {
+    skillBase : SkillBaseBuilder
+    
+    targetIDs : Actor.ActorID Set
+    frame : uint32
+}
+
 and AreaSkillBuilder = {
     skillBase : SkillBaseBuilder
     objectBase : ObjectBase
@@ -107,10 +106,11 @@ and AreaSkillBuilder = {
 }
 
 
-and SkillEmit =
-    // | IDPlayer of PlayerID IDSkill
-    // | IDEnemy of EnemyID IDSkill
-    | Area of AreaSkill
+and EmitMove =
+    | Stay
+    | Move of float32 Vec2
+    | Scale of float32 Vec2
+    | Generate of (AreaSkill -> AreaSkillBuilder [])
 
 module SkillBaseBuilder =
     let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
