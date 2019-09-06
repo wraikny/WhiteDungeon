@@ -27,14 +27,14 @@ module Effect =
                     invoker
                     actor
 
-            Actor.Actor.addHP damage actor, empty
+            Actor.Actor.addHP -damage actor, empty
 
-        | ConstantDamage v ->
+        | AddHP v ->
             Actor.Actor.addHP v actor, empty
 
         | DamageF f ->
             let damage = f invoker actor
-            Actor.Actor.addHP damage actor, empty
+            Actor.Actor.addHP -damage actor, empty
 
         | F f -> f invoker actor
 
