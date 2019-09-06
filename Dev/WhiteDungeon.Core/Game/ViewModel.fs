@@ -8,6 +8,7 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core.View
+open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 
@@ -68,11 +69,13 @@ module PlayerView =
 
 type EnemyView = {
     actorView : ActorView
+    kind : EnemyKind
 }
 
 module EnemyView =
     let inline fromModel (enemy : Actor.Enemy) = {
         actorView = enemy.actor |> ActorView.fromModel
+        kind = enemy.kind
     }
 
     let enemiesView =

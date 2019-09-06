@@ -12,26 +12,15 @@ type AfterLoseSight =
 
 type ChaseKind =
     | Losable of AfterLoseSight
-
-
-
-type 'Model EnemySetting =
-    {
-        actorStatus : ActorStatus
-        skill : 'Model -> Actor.Actor -> Skill.SkillEmitBuilder list
-
-        visionAngle : float32
-        visionDistance : float32
-        lookAroundAfterLoseSight : bool
-        chaseKind : ChaseKind
-    }
+    | ChaseTrace of time:float32
 
 
 type Enemy =
     {
         actor : Actor
-
         id : EnemyID
+
+        kind : EnemyKind
     }
 
 with
@@ -46,7 +35,8 @@ with
 
 
 module Enemy =
-    let init size position id actorStatus = {
+    let init size position id actorStatus kind = {
         actor = Actor.Actor.init size position (Actor.OfEnemyID id) actorStatus
         id = id
+        kind = kind
     }

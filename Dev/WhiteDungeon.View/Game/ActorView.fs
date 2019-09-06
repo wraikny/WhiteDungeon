@@ -20,7 +20,7 @@ open FSharpPlus.Math.Applicative
 type ActorView< 'a
     when 'a : equality
     and 'a : comparison
-    >(imagesMap : Map<_, _>) =
+    >(imagesMap) =
     inherit ObjectBaseView<'a>(imagesMap)
 
     member this.UpdateActorView(actorView : ViewModel.ActorView) =

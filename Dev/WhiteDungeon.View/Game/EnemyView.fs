@@ -17,14 +17,24 @@ open WhiteDungeon.View.Utils.Color
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
-type EnemyView(gameViewSetting) =
-    inherit ActorView<unit>(Map.empty
+type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSetting) =
+    inherit ActorView<Model.EnemyKind>(Map.empty
         #if DEBUG
         , EnabledSizeView = true
         #endif
     )
 
+    let mutable kind = ValueNone
+
+    let mutable enemySetting = Unchecked.defaultof<_>
+
     interface IUpdatee<Game.ViewModel.EnemyView> with
         member this.Update(viewModel) =
             //this.SetAnimationTextures()
             this.UpdateActorView(viewModel.actorView)
+
+            let currentKind = ValueSome viewModel.kind
+            if kind <> currentKind then
+                kind <- currentKind
+
+                enemySetting <- gameSetting.enemySettings |> Map.find viewModel.kind

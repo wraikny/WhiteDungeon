@@ -89,23 +89,28 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     do
+        let playersImagesMap =
+            gameViewSetting.occupationSetting
+            |> Map.map (fun _ x -> x.characterImages)
         // Players
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new PlayerView(gameViewSetting)
+                    create = fun () -> new PlayerView(playersImagesMap)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
                 }))
         |> ignore
+
+        let enemiesImagesMap = ()
 
         // Enemies
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getEnemies)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new EnemyView(gameViewSetting)
+                    create = fun () -> new EnemyView(gameModel.gameSetting, gameViewSetting)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Enemies Updater"
                 }))

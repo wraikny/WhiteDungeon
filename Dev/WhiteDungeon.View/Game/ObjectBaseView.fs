@@ -20,7 +20,7 @@ open FSharpPlus.Math.Applicative
 type ObjectBaseView< 'a
     when 'a : equality
     and 'a : comparison
-    >(imagesMap : Map<_, OccupationViewSetting>) =
+    >(imagesMap : Map<_, ActorImages<_, _>>) =
     inherit asd.GeometryObject2D()
 
     let mutable lastPosition : float32 Vec2 = zero
@@ -101,5 +101,4 @@ type ObjectBaseView< 'a
 
             imagesMap
             |> Map.find textureKind
-            |> fun x -> x.characterImages
             |> moveAnimation.SetAnimationTextures

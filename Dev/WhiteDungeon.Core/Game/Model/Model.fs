@@ -24,7 +24,43 @@ type GameSceneMode =
     | GameFinished of back:bool
 
 
-type Model =
+type OccupationSetting =
+    {
+        status : ActorStatus
+        skill1 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+        skill2 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+
+        skill1CoolTime : uint16
+        skill2CoolTime : uint16
+    }
+
+
+and EnemySetting =
+    {
+        actorStatus : ActorStatus
+        skill : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+
+        visionAngle : float32
+        visionDistance : float32
+        chaseKind : ChaseKind
+
+        attackDistance : float32
+    }
+
+
+and GameSetting = {
+    dungeonCellSize : float32 Vec2
+    minPlayerCount : int
+    maxPlayerCount : int
+    binarySearchCountMovingOnWall : int
+    characterSize : float32 Vec2
+    damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
+    occupationSettings : Map<Occupation, OccupationSetting>
+    enemySettings : Map<EnemyKind, EnemySetting>
+}
+
+
+and Model =
     {
         count : uint32
 
@@ -39,7 +75,7 @@ type Model =
 
         skillList : Skill.SkillList
 
-        gameSetting : Model GameSetting_
+        gameSetting : GameSetting
 
         timePassed : bool
 
@@ -52,6 +88,13 @@ type Model =
 with
     static member SetSkillList (x, s) =
         { x with skillList = s }
+
+
+module OccupationSetting =
+    let inline skillOf kind x =
+        kind |> function
+        | Actor.Skill1 -> x.skill1CoolTime, x.skill1
+        | Actor.Skill2 -> x.skill2CoolTime, x.skill2
 
 
 module Model =
@@ -80,6 +123,7 @@ module Model =
                     walkSpeed = 10.0f
                     dashSpeed = 16.0f
                 }
+                EnemyKind.Slime
         )
         |> Map.ofSeq
 
@@ -107,8 +151,6 @@ module Model =
 
         dungeonFloor = 1u
     }
-
-type GameSetting = Model GameSetting_
 
 module GameSetting =
     open wraikny.Tart.Advanced

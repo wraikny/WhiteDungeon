@@ -85,3 +85,9 @@ type Character = {
 
 type EnemyKind =
     | Slime
+
+with
+    static member FromInt i =
+        i |> function
+        | 0 -> Slime
+        | _ -> invalidArg "i" (sprintf "%d is Out of Range" i)

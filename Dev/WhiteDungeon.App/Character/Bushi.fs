@@ -14,7 +14,7 @@ open WhiteDungeon.View
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
-let setting : Model OccupationSetting = {
+let setting : OccupationSetting = {
     status =
         {
             Model.ActorStatus.level = 1

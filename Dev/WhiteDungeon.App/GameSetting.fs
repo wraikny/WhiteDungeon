@@ -28,4 +28,22 @@ let gameSetting : Model.GameSetting = {
     occupationSettings = Map.ofList [
         Model.Bushi, Character.Bushi.setting
     ]
+
+    enemySettings = Map.ofList [
+        Model.EnemyKind.Slime, {
+            EnemySetting.actorStatus = {
+                Model.ActorStatus.level = 1
+                hp = 30.0f
+                walkSpeed = 4.0f
+                dashSpeed = 6.0f
+            }
+            skill = fun model actor -> []
+
+            visionAngle = 360.0f
+            visionDistance = 1000.0f
+            chaseKind = Model.Actor.ChaseKind.Losable Actor.AfterLoseSight.ChaseLosePoint
+
+            attackDistance = 200.0f
+        }
+    ]
 }
