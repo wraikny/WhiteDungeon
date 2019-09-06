@@ -58,7 +58,7 @@ let playerView (model : Model) =
         model.setting.gameViewSetting.occupationSetting
         |> Map.find x
         |> fun x -> x.name
-    let status = (model.setting.gameSetting.occupationSettings |> Map.find x).status
+    let status = (model.setting.gameSetting.occupationSettings |> HashMap.find x).status
     [
         Text(sprintf "名前: %s" <| Option.defaultValue "Player1" model.playerName)
         Text(sprintf "キャラクター: %s" occupationName)

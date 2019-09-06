@@ -24,8 +24,8 @@ let appSetting : View.AppSetting = {
     windowSize = windowSize
 
     menuSceneSetting =
-        let createButtonColor col x y z =
-            let c a = col |>> float32 |>> ( * ) a |>> byte |> Vec3.toColor
+        let createButtonColor (col : byte Vec3) x y z =
+            let c a = col |>> float32 |>> ( * ) a |> map byte |> Vec3.toColor
             {
                 defaultColor = c x
                 hoverColor = c y

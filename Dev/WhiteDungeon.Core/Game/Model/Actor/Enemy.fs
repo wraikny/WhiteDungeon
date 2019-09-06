@@ -5,6 +5,12 @@ open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
+type EnemyMode =
+    | FreeMoving
+    | Chasing of PlayerID
+    | AfterChasing of float32 Vec2
+
+
 type Enemy =
     {
         actor : Actor
@@ -12,7 +18,9 @@ type Enemy =
 
         kind : EnemyKind
 
-        lookAngle : float32
+        lookAngleRadian : float32
+
+        mode : EnemyMode
     }
 
 with
@@ -27,10 +35,12 @@ with
 
 
 module Enemy =
-    let init size position id actorStatus kind = {
+    let init size position id actorStatus kind angle = {
         actor = Actor.Actor.init size position (Actor.OfEnemyID id) actorStatus
         id = id
         kind = kind
 
-        lookAngle = Angle.pi * 0.5f
+        lookAngleRadian = angle
+
+        mode = FreeMoving
     }

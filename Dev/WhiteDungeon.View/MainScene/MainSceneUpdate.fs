@@ -107,7 +107,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
                             let status =
                                 model.setting.gameSetting.occupationSettings
-                                |> Map.find occupation
+                                |> HashMap.find occupation
                                 |> fun x -> x.status
 
                             let character : Model.Character = {

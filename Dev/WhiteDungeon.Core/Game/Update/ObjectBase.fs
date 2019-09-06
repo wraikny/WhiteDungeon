@@ -10,6 +10,7 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
+//open FSharpPlus.Math.Applicative
 
 
 let inline setDirection (direction) (obj : ObjectBase) =
@@ -117,6 +118,66 @@ let inline private moveWithBS
 let inline moveXYTogether a = moveWithBS bsDiffXYTogether a
 
 let inline moveXYAnother a = moveWithBS bsDiffXYAnother a
+
+
+let inline moveReflectable
+    (gameSetting : GameSetting)
+    (dungeonModel : Dungeon.DungeonModel)
+    (diff0) (x : ^a)
+    =
+    let obj = ObjectBase.get x
+    let area = obj |> ObjectBase.area
+    let lu, rd = area |> Rect.get_LU_RD
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+
+    let objectAreaPoints = [|lu; rd; ld; ru|]
+
+    let isInside = GameSetting.insideDungeon gameSetting dungeonModel
+
+    let isCollided =
+        objectAreaPoints
+        |>> ((+) diff0)
+        |> isInside
+        |> not
+
+    let calcDiff f =
+        f
+            gameSetting.binarySearchCountMovingOnWall
+            (fun newDiff ->
+                objectAreaPoints
+                |>> ((+) newDiff)
+                |> isInside
+            )
+            diff0
+            obj.position
+
+    let diff, reflectedDir =
+        if isCollided then
+            let diffSlide = calcDiff bsDiffXYAnother
+
+            let diff = calcDiff bsDiffXYTogether
+
+            let tangent = Vector.normalize(diffSlide - diff)
+
+            let reflectedDir =
+                let dir = Vector.normalize diff
+                (2.0f * (Vector.dot dir tangent) *. tangent) - dir
+
+
+            let restLength = Vector.length diff - Vector.length diff0
+
+
+            diff + restLength *. reflectedDir, Some reflectedDir
+        else
+            diff0, None
+
+    
+    x
+    |> ObjectBase.map (
+        ObjectBase.mapPosition ((+) diff)
+        >> setDirection (MoveDirection.fromVector diff0)
+        >> fun x -> { x with isMoved = true }
+    ), reflectedDir
 
 
 let inline setVelocity velocity (obj : ObjectBase) =

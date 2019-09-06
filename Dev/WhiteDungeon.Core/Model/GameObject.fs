@@ -88,6 +88,6 @@ type EnemyKind =
 
 with
     static member FromInt i =
-        i |> function
+        (i % 1) |> function
         | 0 -> Slime
         | _ -> invalidArg "i" (sprintf "%d is Out of Range" i)

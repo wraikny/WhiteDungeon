@@ -3,6 +3,7 @@
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
+open wraikny.Tart.Helper.Collections
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.UI
 open WhiteDungeon
@@ -29,11 +30,11 @@ let gameSetting : Model.GameSetting = {
     damageCalculation = fun v invoker target ->
         v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
 
-    occupationSettings = Map.ofList [
+    occupationSettings = HashMap.ofList [
         Model.Bushi, Character.Bushi.setting
     ]
 
-    enemySettings = Map.ofList [
+    enemySettings = HashMap.ofList [
         Model.EnemyKind.Slime, {
             EnemySetting.actorStatus = {
                 Model.ActorStatus.level = 1
@@ -46,6 +47,7 @@ let gameSetting : Model.GameSetting = {
             visionAngleRate = 0.125f
             visionDistance = 1000.0f
             chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
+            freeMove = FreeMove.Forward
 
             attackDistance = 200.0f
         }

@@ -1,6 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Game.Update
 
 open wraikny.Tart.Helper.Extension
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 
@@ -82,6 +83,40 @@ module Update =
         }
         |> Skill.SkillList.map(Skill.SkillList.append (emits))
 
+
+    let updateEnemies model =
+        let playerPoses =
+            model.players
+            |> Map.toSeq
+            |>> (fun (_, p) -> ObjectBase.position p)
+            |> toList
+
+        model
+        |> mapEnemy (fun enemy ->
+            let pos = ObjectBase.position enemy
+            let d = model.gameSetting.enemyUpdateDistance
+            enemy
+            |> ifThen
+                (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d ))
+                (Actor.Enemy.update model)
+        )
+
+    let checkGateCollision model =
+        model.players
+        |> Map.toSeq
+        |>> ( snd >> ObjectBase.get )
+        |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
+        |> function
+        | true ->
+            if model.lastCollidedGate then
+                { model with lastCollidedGate = true }
+            else
+                { model with
+                    mode = Stair
+                    lastCollidedGate = true  }
+        | false ->
+            { model with lastCollidedGate = false }
+
     let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
         let model = { model with timePassed = false }
 
@@ -91,22 +126,7 @@ module Update =
         | TimePasses ->
             model
             |> updateEachPlayer Actor.Player.update
-            |> fun model ->
-                let playerPoses =
-                    model.players
-                    |> Map.toSeq
-                    |>> (fun (_, p) -> ObjectBase.position p)
-                    |> toList
-
-                model
-                |> mapEnemy (fun enemy ->
-                    let pos = ObjectBase.position enemy
-                    let d = model.gameSetting.enemyUpdateDistance
-                    enemy
-                    |> ifThen
-                        (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d ))
-                        Actor.Enemy.update
-                )
+            |> updateEnemies
             |> Skill.SkillList.update
             |> applySkills
             |> fun m -> { m with timePassed = true }
@@ -118,21 +138,9 @@ module Update =
                 |> function
                 | false -> { m with mode = GameFinished false }
                 | true ->
-                    m.players
-                    |> Map.toSeq
-                    |>> ( snd >> ObjectBase.get )
-                    |> exists(ObjectBase.collidedCells model.gameSetting model.dungeonGateCells)
-                    |> function
-                    | true ->
-                        if m.lastCollidedGate then
-                            { m with lastCollidedGate = true }
-                        else
-                            { m with
-                                mode = Stair
-                                lastCollidedGate = true  }
-                    | false ->
-                        { m with lastCollidedGate = false }
-            |> fun model -> model, Cmd.none
+                    checkGateCollision m
+
+            , Cmd.none
 
         | PlayerInputs (playerId, inputSet) ->
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
@@ -154,7 +162,7 @@ module Update =
 
             let coolTime, skill =
                 model.gameSetting.occupationSettings
-                |> Map.find player.character.currentOccupation
+                |> HashMap.find player.character.currentOccupation
                 |> OccupationSetting.skillOf kind
             
 

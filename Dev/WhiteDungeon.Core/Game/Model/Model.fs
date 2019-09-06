@@ -6,6 +6,7 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Advanced
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
@@ -35,6 +36,15 @@ type ChaseKind =
     | ChaseTrace of time:float32
 
 
+type FreeMove =
+    | Forward
+
+
+type EnemyInits = {
+    kind : int
+    lookAngleRadian : float32
+}
+
 
 type OccupationSetting =
     {
@@ -55,6 +65,7 @@ and EnemySetting =
         visionAngleRate : float32
         visionDistance : float32
         chaseKind : ChaseKind
+        freeMove : FreeMove
 
         attackDistance : float32
     }
@@ -68,8 +79,8 @@ and GameSetting = {
     enemyUpdateDistance : float32
     characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
-    occupationSettings : Map<Occupation, OccupationSetting>
-    enemySettings : Map<EnemyKind, EnemySetting>
+    occupationSettings : HashMap<Occupation, OccupationSetting>
+    enemySettings : HashMap<EnemyKind, EnemySetting>
 }
 
 
@@ -121,10 +132,10 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let cellsToEnemies (enemyCells : (int * int Vec2) []) cellSize =
+    let cellsToEnemies (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
-        |> Seq.map(fun (index, (i, cell)) ->
+        |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
             enemyId
             , Actor.Enemy.init
@@ -136,7 +147,8 @@ module Model =
                     walkSpeed = 10.0f
                     dashSpeed = 16.0f
                 }
-                EnemyKind.Slime
+                (EnemyKind.FromInt ei.kind)
+                ei.lookAngleRadian
         )
         |> Map.ofSeq
 
@@ -193,16 +205,12 @@ module GameSetting =
         insideCells gameSetting dungeonModel.cells
 
 module Dungeon =
-    type EnemyInits = {
-        kind : int
-        lookAngle : float32 // 0.0f ~ 1.0f
-    }
 
     type GeneratedDungeonParams = {
         dungeonBuilder : DungeonBuilder
         dungeonModel : DungeonModel
         gateCells : int Vec2 Set
-        enemyCells : (int * int Vec2) []
+        enemyCells : (EnemyInits * int Vec2) []
         initPosition : float32 Vec2
     }
 
@@ -281,8 +289,18 @@ module Dungeon =
                 *)
 
 
-                let! enemyCellIndexs=
+                let! enemyCellIndexs =
                     Random.list smallRoomsCount smallRoomGen
+
+                let! enemyInints =
+                    Random.list smallRoomsCount ( monad {
+                        let! kind = Random.int 0 maxValue<int>
+                        let! angle = Random.double01
+                        return {
+                            EnemyInits.kind = kind
+                            lookAngleRadian = 2.0f * Angle.pi * float32 angle
+                        }
+                    })
 
                 let enemyCells =
                     seq {
@@ -290,7 +308,8 @@ module Dungeon =
                             let cells = space |> Space.cells
                             let cellIndex = (enemyCellIndexs : int list).[index]
                             let cell = fst cells.[ cellIndex % length cells]
-                            (cellIndex, cell)
+                            let ei = (enemyInints : _ list).[index]
+                            (ei, cell)
                     }
                     |> Seq.toArray
 

@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
@@ -66,7 +67,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
 
             if kind <> currentKind then
                 kind <- currentKind
-                enemySetting <- gameSetting.enemySettings |> Map.find viewModel.enemy.kind
+                enemySetting <- gameSetting.enemySettings |> HashMap.find viewModel.enemy.kind
 
                 visionArc.EndingCorner <-
                     int (enemySetting.visionAngleRate * float32 visionArc.NumberOfCorners)
@@ -78,7 +79,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
             this.UpdateActorView(viewModel.actorView)
 
             if this.EnabledVisionView then
-                let lookAngle = viewModel.enemy.lookAngle
+                let lookAngle = viewModel.enemy.lookAngleRadian
 
                 if abs(lookAngle - lastLookAngle) > 0.001f then
                     lastLookAngle <- lookAngle
