@@ -187,7 +187,7 @@ module Update =
                 mode = GameSceneMode.GameMode
                 enemies =
                     Model.cellsToEnemies
-                        model.gameSetting.enemySettings
+                        model.gameSetting
                         dungeonParams.enemyCells
                         model.gameSetting.dungeonCellSize
 

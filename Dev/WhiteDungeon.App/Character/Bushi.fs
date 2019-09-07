@@ -122,7 +122,7 @@ let setting : OccupationSetting = {
     skill2CoolTime = 60us
 }
 
-let images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+let private images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
 
 let viewSetting =
     {

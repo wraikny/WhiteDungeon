@@ -1,6 +1,7 @@
 ﻿namespace WhiteDungeon.View
 
 open wraikny.Tart.Helper
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
@@ -91,7 +92,7 @@ type ObjectViewSetting =
     }
 
 type GameViewSetting = {
-    occupationSetting : Map<Occupation, ObjectViewSetting>
+    occupationSetting : HashMap<Occupation, ObjectViewSetting>
     bgms : string list
 
     gameUIFrameColor : byte Vec4

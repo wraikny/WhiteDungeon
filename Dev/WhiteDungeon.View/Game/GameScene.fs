@@ -92,7 +92,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     do
         let playersImagesMap =
             gameViewSetting.occupationSetting
-            |> Map.map (fun _ x -> x.characterImages)
+            |> HashMap.map (fun _ x -> x.characterImages)
         // Players
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getPlayers)

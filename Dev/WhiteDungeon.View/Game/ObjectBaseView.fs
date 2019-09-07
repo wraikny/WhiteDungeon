@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
@@ -20,7 +21,7 @@ open FSharpPlus.Math.Applicative
 type ObjectBaseView< 'a
     when 'a : equality
     and 'a : comparison
-    >(imagesMap : Map<_, ActorImages<_, _>>) =
+    >(imagesMap : HashMap<_, ActorImages<_, _>>) =
     inherit asd.GeometryObject2D()
 
     let mutable lastPosition : float32 Vec2 = zero
@@ -109,5 +110,5 @@ type ObjectBaseView< 'a
             lastTextureKind <- Some textureKind
 
             imagesMap
-            |> Map.tryFind textureKind
+            |> HashMap.tryFind textureKind
             |> iter moveAnimation.SetAnimationTextures

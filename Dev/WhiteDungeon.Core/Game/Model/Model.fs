@@ -81,6 +81,8 @@ and GameSetting = {
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : HashMap<Occupation, OccupationSetting>
     enemySettings : HashMap<EnemyKind, EnemySetting>
+
+    intToEnemy : (int -> EnemyKind)
 }
 
 
@@ -132,18 +134,18 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let cellsToEnemies (enemySettings : HashMap<EnemyKind, EnemySetting>) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
+    let cellsToEnemies (gameSetting : GameSetting) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
-            let kind = EnemyKind.FromInt ei.kind
+            let kind = gameSetting.intToEnemy ei.kind
             enemyId
             , Actor.Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
-                (enemySettings |> HashMap.find kind).actorStatus
+                (gameSetting.enemySettings |> HashMap.find kind).actorStatus
                 kind
                 ei.lookAngleRadian
         )
@@ -158,7 +160,7 @@ module Model =
 
         enemies =
             cellsToEnemies
-                gameSetting.enemySettings
+                gameSetting
                 enemyCells
                 gameSetting.dungeonCellSize
 

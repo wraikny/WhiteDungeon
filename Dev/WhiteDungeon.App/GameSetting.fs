@@ -17,6 +17,27 @@ open WhiteDungeon.Core.Game.Model.Actor.Skill
 open FSharpPlus.Math.Applicative
 open FSharpPlus
 
+let enemies = [
+    "Slime", {
+        EnemySetting.actorStatus = {
+            Model.ActorStatus.level = 1
+            hp = 50.0f
+            walkSpeed = 2.0f
+            dashSpeed = 4.0f
+        }
+        skill = fun model actor -> []
+
+        visionAngleRate = 0.125f
+        visionDistance = 1000.0f
+        chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
+        freeMove = FreeMove.Forward
+
+        attackDistance = 100.0f
+    }
+]
+
+let enemiesCount = enemies.Length
+
 let gameSetting : Model.GameSetting = {
     Model.GameSetting.dungeonCellSize = Vec2.init 250.0f 250.0f
     minPlayerCount = 1
@@ -31,25 +52,11 @@ let gameSetting : Model.GameSetting = {
         v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
 
     occupationSettings = HashMap.ofList [
-        Model.Bushi, Character.Bushi.setting
+        Character.Bushi.viewSetting.name, Character.Bushi.setting
     ]
 
-    enemySettings = HashMap.ofList [
-        Model.EnemyKind.Slime, {
-            EnemySetting.actorStatus = {
-                Model.ActorStatus.level = 1
-                hp = 200.0f
-                walkSpeed = 2.0f
-                dashSpeed = 4.0f
-            }
-            skill = fun model actor -> []
+    enemySettings = HashMap.ofList enemies
 
-            visionAngleRate = 0.125f
-            visionDistance = 1000.0f
-            chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
-            freeMove = FreeMove.Forward
-
-            attackDistance = 50.0f
-        }
-    ]
+    intToEnemy = fun i ->
+        enemies.[i % enemiesCount] |> fst
 }

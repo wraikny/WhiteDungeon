@@ -116,7 +116,10 @@ let initModel env (setting : View.AppSetting) =
         occupationListToggle = false
 
         playerName = None
-        selectOccupation = Occupation.DefaultValue
+        selectOccupation =
+            setting.gameViewSetting.occupationSetting
+            |> HashMap.toList
+            |> fun x -> fst (x.[0])
 
         gateCount = zero
         dungeonBuilder =
@@ -145,4 +148,4 @@ let initModel env (setting : View.AppSetting) =
 
         msgHistory = []
     }
-    |> updateDungeonBuilder 2
+    |> updateDungeonBuilder 1

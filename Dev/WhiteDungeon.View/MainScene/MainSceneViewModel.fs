@@ -56,7 +56,7 @@ let playerView (model : Model) =
 
     let occupationName =
         model.setting.gameViewSetting.occupationSetting
-        |> Map.find x
+        |> HashMap.find x
         |> fun x -> x.name
     let status = (model.setting.gameSetting.occupationSettings |> HashMap.find x).status
     [
@@ -75,7 +75,7 @@ let selectUIChara (model : Model) : Msg MenuItem list =
         if model.occupationListToggle then
             yield!
                 model.setting.gameViewSetting.occupationSetting
-                |> Map.toSeq
+                |> HashMap.toSeq
                 |> Seq.map(fun (x, characterSetting) ->
                     Button(characterSetting.name, SelectOccupation x)
                 )

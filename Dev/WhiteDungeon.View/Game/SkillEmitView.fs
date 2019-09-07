@@ -2,6 +2,7 @@
 
 open wraikny
 open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
@@ -17,7 +18,7 @@ open FSharpPlus
 open FSharpPlus.Math.Applicative
 
 type SkillEmitView(gameViewSetting : GameViewSetting) =
-    inherit ObjectBaseView<unit>(Map.empty
+    inherit ObjectBaseView<unit>(HashMap.empty
         , EnabledSizeView = true
         , EnabledTextureView = false
     )

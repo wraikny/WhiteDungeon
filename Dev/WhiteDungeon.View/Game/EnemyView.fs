@@ -19,7 +19,7 @@ open FSharpPlus
 open FSharpPlus.Math.Applicative
 
 type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSetting, hpLayer) =
-    inherit ActorView<Model.EnemyKind>(Map.empty, hpLayer
+    inherit ActorView<Model.EnemyKind>(HashMap.empty, hpLayer
         #if DEBUG
         , EnabledSizeView = true
         #endif

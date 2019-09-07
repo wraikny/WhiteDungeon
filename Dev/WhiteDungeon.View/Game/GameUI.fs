@@ -133,8 +133,13 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
 
             let hpCurrent = int playerVM.actorView.statusCurrent.hp
             let hpDefault = int playerVM.actorView.statusDefault.hp
+
+            let occSetting =
+                gameViewSetting.occupationSetting
+                |> HashMap.find playerVM.character.currentOccupation
+
             playerStatusWindow.UIContents <- [
-                UI.Text (sprintf "%s / %A" playerVM.character.name playerVM.character.currentOccupation)
+                UI.Text (sprintf "%s / %s" playerVM.character.name occSetting.name )
                 UI.Text (sprintf "Level: %d" playerVM.actorView.statusCurrent.level)
                 UI.Text (sprintf "HP: %d/%d" hpCurrent hpDefault)
                 UI.Rect (5.0f, 0.8f * ViewModel.ActorView.hpRate playerVM.actorView)

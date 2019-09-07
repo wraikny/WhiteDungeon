@@ -1,5 +1,6 @@
 ﻿module WhiteDungeon.App.GameViewSetting
 
+open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
@@ -41,8 +42,10 @@ let gameViewSetting : View.GameViewSetting =
         //    Model.Bushi, Character.Bushi.images
         //] |> Map.ofList
         occupationSetting = [
-            Model.Bushi, Character.Bushi.viewSetting
-        ] |> Map.ofList
+            Character.Bushi.viewSetting
+        ]
+        |> Seq.map(fun x -> (x.name, x))
+        |> HashMap.ofSeq
 
         bgms = [
             "bgm/gensei_no_rakuen.ogg"
