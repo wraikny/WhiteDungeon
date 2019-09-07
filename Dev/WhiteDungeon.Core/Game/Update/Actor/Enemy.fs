@@ -1,23 +1,47 @@
 ﻿module WhiteDungeon.Core.Game.Update.Actor.Enemy
 
+open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Collections
+open wraikny.Tart.Advanced.Dungeon
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
+open WhiteDungeon.Core.Game.Update
 open WhiteDungeon.Core.Game.Update.Actor
 
-let inline setActor actor (enemy : Enemy) =
-    { enemy with actor = actor }
+let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
+    let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
+    let status =
+        enemy |> Actor.statusCurrent
+
+    let dir = Vec2.fromAngle enemy.lookAngleRadian
+    
+    setting.freeMove |> function
+    | FreeMove.Forward ->
+        let enemy, newDirection =
+            enemy |>
+                ObjectBase.moveReflectable
+                    gameSetting
+                    dungeonModel
+                    (dir .* status.walkSpeed)
+
+        newDirection |> function
+        | None -> enemy
+        | Some dir ->
+            let angle = Vec2.angle dir
+            { enemy with lookAngleRadian = angle }
 
 
-let inline updateActor f (enemy : Enemy) =
+let inline move (model : Model) enemy : Enemy =
+    enemy.mode |> function
+    | EnemyMode.FreeMoving ->
+        freeMove model.gameSetting model.dungeonModel enemy
+    | EnemyMode.Chasing target ->
+        enemy
+    | EnemyMode.AfterChasing target ->
+        enemy
+
+let inline update model enemy : Enemy =
     enemy
-    |> setActor (f enemy.actor)
-
-
-let inline updateObjectBase f (enemy : Enemy) =
-    enemy
-    |> setActor (enemy.actor |> Actor.updateObjectBase f)
-
-
-let inline update enemy : Enemy =
-    enemy
-    |> updateActor Actor.update
+    |> Actor.update
+    |> move model

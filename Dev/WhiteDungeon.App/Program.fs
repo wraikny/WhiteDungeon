@@ -1,44 +1,67 @@
-﻿module WhiteDungeon.App.Program
+module WhiteDungeon.App.Program
 
 open wraikny.Tart.Helper.Math
-open WhiteDungeon
+open wraikny.MilleFeuille.Fs.Math
+open WhiteDungeon.Core
+open WhiteDungeon.View
 
-open WhiteDungeon.Core.Game.Model.Skill
+open WhiteDungeon.App.Setting
+
+open System
 
 
 [<EntryPoint>]
 let main _ =
-    let viewSetting : View.ViewSetting = {
-        uiFontPath = "Font/mplus-1c-light.ttf"
-        menuButtonSize = new asd.Vector2DF(400.0f, 100.0f)
-        menuButtonFontSize = 70
+    try
+        let windowSize = appSetting.windowSize |> Vec2.toVector2DI
+        asd.Engine.Initialize(
+            "九十九のラビリンス"
+            , windowSize.X, windowSize.Y
+            , new asd.EngineOption(WindowPosition = asd.WindowPositionType.Centering)
+        )
+        |> function
+        | false ->
+            failwith "Failed at asd.Engine.Initialize"
+        | true ->
+    #if DEBUG
+            asd.Engine.File.AddRootDirectory("Resources")
+    #else
+            asd.Engine.File.AddRootPackageWithPassword("Resources.pack", "password")
+    #endif
 
-        messageFontSize = 70
+            let errorHandler = Utils.ErrorHandler()
 
-        titleText = "White Dungeon"
-        titleTextFontSize = 150
+            let scene = new MainScene.MainScene(errorHandler, appSetting)
 
-        button1 = new asd.Vector2DF(250.0f, 400.0f)
-        button2 = new asd.Vector2DF(250.0f, 550.0f)
-        button3 = new asd.Vector2DF(250.0f, 700.0f)
-    }
+            asd.Engine.ChangeScene(scene)
 
-    let windowSize = new asd.Vector2DI(16, 9) * 100
-    asd.Engine.Initialize("WhiteDungeon", windowSize.X, windowSize.Y, new asd.EngineOption())
-    |> ignore
+            let rec loop n =
+                if n < 0 then
+                    ()
+                else
+                    try
 
-    asd.Engine.File.AddRootDirectory("Resources")
+                        while asd.Engine.DoEvents() do
+                            asd.Engine.Update()
+                    with e ->
+                        errorHandler.CallBack(e)
+                        System.Console.WriteLine(e)
 
-    let scene = new View.Title.TitleScene(viewSetting)
+                        loop (n - 1)
 
-    asd.Engine.ChangeScene(scene)
+            loop 1
 
-    let rec loop() =
-        if asd.Engine.DoEvents() then
-            asd.Engine.Update()
-            loop()
+            asd.Engine.Terminate()
 
-    loop()
+    with
+    | e ->
+        // わからん……
+        // n : 1 ~ 3
+        // System.Exception: 未開放のインスタンスがn個存在します。 
+        // 場所 asd.Particular.Helper.ThrowUnreleasedInstanceException(Int32 count)
+        // 場所 asd.Engine.Terminate()
+        
+        Console.WriteLine(e)
+        Console.ReadLine() |> ignore
 
-    asd.Engine.Terminate()
     0

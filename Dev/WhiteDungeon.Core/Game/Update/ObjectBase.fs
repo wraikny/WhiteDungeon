@@ -9,50 +9,56 @@ open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
-let inline setPosition position (obj : ObjectBase) = {
-    obj with
-        position = position
-        lastPosition = obj.position
-}
+open FSharpPlus
+//open FSharpPlus.Math.Applicative
 
-let inline addPosition diff (obj : ObjectBase) =
-    obj |> setPosition (diff + obj.position)
-
-let inline setSize size (obj : ObjectBase) =
-    { obj with size = size }
-
-let inline addSize diff obj =
-    obj |> setSize (obj.size + diff)
 
 let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
-let insideDungeon
-    (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel) obj =
+
+let inline getCorners (obj : ObjectBase) =
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
-    
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+    [|lu; rd; ld; ru|]
+
+
+let collidedCell (gameSetting : GameSetting) (cell) obj =
+    GameSetting.collidedWithCell
+        gameSetting
+        cell
+        (getCorners obj)
+
+
+let collidedCells (gameSetting : GameSetting) (cells) obj =
+    GameSetting.collidedWiithCells
+        gameSetting
+        cells
+        (getCorners obj)
+
+let inline insideDungeon
+    (gameSetting : GameSetting)
+    (dungeonModel : Dungeon.DungeonModel) x =
     GameSetting.insideDungeon
         gameSetting
         dungeonModel
-        [|lu; rd; ld; ru|]
+        (getCorners (ObjectBase.get x))
 
 open WhiteDungeon.Core.Utils
 
-let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition =
-    BinarySearch.vector
+let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
+    BinarySearch.binarySearch
         bsCount
         isInside
         currentPosition
         (currentPosition + diff)
 
-let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
+let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     let searchDiff =
         (+) currentPosition
         >>
-        BinarySearch.vector
+        BinarySearch.binarySearch
             bsCount
             isInside
             currentPosition
@@ -65,17 +71,18 @@ let private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition =
         searchDiff { diff with x = 0.0f }
         |> Vec2.y
 
-    Vec2.init(diffX, diffY)
+    Vec2.init diffX diffY
 
-let private moveWithBS
+let inline private moveWithBS
     f
-    (gameSetting : Model.GameSetting)
+    (gameSetting : GameSetting)
     (dungeonModel : Dungeon.DungeonModel)
-    (diff) (obj : ObjectBase)
+    (diff0) (x : ^a)
     =
+    let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
     let lu, rd = area |> Rect.get_LU_RD
-    let ld, ru = lu + area.size * Vec2.init(0.0f, 1.0f), lu + area.size * Vec2.init(1.0f, 0.0f)
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 
@@ -83,7 +90,7 @@ let private moveWithBS
 
     let isCollided =
         objectAreaPoints
-        |> Array.map ((+) diff)
+        |>> ((+) diff0)
         |> isInside
         |> not
 
@@ -93,26 +100,89 @@ let private moveWithBS
                 gameSetting.binarySearchCountMovingOnWall
                 (fun newDiff ->
                     objectAreaPoints
-                    |> Array.map ((+) newDiff)
+                    |>> ((+) newDiff)
                     |> isInside
                 )
-                diff
+                diff0
                 obj.position
         else
-            diff
+            diff0
     
-    obj
-    |> addPosition (diff)
-    |> setDirection (MoveDirection.fromVector diff), isCollided
+    x
+    |> ObjectBase.map (
+        ObjectBase.mapPosition ((+) diff)
+        >> setDirection (MoveDirection.fromVector diff0)
+        >> fun x -> { x with isMoved = true }
+    ), isCollided
 
-let moveXYTogether = moveWithBS bsDiffXYTogether
+let inline moveXYTogether a = moveWithBS bsDiffXYTogether a
 
-let moveXYAnother = moveWithBS bsDiffXYAnother
+let inline moveXYAnother a = moveWithBS bsDiffXYAnother a
+
+
+let inline moveReflectable
+    (gameSetting : GameSetting)
+    (dungeonModel : Dungeon.DungeonModel)
+    (diff0) (x : ^a)
+    =
+    let obj = ObjectBase.get x
+    let area = obj |> ObjectBase.area
+    let lu, rd = area |> Rect.get_LU_RD
+    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+
+    let objectAreaPoints = [|lu; rd; ld; ru|]
+
+    let isInside = GameSetting.insideDungeon gameSetting dungeonModel
+
+    let isCollided =
+        objectAreaPoints
+        |>> ((+) diff0)
+        |> isInside
+        |> not
+
+    let calcDiff f =
+        f
+            gameSetting.binarySearchCountMovingOnWall
+            (fun newDiff ->
+                objectAreaPoints
+                |>> ((+) newDiff)
+                |> isInside
+            )
+            diff0
+            obj.position
+
+    let diff, reflectedDir =
+        if isCollided then
+            let diffSlide = calcDiff bsDiffXYAnother
+
+            let diff = calcDiff bsDiffXYTogether
+
+            let tangent = Vector.normalize(diffSlide - diff)
+
+            let reflectedDir =
+                let dir = Vector.normalize diff
+                (2.0f * (Vector.dot dir tangent) *. tangent) - dir
+
+            let restLength = Vector.length diff - Vector.length diff0
+
+            diff + ( reflectedDir .* (if restLength < 1.0f then 1.0f else restLength) )
+            , Some reflectedDir
+        else
+            diff0, None
+
+    
+    x
+    |> ObjectBase.map (
+        ObjectBase.mapPosition ((+) diff)
+        >> setDirection (MoveDirection.fromVector diff0)
+        >> fun x -> { x with isMoved = true }
+    ), reflectedDir
 
 
 let inline setVelocity velocity (obj : ObjectBase) =
     { obj with velocity = velocity }
 
-let inline update (obj : ObjectBase) =
-    obj
-    |> addPosition obj.velocity
+let inline update (o : ^a) =
+    o
+    |> ObjectBase.mapPosition ( (+) (ObjectBase.velocity o))
+    |> ObjectBase.map( fun x -> { x with isMoved = false } )

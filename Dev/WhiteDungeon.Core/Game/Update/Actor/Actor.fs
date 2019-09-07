@@ -2,32 +2,23 @@
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 
-let inline setObjectBase (objectBase : Model.ObjectBase) (actor : Actor) =
-    { actor with objectBase = objectBase }
-
-
-let inline updateObjectBase f (actor : Actor) =
-    actor
-    |> setObjectBase (f actor.objectBase)
-
-
-let inline setActorStatusCurrent status actor : Actor =
-    { actor with statusCurrent = status }
+open FSharpPlus
 
 let inline updateActorStatusCurrent f actor : Actor =
     { actor with statusCurrent = f actor.statusCurrent }
 
 
-let addHP damage (actor : Actor) =
+let addHP diff (actor : Actor) =
     let hp =
-        (actor.statusCurrent.hp + damage)
+        (actor.statusCurrent.hp + diff)
         |> max 0.0f
         |> min actor.statusDefault.hp
 
     actor
-    |> updateActorStatusCurrent(fun status ->
+    |> Actor.mapStatus (fun status ->
         { status with hp = hp }
     )
 
@@ -45,13 +36,12 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
     let direction = direction |> Vector.normalize
 
     actor
-    |> updateObjectBase(
-        Update.ObjectBase.moveXYAnother
+    |> fun x -> { x with currentMove = move }
+    |> Update.ObjectBase.moveXYAnother
             gameSetting
             dungeonModel
-            (speed .* direction)
-        >> fst
-    )
+            (speed *. direction)
+    |> fst
 
 //let calcStatusCurrent (actor : Actor) =
 //    let rec applyCorrection corrections result =
@@ -117,6 +107,9 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 //        actor
 //        |> setConditions conditions
 
-let inline update actor : Actor =
+open WhiteDungeon.Core.Game.Update
+
+let inline update (actor : ^a) =
     actor
+    |> ObjectBase.update
     //|> updateConditions

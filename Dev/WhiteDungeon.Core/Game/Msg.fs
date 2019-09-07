@@ -5,11 +5,7 @@ open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 
-
-[<Struct>]
-type ActorMove =
-    | Walk
-    | Dash
+open FSharpPlus
 
 
 [<Struct>]
@@ -27,6 +23,8 @@ type PlayerInput =
     | UpKey
     | DownKey
     | DashKey
+    //| Skill1Key
+    //| Skill2Key
 
 
 module PlayerInput =
@@ -39,34 +37,41 @@ module PlayerInput =
             DashKey
         ]
 
-    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : ActorMove * float32 Vec2 =
+    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : Actor.ActorMove * float32 Vec2 =
         let actorMove =
-            if inputSet |> Set.contains PlayerInput.DashKey then Dash else Walk
+            if inputSet |> Set.contains PlayerInput.DashKey then Actor.Dash else Actor.Walk
 
         let moveDirs = [|
-            UpKey, Vec2.init(0.0f, -1.0f)
-            DownKey, Vec2.init(0.0f, 1.0f)
-            RightKey, Vec2.init(1.0f, 0.0f)
-            LeftKey, Vec2.init(-1.0f, 0.0f)
+            UpKey, Vec2.init 0.0f -1.0f
+            DownKey, Vec2.init 0.0f 1.0f
+            RightKey, Vec2.init 1.0f 0.0f
+            LeftKey, Vec2.init -1.0f 0.0f
         |]
 
         let direction =
             moveDirs
-            |> Array.filter(fun (key, _) ->
+            |> filter (fun (key, _) ->
                 inputSet |> Set.contains key
             )
-            |> Array.map snd
-            |> Array.fold (+) (Vector.zero())
+            |>> snd
+            |> sum
             |> Vector.normalize
     
         actorMove, direction
 
 
+open wraikny.Tart.Advanced.Dungeon
+
 
 type Msg =
+    | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
-    #if DEBUG
-    /// for Debug
-    | AppendSkillEmits
-    #endif
+    | PlayerSkill of PlayerID * Actor.SkillKind
+    | GenerateNewDungeon
+    | GeneratedDungeonModel of DungeonBuilder * DungeonModel
+    | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
+    //#if DEBUG
+    ///// for Debug
+    //| AppendSkillEmits
+    //#endif

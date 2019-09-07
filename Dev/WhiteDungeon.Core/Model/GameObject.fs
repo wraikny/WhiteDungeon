@@ -15,7 +15,6 @@ type ActorStatus = {
     walkSpeed : Speed
     dashSpeed : Speed
 } with
-
     static member (+) (a, b) = {
         level = a.level + b.level
         hp = a.hp + b.hp
@@ -63,8 +62,12 @@ module ActorStatus =
         
 
 
-type Occupation =
-    | Hunter
+//type Occupation =
+//    //| Seeker
+//    | Bushi
+//with
+//    static member DefaultValue = Bushi
+type Occupation = string
 
 
 [<Struct>]
@@ -80,6 +83,12 @@ type Character = {
     occupations : Map<Occupation, ActorStatus>
 }
 
+type EnemyKind = string
+//type EnemyKind =
+//    | Slime
 
-type EnemyKind =
-    | Slime
+//with
+//    static member FromInt i =
+//        (i % 1) |> function
+//        | 0 -> Slime
+//        | _ -> invalidArg "i" (sprintf "%d is Out of Range" i)

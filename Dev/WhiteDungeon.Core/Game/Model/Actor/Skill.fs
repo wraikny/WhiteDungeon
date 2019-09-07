@@ -1,9 +1,10 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Skill
+﻿namespace WhiteDungeon.Core.Game.Model.Actor.Skill
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Game.Model.Actor
 
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
@@ -21,12 +22,22 @@ open WhiteDungeon.Core.Game.Model
 //    let priority c = c.priority
 
 
+type AreaTarget =
+    | Players
+    | Enemies
+    | All
+
+
 type Effect =
     // | AddConditions of Condition list
-    | Damage of (GameSetting -> ActorStatus -> ActorStatus -> float32)
+    | Damage of float32
+    | AddHP of float32
+    | DamageF of (Actor -> Actor -> float32)
+    | F of (Actor -> Actor -> (Actor * SkillEmit []))
 
 
-type SkillBase = {
+
+and SkillBase = {
     invokerActor : Actor.Actor
 
     delay : uint32
@@ -34,7 +45,7 @@ type SkillBase = {
 }
 
 
-type 'ID IDSkill when 'ID : comparison = {
+and 'ID IDSkill when 'ID : comparison = {
     skillBase : SkillBase
 
     targetIDs : 'ID Set
@@ -42,56 +53,46 @@ type 'ID IDSkill when 'ID : comparison = {
     frame : uint32
 }
 
+and AreaSkill =
+    {
+        skillBase : SkillBase
+        objectBase : ObjectBase
 
-type SkillBaseBuilder = {
+        target : AreaTarget
+        removeWhenHitWall : bool
+        removeWhenHitActor : bool
+
+        move : EmitMove list
+
+        emits : AreaSkillBuilder []
+        collidedActors : Set<Actor.ActorID>
+
+        frame : uint32
+        frameFirst : uint32
+    }
+with
+    static member inline SetObjectBase (x : AreaSkill, y : ObjectBase) =
+        { x with objectBase = y }
+
+
+
+and SkillEmit =
+    // | IDPlayer of PlayerID IDSkill
+    // | IDEnemy of EnemyID IDSkill
+    | Area of AreaSkill
+
+
+and SkillBaseBuilder = {
     delay : uint32
     effects : Effect []
 }
 
-module SkillBaseBuilder =
-    let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
-        {
-            invokerActor = invoker
-            delay = builder.delay
-            effects = builder.effects
-        }
 
-
-type IDSkillBuilder = {
+and IDSkillBuilder = {
     skillBase : SkillBaseBuilder
     
     targetIDs : Actor.ActorID Set
     frame : uint32
-}
-
-
-type AreaTarget =
-    | Players
-    | Enemies
-    | All
-
-type EmitMove =
-    | Stay
-    | Move of float32 Vec2
-    | Scale of float32 Vec2
-    | Generate of (AreaSkill -> AreaSkillBuilder [])
-
-
-and AreaSkill = {
-    skillBase : SkillBase
-    objectBase : ObjectBase
-
-    target : AreaTarget
-    removeWhenHitWall : bool
-    removeWhenHitActor : bool
-
-    move : EmitMove list
-
-    emits : AreaSkillBuilder []
-    collidedActors : Set<Actor.ActorID>
-
-    frame : uint32
-    frameFirst : uint32
 }
 
 and AreaSkillBuilder = {
@@ -104,6 +105,21 @@ and AreaSkillBuilder = {
     
     move : EmitMove list
 }
+
+
+and EmitMove =
+    | Stay
+    | Move of float32 Vec2
+    | Scale of float32 Vec2
+    | Generate of (AreaSkill -> AreaSkillBuilder [])
+
+module SkillBaseBuilder =
+    let build (invoker) (builder : SkillBaseBuilder) : SkillBase =
+        {
+            invokerActor = invoker
+            delay = builder.delay
+            effects = builder.effects
+        }
 
 module AreaSkillBuilder =
     let build (invoker) (builder : AreaSkillBuilder) : AreaSkill =
@@ -127,12 +143,6 @@ module AreaSkillBuilder =
             frame = frame
             frameFirst = frame
         }
-
-
-type SkillEmit =
-    // | IDPlayer of PlayerID IDSkill
-    // | IDEnemy of EnemyID IDSkill
-    | Area of AreaSkill
 
 module SkillEmit =
     let inline skillBase s =
@@ -170,7 +180,7 @@ type SkillList =
     }
 
 module SkillList =
-    let inline init() =
+    let init =
         let m = Map.empty
         {
             nextID = 0u
@@ -181,3 +191,12 @@ module SkillList =
             areaEnemy = m
             areaAll = m
         }
+
+    let inline get (x : ^a) : SkillList =
+        (^a : (member skillList : _) x)
+
+    let inline set skillList (x : ^a) : ^a =
+        (^a : (static member SetSkillList : _*_->_) (x, skillList))
+
+    let inline map f x =
+        set (f (get x)) x

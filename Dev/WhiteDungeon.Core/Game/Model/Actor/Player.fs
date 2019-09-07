@@ -4,37 +4,53 @@ open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 
 
-type Player = {
-    actor : Actor
+type SkillKind = Skill1 | Skill2
 
-    id : PlayerID
-    character : Character
-}
+
+type Player =
+    {
+        actor : Actor
+
+        id : PlayerID
+        character : Character
+
+        skill1CoolTime : uint16
+        skill2CoolTime : uint16
+    }
+
+with
+    member inline x.objectBase =
+        x.actor.objectBase
+
+    static member inline SetActor (x : Player, y) =
+        { x with actor = y }
+
+    static member inline SetObjectBase (x : Player, y) =
+        Actor.map (ObjectBase.set y) x
+
 
 module Player =
-    let inline actor (player : Player) = player.actor
-
     let inline id (player : Player) = player.id
 
     let inline character (player : Player) = player.character
 
-    let inline objectBase (player : Player) = player.actor.objectBase
-
     let inline init size position actorStatus id character = {
-        actor = Actor.Actor.init size position (Actor.Player id) actorStatus
+        actor = Actor.Actor.init size position (Actor.OfPlayerID id) actorStatus
         id = id
         character = character
+
+        skill1CoolTime = 0us
+        skill2CoolTime = 0us
     }
 
+    let inline coolTime kind player =
+        kind |> function
+        | Skill1 -> player.skill1CoolTime
+        | Skill2 -> player.skill2CoolTime
 
-open wraikny.Tart.Helper.Math
-
-
-//module PlayerBuilder =
-//    let inline build size position id actorStatus (character : Character) =
-//        Player.init
-//            size
-//            position
-//            actorStatus
-//            id
-//            character
+    let inline mapCoolTime kind f player =
+        kind |> function
+        | Skill1 ->
+            { player with skill1CoolTime = f player.skill1CoolTime }
+        | Skill2 ->
+            { player with skill2CoolTime = f player.skill2CoolTime }
