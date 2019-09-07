@@ -164,7 +164,7 @@ module Model =
                 enemyCells
                 gameSetting.dungeonCellSize
 
-        skillList = Skill.SkillList.init()
+        skillList = Skill.SkillList.init
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel

@@ -180,7 +180,7 @@ type SkillList =
     }
 
 module SkillList =
-    let inline init() =
+    let init =
         let m = Map.empty
         {
             nextID = 0u

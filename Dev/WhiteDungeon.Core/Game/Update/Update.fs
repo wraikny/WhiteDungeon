@@ -191,6 +191,8 @@ module Update =
                         dungeonParams.enemyCells
                         model.gameSetting.dungeonCellSize
 
+                skillList = Model.Actor.Skill.SkillList.init
+
                 dungeonBuilder = dungeonParams.dungeonBuilder
                 dungeonModel = dungeonParams.dungeonModel
                 dungeonGateCells = dungeonParams.gateCells

@@ -14,6 +14,18 @@ open wraikny.Tart.Helper.Extension
 
 open System.Collections.Generic
 
+type SkillResult =
+    {
+        emits : SkillEmit []
+    }
+
+module SkillResult =
+    let append a b =
+        {
+            emits = Array.append a.emits b.emits
+        }
+
+
 module Effect =
     let apply
         (gameSetting : GameSetting)
