@@ -79,7 +79,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
             this.UpdateActorView(viewModel.actorView)
 
             if this.EnabledVisionView then
-                let lookAngle = viewModel.enemy.lookAngleRadian
+                let lookAngle = viewModel.enemy.lookingRadian
 
                 if abs(lookAngle - lastLookAngle) > 0.001f then
                     lastLookAngle <- lookAngle

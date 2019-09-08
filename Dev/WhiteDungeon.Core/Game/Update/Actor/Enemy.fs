@@ -14,7 +14,7 @@ let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : E
     let status =
         enemy |> Actor.statusCurrent
 
-    let dir = Vec2.fromAngle enemy.lookAngleRadian
+    let dir = Vec2.fromAngle enemy.lookingRadian
     
     setting.freeMove |> function
     | FreeMove.Forward ->
@@ -29,7 +29,7 @@ let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : E
         | None -> enemy
         | Some dir ->
             let angle = Vec2.angle dir
-            { enemy with lookAngleRadian = angle }
+            { enemy with lookingRadian = angle }
 
 
 let inline move (model : Model) enemy : Enemy =

@@ -140,14 +140,17 @@ module Model =
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
             let kind = gameSetting.intToEnemy ei.kind
+            let setting = gameSetting.enemySettings |> HashMap.find kind
             enemyId
             , Actor.Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
-                (gameSetting.enemySettings |> HashMap.find kind).actorStatus
+                setting.actorStatus
                 kind
                 ei.lookAngleRadian
+                setting.visionDistance
+                setting.visionAngleRate
         )
         |> Map.ofSeq
 
