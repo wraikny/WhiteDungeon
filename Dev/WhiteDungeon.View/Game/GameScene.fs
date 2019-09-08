@@ -112,8 +112,6 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 }))
         |> ignore
 
-        let enemiesImagesMap = ()
-
         // Enemies
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getEnemies)

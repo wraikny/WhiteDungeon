@@ -49,8 +49,8 @@ type EnemyInits = {
 type OccupationSetting =
     {
         status : ActorStatus
-        skill1 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
-        skill2 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+        skill1 : Model -> Actor.Player -> Skill.SkillEmitBuilder list
+        skill2 : Model -> Actor.Player -> Skill.SkillEmitBuilder list
 
         skill1CoolTime : uint16
         skill2CoolTime : uint16
@@ -60,7 +60,8 @@ type OccupationSetting =
 and EnemySetting =
     {
         actorStatus : ActorStatus
-        skill : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+        skillCoolTime : uint16
+        skill : Model -> Actor.Enemy -> Skill.SkillEmitBuilder list
 
         visionAngleRate : float32
         visionDistance : float32
@@ -68,6 +69,7 @@ and EnemySetting =
         freeMove : FreeMove
 
         attackDistance : float32
+        attackRange : float32
     }
 
 

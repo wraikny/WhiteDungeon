@@ -158,10 +158,10 @@ type SkillEmitBuilder =
 
 
 module SkillEmitBuilder =
-    let build invoker (builder) : SkillEmit =
+    let inline build invoker (builder) : SkillEmit =
         builder |> function
         | AreaBuilder area ->
-            AreaSkillBuilder.build invoker area
+            AreaSkillBuilder.build (Actor.get invoker) area
             |> Area
 
 

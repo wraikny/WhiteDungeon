@@ -30,6 +30,8 @@ type Enemy =
 
         //target : PlayerID option
 
+        skillCoolTime : uint16
+
         hateMap : Map<PlayerID, float32>
     }
 
@@ -57,10 +59,11 @@ module Enemy =
 
         mode = FreeMoving
 
-        //target = None
+        skillCoolTime = 0us
 
         hateMap = Map.empty
     }
+
 
     let inline lookingDirection (enemy : Enemy) =
         enemy.lookingRadian

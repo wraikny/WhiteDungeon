@@ -14,6 +14,8 @@ open WhiteDungeon.Core.Game.Update
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
+open System.Collections.Generic
+
 module Update =
     let inline incrCount (model : Model) : Model =
         { model with count = model.count + 1u }
@@ -49,7 +51,7 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let appendSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) (model : Model) : Model =
+    let inline appendSkills (actor : ^a) (skills : ^a -> Skill.SkillEmitBuilder list) (model : Model) : Model =
         model |> Skill.SkillList.map(
             SkillList.appendActorSkills actor skills
         )
@@ -62,6 +64,9 @@ module Update =
             |>> (fun (_, p) -> ObjectBase.position p)
             |> toList
 
+        // mutable
+        let skillEmits = List<_>()
+
         let enemies =
             seq {
                 for (id, enemy) in (Map.toSeq model.enemies) do
@@ -71,14 +76,31 @@ module Update =
                     if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
                         
                         let enemy = (Actor.Enemy.update model) enemy
+                        let enemy, skill = Actor.Enemy.getSKill model.gameSetting enemy
+
+                        // mutable
+                        skill |> Option.iter(fun skill ->
+                            skillEmits.Add(enemy, skill)
+                        )
+
                         let pos = ObjectBase.position enemy
                         if (Actor.statusCurrent enemy).hp > 0.0f && not(pos.x = nanf || pos.y = nanf) then
                             yield (id, enemy)
                     elif not(pos.x = nanf || pos.y = nanf) then
                         yield (id, enemy)
             }
+            |> Map.ofSeq
 
-        { model with enemies = Map.ofSeq enemies }
+        let skillList =
+            seq {
+                for (enemy, skill) in skillEmits ->
+                    SkillList.appendActorSkills enemy (skill model)
+            }
+            |> Seq.fold (|>) model.skillList
+
+
+        { model with enemies = enemies; skillList = skillList }
+
 
     let checkGateCollision model =
         model.players
@@ -152,7 +174,7 @@ module Update =
             model
             |> ifThen (player |> Player.coolTime kind = 0us) (
                 mapPlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
-                >> appendSkills player.actor (skill model)
+                >> appendSkills player (skill model)
             )
             , Cmd.none
 

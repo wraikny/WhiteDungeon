@@ -22,7 +22,8 @@ let setting : OccupationSetting = {
             walkSpeed = 12.0f
             dashSpeed = 18.0f
         }
-    skill1 = fun model actor ->
+    skill1 = fun model player ->
+        let actor = player.actor
         let dir = 
             actor.objectBase.direction
             |> Model.MoveDirection.toVector
@@ -78,7 +79,8 @@ let setting : OccupationSetting = {
             createSkill delay zero size2 damage2
             createSkill (delay * 2u) (attackDir .* posDiff) size1 damage1
         ]
-    skill2 = fun model actor ->
+    skill2 = fun model player ->
+        let actor = player.actor
         let dir = 
             actor.objectBase.direction
             |> Model.MoveDirection.toVector

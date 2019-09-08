@@ -7,6 +7,17 @@ open WhiteDungeon.Core.Game.Model
 type ActorID =
     | OfPlayerID of PlayerID
     | OfEnemyID of EnemyID
+with
+    member x.GetPlayerId =
+        x |> function
+            | OfPlayerID id -> ValueSome id
+            | _ -> ValueNone
+        |> fun x -> ValueOption.get x
+    member x.GetEnemyId =
+        x |> function
+            | OfEnemyID id -> ValueSome id
+            | _ -> ValueNone
+        |> fun x -> ValueOption.get x
 
 
 [<Struct>]

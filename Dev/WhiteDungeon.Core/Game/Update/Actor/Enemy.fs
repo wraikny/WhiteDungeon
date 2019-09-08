@@ -11,6 +11,13 @@ open WhiteDungeon.Core.Game.Update.Actor
 
 open FSharpPlus
 
+let inline decrCoolTime (enemy : Enemy) =
+    let x = enemy.skillCoolTime
+    { enemy with
+        skillCoolTime = if x = 0us then 0us else x - 1us
+    }
+
+
 let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
     let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
     let status =
@@ -74,10 +81,11 @@ let move (model : Model) enemy : Enemy =
         enemy
         |> chasingMove model pos
         |> fun (x, diff) ->
-            if abs(diff) < 0.1f then
+            if abs diff < 0.1f then
                 { enemy with mode = FreeMoving }
             else
                 x
+            
             
 
 let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vec2) : bool =
@@ -189,11 +197,25 @@ let updateMode (model : Model) (enemy : Enemy) : Enemy =
         |> Option.defaultValue enemy
 
 
+let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
+    enemy.mode |> function
+    | EnemyMode.Chasing(id, pos) ->
+        let setting =
+            gameSetting.enemySettings
+            |> HashMap.find enemy.kind
+        let atkDist = setting.attackDistance
+        let d = Vector.length(pos - ObjectBase.position enemy)
 
+        if enemy.skillCoolTime = 0us && abs (d - atkDist) < setting.attackRange then
+            { enemy with skillCoolTime = setting.skillCoolTime}, Some setting.skill
+        else
+            enemy, None
+    | _ -> enemy, None
 
 
 let inline update model enemy : Enemy =
     enemy
     |> Actor.update
+    |> decrCoolTime
     |> move model
     |> updateMode model

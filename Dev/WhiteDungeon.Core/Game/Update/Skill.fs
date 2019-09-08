@@ -220,7 +220,7 @@ module SkillEmit =
 
 
 module SkillList =
-    let private append skills skillList =
+    let inline private append (skills : seq<_>) skillList =
         let skillsCount = skills |> length
         {
             skillList with
@@ -326,7 +326,7 @@ module SkillList =
         |> append (f skillList.areaEnemy)
         |> append (f skillList.areaAll)
 
-    let appendActorSkills (actor : Actor) (skills : Actor -> Skill.SkillEmitBuilder list) =
+    let inline appendActorSkills (actor) (skills : ^a -> Skill.SkillEmitBuilder list) =
         skills actor
         |>> Skill.SkillEmitBuilder.build actor
         |> append

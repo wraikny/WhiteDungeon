@@ -148,7 +148,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
 
         lastPlayerStatus |> function
         | None -> updatePlayerStatusView()
-        | Some x when x = playerVM -> updatePlayerStatusView()
+        | Some x when x <> playerVM -> updatePlayerStatusView()
         | _ -> ()
 
 
