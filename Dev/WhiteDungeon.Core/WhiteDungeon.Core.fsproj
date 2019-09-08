@@ -23,7 +23,7 @@
     <Compile Include="Game\Update\Actor\Actor.fs" />
     <Compile Include="Game\Update\Actor\Player.fs" />
     <Compile Include="Game\Update\Actor\Enemy.fs" />
-    <Compile Include="Game\Update\Skill\Skill.fs" />
+    <Compile Include="Game\Update\Skill.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Game.Update.Skill
+﻿namespace WhiteDungeon.Core.Game.Update
 
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections

@@ -10,7 +10,6 @@ open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 
 open WhiteDungeon.Core.Game.Update
-open WhiteDungeon.Core.Game.Update.Skill
 
 open FSharpPlus
 open FSharpPlus.Math.Applicative
@@ -107,7 +106,7 @@ module Update =
             model
             |> updateEachPlayer Actor.Player.update
             |> updateEnemies
-            |> Skill.SkillList.update
+            |> SkillList.update
             |> fun m -> { m with timePassed = true }
             |> fun m ->
                 m.players
