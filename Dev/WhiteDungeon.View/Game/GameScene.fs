@@ -81,6 +81,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     let dungeonLayer = new asd.Layer2D()
     let actorLayer = new asd.Layer2D()
     let hpLayer = new asd.Layer2D()
+
+    let pauseLayers = [
+        dungeonLayer
+        actorLayer
+        hpLayer
+    ]
+
+
     //let skillEffectsLayer = new asd.Layer2D()
     let uiLayer = new asd.Layer2D()
 
@@ -297,6 +305,9 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
                             (gameUIWindows :> UI.IToggleWindow).Toggle(true)
                             GC.Collect()
+
+                            pauseLayers
+                            |> Seq.iter(fun x -> x.IsUpdated <- true)
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -309,6 +320,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                             playSE(se_page)
                             uiBackRect.IsDrawn <- true
                             uiWindowMain.Toggle(true)
+                            pauseLayers
+                            |> Seq.iter(fun x -> x.IsUpdated <- false)
                             
                         if (gameUIWindows :> UI.IToggleWindow).IsToggleOn then
                             (gameUIWindows :> UI.IToggleWindow).Toggle(false, openUI)
