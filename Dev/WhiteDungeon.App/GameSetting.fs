@@ -27,8 +27,9 @@ let enemies = [
         }
         skill = fun model actor -> []
 
-        visionAngleRate = 0.125f
+        visionAngleRate = 0.25f
         visionDistance = 1000.0f
+
         chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
         freeMove = FreeMove.Forward
 

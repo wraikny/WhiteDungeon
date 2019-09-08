@@ -71,7 +71,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
 
                 visionArc.EndingCorner <-
                     int (enemySetting.visionAngleRate * float32 visionArc.NumberOfCorners)
-                visionArc.OuterDiameter <- enemySetting.visionDistance
+                visionArc.OuterDiameter <- enemySetting.visionDistance * 2.0f
                 visionArc.Angle <- 90.0f - enemySetting.visionAngleRate * 180.0f
 
             

@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Game.Model.Actor
 
-
+open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
@@ -9,8 +9,9 @@ open FSharpPlus
 
 type EnemyMode =
     | FreeMoving
-    | Chasing of PlayerID
+    | Chasing of PlayerID * float32 Vec2
     | AfterChasing of float32 Vec2
+    //| LookingAround of uint16
 
 
 type Enemy =
@@ -27,7 +28,7 @@ type Enemy =
 
         mode : EnemyMode
 
-        target : PlayerID option
+        //target : PlayerID option
 
         hateMap : Map<PlayerID, float32>
     }
@@ -56,10 +57,14 @@ module Enemy =
 
         mode = FreeMoving
 
-        target = None
+        //target = None
 
         hateMap = Map.empty
     }
+
+    let inline lookingDirection (enemy : Enemy) =
+        enemy.lookingRadian
+        |> Vec2.fromAngle
 
     let addHate targetId hate (enemy : Enemy) =
         { enemy with
@@ -76,12 +81,24 @@ module Enemy =
         let pos = enemy |> ObjectBase.position
 
         (
-            let dist = pos - point |> Vector.squaredLength
+            let dist = (pos - point) |> Vector.squaredLength
             dist < enemy.visionDistance * enemy.visionDistance
         )
         &&
         (
+            let pi2 = Angle.pi * 2.0f
             let angle = (point - pos) |> Vec2.angle
-            let d = angle - enemy.visionAngle
+
+            let d =
+                (angle - enemy.lookingRadian)
+                |> Vec2.fromAngle
+                |> Vec2.angle
             (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
         )
+
+    let setTarget (target : Player) (enemy : Enemy) : Enemy =
+        { enemy with
+            mode = Chasing(target.id, ObjectBase.position target)
+            lookingRadian = ObjectBase.calcAngle enemy target
+        }
+

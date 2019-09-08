@@ -127,3 +127,6 @@ module ObjectBase =
     let inline mapVelocity f x =
         x |> map (fun o -> { o with velocity = f o.velocity })
 
+    let inline calcAngle oFrom oTo =
+        Vec2.angle(position oTo - position oFrom)
+
