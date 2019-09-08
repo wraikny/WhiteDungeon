@@ -75,26 +75,6 @@ module Enemy =
                 |> Option.defaultValue hate
                 |> flip (Map.add targetId) enemy.hateMap
         }
-        
-
-    let insideVision (enemy : Enemy) (point : float32 Vec2) : bool =
-        let pos = enemy |> ObjectBase.position
-
-        (
-            let dist = (pos - point) |> Vector.squaredLength
-            dist < enemy.visionDistance * enemy.visionDistance
-        )
-        &&
-        (
-            let pi2 = Angle.pi * 2.0f
-            let angle = (point - pos) |> Vec2.angle
-
-            let d =
-                (angle - enemy.lookingRadian)
-                |> Vec2.fromAngle
-                |> Vec2.angle
-            (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
-        )
 
     let setTarget (target : Player) (enemy : Enemy) : Enemy =
         { enemy with

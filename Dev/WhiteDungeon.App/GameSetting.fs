@@ -45,6 +45,8 @@ let gameSetting : Model.GameSetting = {
     maxPlayerCount = 1
     binarySearchCountMovingOnWall = 4
 
+    visionWallCheckCount = 8u
+
     enemyUpdateDistance = 20000.0f
 
     characterSize = Vec2.init 100.0f 100.0f

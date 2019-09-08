@@ -42,7 +42,6 @@ module Effect =
                     invoker
                     actor
 
-
             Actor.Actor.addHP -damage actor, empty
 
         | AddHP v ->
@@ -141,7 +140,7 @@ module AreaSkill =
 
     let inline applyToActorHolders
         gameSetting
-        (onApplyAreaSkill : AreaSkill -> ^a -> ^a)
+        (onApplyAreaSkill : AreaSkill -> ^a -> ^a -> ^a)
         (skills : Map<_, AreaSkill>)
         (holders : Map<'ID, ^a>) : Map<'ID, ^a> * SkillEmit [] =
 
@@ -159,8 +158,8 @@ module AreaSkill =
                 |> Seq.map(fun areaSkill h ->
                     let actor = Actor.get h
                     let (a, e) = apply gameSetting areaSkill actor
-                    let h = Actor.set a h
-                    ( onApplyAreaSkill areaSkill h, e)
+                    let nh = Actor.set a h
+                    ( onApplyAreaSkill areaSkill h nh, e)
                 )
 
             let mutable holder = x
@@ -313,8 +312,8 @@ module SkillList =
 
         let players, emits =
             (model.players, empty)
-            |> chain (f (fun _ a -> a) skillList.areaPlayer)
-            |> chain (f (fun _ a -> a) skillList.areaAll)
+            |> chain (f (fun _ _ a -> a) skillList.areaPlayer)
+            |> chain (f (fun _ _ a -> a) skillList.areaAll)
 
         let enemies, emits =
             (model.enemies, emits)

@@ -76,6 +76,9 @@ and GameSetting = {
     minPlayerCount : int
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
+
+    visionWallCheckCount : uint32
+
     enemyUpdateDistance : float32
     characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
@@ -203,12 +206,25 @@ module GameSetting =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip HashMap.containsKey cells
-        |> Seq.forall
 
     let inline insideDungeon 
         (gameSetting : GameSetting)
         (dungeonModel : Dungeon.DungeonModel) =
         insideCells gameSetting dungeonModel.cells
+        |> Seq.forall
+
+    let inline insideDungeonOfLine
+        (gameSetting : GameSetting)
+        (dungeonModel : Dungeon.DungeonModel)
+        count
+        (p1) (p2) =
+
+        let count = count - 1u
+
+        [0u..count - 1u]
+        |> Seq.map (fun x -> float32 x / float32 count)
+        |> Seq.map(fun x -> p1 .* x + p2 .* (1.0f - x))
+        |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
 

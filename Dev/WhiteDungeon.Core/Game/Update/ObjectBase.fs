@@ -165,7 +165,7 @@ let inline moveReflectable
 
             let restLength = Vector.length diff - Vector.length diff0
 
-            diff + ( reflectedDir .* (if restLength < 1.0f then 1.0f else restLength) )
+            diff + ( reflectedDir .* (max restLength 10.0f) )
             , Some reflectedDir
         else
             diff0, None

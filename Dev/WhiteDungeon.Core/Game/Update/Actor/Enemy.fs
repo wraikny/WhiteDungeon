@@ -79,10 +79,37 @@ let move (model : Model) enemy : Enemy =
             else
                 x
             
+
+let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vec2) : bool =
+    let pos = enemy |> ObjectBase.position
+
+    (
+        let dist = (pos - point) |> Vector.squaredLength
+        dist < enemy.visionDistance * enemy.visionDistance
+    )
+    &&
+    (
+        let angle = (point - pos) |> Vec2.angle
+
+        let d =
+            (angle - enemy.lookingRadian)
+            |> Vec2.fromAngle
+            |> Vec2.angle
+        (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
+    )
+    &&
+    (
+        GameSetting.insideDungeonOfLine
+            gameSetting
+            dungeonModel
+            gameSetting.visionWallCheckCount
+            pos
+            point
+    )
         
 
 
-let tryGetTarget (targets : seq<Player>) (enemy : Enemy) : Player option =
+let tryGetTarget (model : Model) (targets : seq<Player>) (enemy : Enemy) : Player option =
     targets
     |> Seq.sortBy(fun x ->
         enemy.hateMap
@@ -90,17 +117,40 @@ let tryGetTarget (targets : seq<Player>) (enemy : Enemy) : Player option =
         |> Option.defaultValue 0.0f
         |> ( * ) -1.0f
     )
-    |> Seq.tryFind(fun x -> Enemy.insideVision enemy (ObjectBase.position x))
+    |> Seq.tryFind(fun x ->
+        insideVision
+            model.gameSetting
+            model.dungeonModel
+            enemy
+            (ObjectBase.position x)
+    )
 
 
-let onApplyAreaSkill (areaSkill : Skill.AreaSkill) (enemy : Enemy) : Enemy =
-    enemy.mode |> function
-    | EnemyMode.FreeMoving ->
-        let invoker = areaSkill.skillBase.invokerActor
-        let dir =ObjectBase.calcAngle enemy invoker
-        { enemy with lookingRadian = dir }
-    | _ ->
+let onApplyAreaSkill
+    (areaSkill : Skill.AreaSkill)
+    (prevEnemy : Enemy) (enemy : Enemy) : Enemy =
+    areaSkill.skillBase.invokerActor.id |> function
+    | ActorID.OfEnemyID _ ->
         enemy
+
+    | ActorID.OfPlayerID id ->
+        let statusDefault = Actor.statusDefault enemy
+        let status = Actor.statusCurrent enemy
+        let hpDiff =
+            (Actor.statusCurrent prevEnemy).hp
+            - status.hp
+
+        enemy
+        |> Enemy.addHate id (hpDiff / statusDefault.hp)
+
+    |> fun enemy ->
+        enemy.mode |> function
+        | EnemyMode.FreeMoving ->
+            let invoker = areaSkill.skillBase.invokerActor
+            let dir = ObjectBase.calcAngle enemy invoker
+            { enemy with lookingRadian = dir }
+        | _ ->
+            enemy
 
     
 
@@ -109,7 +159,7 @@ let updateMode (model : Model) (enemy : Enemy) : Enemy =
     let players = model.players |> Map.toSeq |> Seq.map snd |> Seq.toList
 
     let trySetTarget enemy =
-        tryGetTarget players enemy
+        tryGetTarget model players enemy
         |>> flip Enemy.setTarget enemy
 
     enemy.mode |> function
@@ -119,7 +169,12 @@ let updateMode (model : Model) (enemy : Enemy) : Enemy =
         |> Option.defaultValue enemy
     | EnemyMode.Chasing (id, pos) ->
         let player = model.players |> Map.find id
-        if Enemy.insideVision enemy (ObjectBase.position player) then
+        let inVision =
+            insideVision
+                model.gameSetting
+                model.dungeonModel
+                enemy (ObjectBase.position player)
+        if inVision then
             enemy |> Enemy.setTarget player
         else
             enemy
