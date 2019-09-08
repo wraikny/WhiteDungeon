@@ -46,11 +46,11 @@ let chasingMove (model : Model) (pos) (enemy : Enemy) : Enemy * _ =
         (Actor.statusCurrent enemy).dashSpeed
     let diff = 
         if dist > atkDist then
-            speed |> max (dist - atkDist)
+            speed |> min (dist - atkDist)
         elif dist = atkDist then
             0.0f
         else
-            -(speed |> max (atkDist - dist))
+            -(speed |> min (atkDist - dist))
 
     enemy
     |> ObjectBase.moveXYAnother
@@ -63,7 +63,6 @@ let chasingMove (model : Model) (pos) (enemy : Enemy) : Enemy * _ =
 
 let move (model : Model) enemy : Enemy =
     enemy.mode |> function
-    | _
     | EnemyMode.FreeMoving ->
         freeMove model.gameSetting model.dungeonModel enemy
     | EnemyMode.Chasing (id, pos) ->
@@ -93,6 +92,17 @@ let tryGetTarget (targets : seq<Player>) (enemy : Enemy) : Player option =
     )
     |> Seq.tryFind(fun x -> Enemy.insideVision enemy (ObjectBase.position x))
 
+
+let onApplyAreaSkill (areaSkill : Skill.AreaSkill) (enemy : Enemy) : Enemy =
+    enemy.mode |> function
+    | EnemyMode.FreeMoving ->
+        let invoker = areaSkill.skillBase.invokerActor
+        let dir =ObjectBase.calcAngle enemy invoker
+        { enemy with lookingRadian = dir }
+    | _ ->
+        enemy
+
+    
 
 
 let updateMode (model : Model) (enemy : Enemy) : Enemy =

@@ -64,7 +64,7 @@ and EnemySetting =
 
         visionAngleRate : float32
         visionDistance : float32
-        chaseKind : ChaseKind
+        //chaseKind : ChaseKind
         freeMove : FreeMove
 
         attackDistance : float32

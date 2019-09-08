@@ -141,6 +141,7 @@ module AreaSkill =
 
     let inline applyToActorHolders
         gameSetting
+        (onApplyAreaSkill : AreaSkill -> ^a -> ^a)
         (skills : Map<_, AreaSkill>)
         (holders : Map<'ID, ^a>) : Map<'ID, ^a> * SkillEmit [] =
 
@@ -155,16 +156,21 @@ module AreaSkill =
                 skills
                 |> Seq.map snd
                 |> Seq.filter (flip isCollided x)
-                |> Seq.map(apply gameSetting)
+                |> Seq.map(fun areaSkill h ->
+                    let actor = Actor.get h
+                    let (a, e) = apply gameSetting areaSkill actor
+                    let h = Actor.set a h
+                    ( onApplyAreaSkill areaSkill h, e)
+                )
 
-            let mutable actor = Actor.get x
+            let mutable holder = x
 
             for f in fs do
-                let a, es = f actor
-                actor <- a
+                let h, es = f holder
+                holder <- h
                 for e in es do resultEmits.Add(e)
 
-            resultHolders.Add(hId, Actor.Actor.set actor x)
+            resultHolders.Add(hId, holder)
 
         (Map.ofSeq resultHolders), resultEmits.ToArray()
 
@@ -299,7 +305,7 @@ module SkillList =
     let private applySkillsToModel (model : Model) : Model =
         let skillList = model.skillList
                 
-        let inline f x = AreaSkill.applyToActorHolders model.gameSetting x
+        let inline f onApply x = AreaSkill.applyToActorHolders model.gameSetting onApply x
 
         let chain f (a, b) =
             let x, y = f a
@@ -307,13 +313,13 @@ module SkillList =
 
         let players, emits =
             (model.players, empty)
-            |> chain (f skillList.areaPlayer)
-            |> chain (f skillList.areaAll)
+            |> chain (f (fun _ a -> a) skillList.areaPlayer)
+            |> chain (f (fun _ a -> a) skillList.areaAll)
 
         let enemies, emits =
             (model.enemies, emits)
-            |> chain (f skillList.areaEnemy)
-            |> chain (f skillList.areaAll)
+            |> chain (f (Actor.Enemy.onApplyAreaSkill) skillList.areaEnemy)
+            |> chain (f (Actor.Enemy.onApplyAreaSkill) skillList.areaAll)
 
         { model with
             players = players
