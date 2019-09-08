@@ -103,22 +103,27 @@ module Update =
         | SetGameMode mode ->
             { model with mode = mode }, Cmd.none
         | TimePasses ->
-            model
-            |> updateEachPlayer Actor.Player.update
-            |> updateEnemies
-            |> SkillList.update
-            |> fun m -> { m with timePassed = true }
-            |> fun m ->
-                m.players
-                |> Map.toSeq
-                |>> snd
-                |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
-                |> function
+            let m, ds =
+                model
+                |> updateEachPlayer Actor.Player.update
+                |> updateEnemies
+                |> SkillList.update
+
+            let m = { m with timePassed = true }
+
+            m.players
+            |> Map.toSeq
+            |>> snd
+            |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+            |> function
                 | false -> { m with mode = GameFinished false }
                 | true ->
                     checkGateCollision m
 
-            , Cmd.none
+            , (ds |> function
+                | [||] -> Cmd.none
+                | _ -> Cmd.port(ViewMsg.DamagesView ds)
+            )
 
         | PlayerInputs (playerId, inputSet) ->
             let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet

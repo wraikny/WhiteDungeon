@@ -12,4 +12,5 @@ open WhiteDungeon.Core.Game.Model
 
 type ViewMsg =
     | UpdateDungeonView of Dungeon.DungeonModel * int Vec2 Set
-    //| AppendSkills of Skill.SkillEmit list
+    | DamagesView of (float32 Vec2 * float32) []
+    //| AppendSkills of Skill.SkillEmit list  

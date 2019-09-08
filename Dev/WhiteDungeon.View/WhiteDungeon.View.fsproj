@@ -80,6 +80,7 @@
     <Compile Include="Game\PlayerView.fs" />
     <Compile Include="Game\EnemyView.fs" />
     <Compile Include="Game\SkillEmitView.fs" />
+    <Compile Include="Game\DamagesView.fs" />
     <Compile Include="Game\GameCamera.fs" />
     <Compile Include="Game\DungeonCellView.fs" />
     <Compile Include="Game\GameUI.fs" />

@@ -64,7 +64,7 @@ type GameCamera(isMapChip) =
             this.Zoom <- this.Zoom - 0.02f |> max 0.02f
             this.SetSrc()
         elif pushed asd.Keys.Num3 then
-            this.Zoom <- 0.5f
+            this.Zoom <- 0.4f
             this.SetSrc()
 #endif
 

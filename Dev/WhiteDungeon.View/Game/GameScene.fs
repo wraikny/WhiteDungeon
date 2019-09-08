@@ -134,6 +134,10 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                     }))
         |> ignore
 
+    let damagesView = new DamagesView(gameViewSetting)
+    do
+        hpLayer.AddComponent(damagesView, "DamagesView")
+
     let dungeonCamera = new GameCamera(true)
     let actorCamera = new GameCamera(false)
     let hpCamera = new GameCamera(false)
@@ -182,6 +186,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
                     GC.Collect()
                 //| _ -> ()
+                | ViewMsg.DamagesView x -> damagesView.Add(x)
             )
 
     let gameUIWindows = new GameUI(gameViewSetting, gameSceneArgs)

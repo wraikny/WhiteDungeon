@@ -242,7 +242,8 @@ module Dungeon =
             let rec loop n = async {
                 let builder = { dungeonBuilder with seed = seed + n }
                 let dungeon = DungeonBuilder.generate builder
-                if length dungeon.largeRooms > 2 then
+
+                if length dungeon.largeRooms > 3 then
                     return ( builder, dungeon )
                 else
                     return! loop(n + 1)

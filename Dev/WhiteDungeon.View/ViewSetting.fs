@@ -91,6 +91,15 @@ type ObjectViewSetting =
         characterImages : ActorImages<string, int Rect2>
     }
 
+type DamageViewSetting =
+    {
+        font : string
+        size : int
+        sizeOutline : int
+        color : byte Vec3
+        colorOutline : byte Vec3
+    }
+
 type GameViewSetting = {
     occupationSetting : HashMap<Occupation, ObjectViewSetting>
     bgms : string list
@@ -103,14 +112,19 @@ type GameViewSetting = {
     gameUIPlayerArea : float32 Rect2
 
     dungeonCellTexture : string
+
+    damageTextFrame : int
+    damageTextMove : float32
+    damageView : DamageViewSetting
+    healView : DamageViewSetting
 }
 
 module GameViewSetting =
     [<Literal>]
     let modForCulling = 40000.0f
 
-
 open wraikny.MilleFeuille.Fs.UI
+
 
 type MainSceneSetting = {
     backColor : byte Vec3
