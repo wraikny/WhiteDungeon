@@ -39,6 +39,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
         base.AddDrawnChildWithoutColor(visionObj)
 
         #if DEBUG
+        base.EnabledTextureView <- false
         base.EnabledSizeView <- true
         visionObj.IsDrawn <- true
         #endif

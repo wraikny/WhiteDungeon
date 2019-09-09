@@ -63,7 +63,7 @@ module ActorImages =
         }
 
     // http://www.silversecond.com/WolfRPGEditor/
-    let fromGraphicmaker sleepWalk sleepDash path =
+    let fromGraphicmaker sleepWalk sleepDash (path : string) =
         let size = Vec2.init 32 64
         let textures xi yi =
             [1; 2; 1; 0]

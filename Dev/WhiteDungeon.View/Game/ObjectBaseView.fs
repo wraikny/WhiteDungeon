@@ -97,11 +97,12 @@ type ObjectBaseView< 'a
                 moveAnimation.Next()
             
                 let texSize = textureObj.Src.Size
-                let scale = size.X / texSize.X
-                textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
+                //let scale = 1.0f // size.X / texSize.X
+                //textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
                 textureObj.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
                 textureObj.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
-                texViewSize <- texSize * scale
+                // TODO
+                texViewSize <- texSize * asd.Vector2DF(0.5f, 1.0f) // * scale
         else
             texViewSize <- size
 

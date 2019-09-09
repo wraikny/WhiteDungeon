@@ -124,7 +124,41 @@ let setting : OccupationSetting = {
     skill2CoolTime = 60us
 }
 
-let private images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+
+let private images =
+    let size = Rect.init (Vec2.init 0 0) (Vec2.init 256 256)
+    let f = List.map (fun x -> (sprintf "Image/Game/bushi/%s.png" x, size, 0.0f))
+    {
+        sleepWalk = 8u
+        sleepDash = 4u
+        front = f [
+            "Front"
+        ]
+        back = f [
+            "Back"
+        ]
+        right = f [
+            "Right"
+        ]
+        left = f [
+            "Left"
+        ]
+        frontRight = f [
+            "FrontRight"
+        ]
+        frontLeft = f [
+            "FrontLeft"
+        ]
+        backRight = f [
+            "BackRight"
+        ]
+        backLeft = f [
+            "BackLeft"
+        ]
+    }
+
+//let private images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
+
 
 let viewSetting =
     {

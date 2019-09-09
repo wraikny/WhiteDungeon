@@ -69,16 +69,16 @@ let enemies = [
 let enemiesCount = enemies.Length
 
 let gameSetting : Model.GameSetting = {
-    Model.GameSetting.dungeonCellSize = Vec2.init 250.0f 250.0f
+    Model.GameSetting.dungeonCellSize = one .* 256.0f
     minPlayerCount = 1
     maxPlayerCount = 1
     binarySearchCountMovingOnWall = 4
 
     visionWallCheckCount = 8u
 
-    enemyUpdateDistance = 20000.0f
+    enemyUpdateDistance = 10000.0f
 
-    characterSize = Vec2.init 100.0f 100.0f
+    characterSize = one .* 128.0f
 
     damageCalculation = fun v invoker target ->
         v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
