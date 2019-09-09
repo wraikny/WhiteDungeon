@@ -38,6 +38,12 @@ type ChaseKind =
 
 type FreeMove =
     | Forward
+    | WithRotate of frame : uint16
+
+//module FreeMove =
+//    let toContainer = function
+//        | Forward -> NoValue
+//        | WithRotate x -> WithRotateContainer x
 
 
 type EnemyInits = {
@@ -156,6 +162,7 @@ module Model =
                 ei.lookAngleRadian
                 setting.visionDistance
                 setting.visionAngleRate
+                //(FreeMove.toContainer setting.freeMove)
         )
         |> Map.ofSeq
 

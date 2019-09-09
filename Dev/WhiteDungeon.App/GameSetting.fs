@@ -59,7 +59,7 @@ let enemies = [
         visionDistance = 1000.0f
 
         //chaseKind = ChaseKind.Losable AfterLoseSight.ChaseLosePoint
-        freeMove = FreeMove.Forward
+        freeMove = FreeMove.WithRotate 300us
 
         attackRange = 50.0f
         attackDistance = 300.0f

@@ -3,6 +3,7 @@
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Advanced.Dungeon
+open wraikny.Tart.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
@@ -11,34 +12,53 @@ open WhiteDungeon.Core.Game.Update.Actor
 
 open FSharpPlus
 
+type EnemyCmd =
+    | Rotate of EnemyID
+
+
+let updateOfMsg (msg : EnemyMsg) (enemy : Enemy) =
+    msg |> function
+    | RotateMsg x ->
+        { enemy with lookingRadian = x }
+
+
 let inline decrCoolTime (enemy : Enemy) =
     let x = enemy.skillCoolTime
     { enemy with
         skillCoolTime = if x = 0us then 0us else x - 1us
     }
 
-
-let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
-    let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
-    let status =
-        enemy |> Actor.statusCurrent
-
+let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
+    let status = enemy |> Actor.statusCurrent
     let dir = Vec2.fromAngle enemy.lookingRadian
-    
+    let enemy, newDirection =
+        enemy
+        |> ObjectBase.moveReflectable
+            gameSetting
+            dungeonModel
+            (dir .* status.walkSpeed)
+
+    newDirection |> function
+    | None -> enemy
+    | Some dir -> { enemy with lookingRadian = Vec2.angle dir; moveValues = zero }
+
+let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy * EnemyCmd [] =
+    let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
+
     setting.freeMove |> function
     | FreeMove.Forward ->
-        let enemy, newDirection =
-            enemy
-            |> ObjectBase.moveReflectable
-                gameSetting
-                dungeonModel
-                (dir .* status.walkSpeed)
+        moveForward gameSetting dungeonModel enemy
+        , empty
 
-        newDirection |> function
-        | None -> enemy
-        | Some dir ->
-            let angle = Vec2.angle dir
-            { enemy with lookingRadian = angle }
+    | WithRotate x ->
+        let frame = enemy.moveValues.rotateFrame + one
+        let updateFrame x = { enemy with moveValues = { enemy.moveValues with rotateFrame = x }}
+        if frame >= x then
+            (updateFrame zero), [| EnemyCmd.Rotate(enemy.id) |]
+        else
+            (updateFrame frame)
+            |> moveForward gameSetting dungeonModel
+            , empty
 
 
 let chasingMove (model : Model) (pos) (enemy : Enemy) : Enemy * _ =
@@ -68,23 +88,25 @@ let chasingMove (model : Model) (pos) (enemy : Enemy) : Enemy * _ =
     , diff
 
 
-let move (model : Model) enemy : Enemy =
+let move (model : Model) enemy : Enemy * (EnemyCmd []) =
     enemy.mode |> function
     | EnemyMode.FreeMoving ->
         freeMove model.gameSetting model.dungeonModel enemy
     | EnemyMode.Chasing (id, pos) ->
         enemy
-        |> chasingMove model pos
-        |> fst
+            |> chasingMove model pos
+            |> fst
+        , empty
     | EnemyMode.AfterChasing pos ->
         // TODO
         enemy
         |> chasingMove model pos
         |> fun (x, diff) ->
             if abs diff < 0.1f then
-                { enemy with mode = FreeMoving }
+                { enemy with mode = FreeMoving; moveValues = zero }
             else
                 x
+            , empty
             
             
 
@@ -213,9 +235,16 @@ let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
     | _ -> enemy, None
 
 
-let inline update model enemy : Enemy =
+//let updateFreeMove (model : Model) (enemy : Enemy) =
+//    enemy.freeMoveContainer |> function
+//    | NoValue -> NoValue
+//    | WithRotateContainer x
+
+
+let inline update model enemy : Enemy * _ =
     enemy
     |> Actor.update
     |> decrCoolTime
     |> move model
-    |> updateMode model
+    |> fun (enemy, x) ->
+        enemy |> updateMode model, x

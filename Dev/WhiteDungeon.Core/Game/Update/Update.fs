@@ -26,6 +26,9 @@ module Update =
     let inline mapPlayers f (model : Model) : Model =
         { model with players = f model.players }
 
+    let inline mapEnemies f (model : Model) =
+        { model with enemies = f model.enemies }
+
 
     let inline updateEachPlayer f (model : Model) : Model =
         model
@@ -43,6 +46,14 @@ module Update =
 
     let inline mapEnemy f (model : Model) : Model =
         { model with enemies = model.enemies |>> f }
+
+    let inline mapEnemyOf id f (model : Model) =
+        model.enemies
+        |> Map.tryFind id
+        |>> (fun enemy ->
+            model
+            |> mapEnemies (Map.add id (f enemy)))
+        |> Option.defaultValue model
 
     open wraikny.Tart.Helper.Math
     open WhiteDungeon.Core.Game.Msg
@@ -66,6 +77,7 @@ module Update =
 
         // mutable
         let skillEmits = List<_>()
+        let enemyCmds = List<_>()
 
         let enemies =
             seq {
@@ -75,7 +87,7 @@ module Update =
 
                     if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
                         
-                        let enemy = (Actor.Enemy.update model) enemy
+                        let enemy, cmds = (Actor.Enemy.update model) enemy
                         let enemy, skill = Actor.Enemy.getSKill model.gameSetting enemy
 
                         // mutable
@@ -85,6 +97,8 @@ module Update =
 
                         let pos = ObjectBase.position enemy
                         if (Actor.statusCurrent enemy).hp > 0.0f && not(pos.x = nanf || pos.y = nanf) then
+                            enemyCmds.Add(cmds)
+
                             yield (id, enemy)
                     elif not(pos.x = nanf || pos.y = nanf) then
                         yield (id, enemy)
@@ -98,8 +112,23 @@ module Update =
             }
             |> Seq.fold (|>) model.skillList
 
+        let cmd : Cmd<Msg, ViewMsg.ViewMsg> =
+            seq{
+                for cmds in enemyCmds do
+                    for cmd in cmds ->
+                        cmd |> function
+                        | Actor.Enemy.EnemyCmd.Rotate id ->
+                            Random.double01
+                            |> Random.map(float32 >> (*) (Angle.pi * 2.0f))
+                            |> Random.generate(fun x ->
+                                Msg.UpdateEnemyOf(id, EnemyMsg.RotateMsg x)
+                            )
+                    
+            }
+            |> Cmd.batch
 
-        { model with enemies = enemies; skillList = skillList }
+
+        { model with enemies = enemies; skillList = skillList }, cmd
 
 
     let checkGateCollision model =
@@ -125,11 +154,11 @@ module Update =
         | SetGameMode mode ->
             { model with mode = mode }, Cmd.none
         | TimePasses ->
-            let m, ds =
+            let m, cmd =
                 model
                 |> updateEachPlayer Actor.Player.update
                 |> updateEnemies
-                |> SkillList.update
+            let m, ds = m |> SkillList.update
 
             let m = { m with timePassed = true }
 
@@ -143,8 +172,8 @@ module Update =
                     checkGateCollision m
 
             , (ds |> function
-                | [||] -> Cmd.none
-                | _ -> Cmd.port(ViewMsg.DamagesView ds)
+                | [||] -> cmd
+                | _ -> Cmd.batch[ Cmd.port(ViewMsg.DamagesView ds); cmd ]
             )
 
         | PlayerInputs (playerId, inputSet) ->
@@ -176,6 +205,11 @@ module Update =
                 mapPlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
                 >> appendSkills player (skill model)
             )
+            , Cmd.none
+
+        | UpdateEnemyOf(id, msg) ->
+            model
+            |> mapEnemyOf id (Actor.Enemy.updateOfMsg msg)
             , Cmd.none
 
         | GenerateNewDungeon ->

@@ -71,6 +71,8 @@ type Msg =
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
     | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
+
+    | UpdateEnemyOf of EnemyID * Actor.EnemyMsg
     //#if DEBUG
     ///// for Debug
     //| AppendSkillEmits

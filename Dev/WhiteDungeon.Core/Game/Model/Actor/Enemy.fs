@@ -7,6 +7,17 @@ open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 
+type EnemyMsg =
+    | RotateMsg of float32
+
+
+type MoveValueContainer = {
+    rotateFrame : uint16
+} with
+    static member Zero : MoveValueContainer = {
+        rotateFrame = zero
+    }
+
 type EnemyMode =
     | FreeMoving
     | Chasing of PlayerID * float32 Vec2
@@ -33,6 +44,8 @@ type Enemy =
         skillCoolTime : uint16
 
         hateMap : Map<PlayerID, float32>
+
+        moveValues : MoveValueContainer
     }
 
 with
@@ -44,6 +57,9 @@ with
 
     static member inline SetObjectBase (x : Enemy, y) =
         Actor.map (ObjectBase.set y) x
+
+    static member inline SetMoveValues (x : Enemy, y) =
+        { x with moveValues = y }
 
 
 module Enemy =
@@ -59,9 +75,11 @@ module Enemy =
 
         mode = FreeMoving
 
-        skillCoolTime = 0us
+        skillCoolTime = zero
 
         hateMap = Map.empty
+
+        moveValues = zero
     }
 
 
