@@ -175,7 +175,7 @@ module UIItem =
         Separator
     ]
 
-    let errorUI (model : Model) (e : exn) =
+    let errorUI (_model : Model) (e : exn) =
         let url title body =
             let encode : string -> string = System.Web.HttpUtility.UrlEncode
             let title = encode title

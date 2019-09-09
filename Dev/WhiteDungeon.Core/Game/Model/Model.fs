@@ -273,7 +273,7 @@ module Dungeon =
 
         let rec loop() = monad {
             try
-                let gen = Random.int minValue<int> maxValue<int>
+                //let gen = Random.int minValue<int> maxValue<int>
                 let genNatural = Random.int 0 maxValue<int>
                 let smallRoomGen = Random.int 0 (smallRoomsCount - 1)
                 //let largeRoomGen = Random.int 0 (largeRoomsCount - 1)

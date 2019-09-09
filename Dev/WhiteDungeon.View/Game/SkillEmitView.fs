@@ -17,7 +17,7 @@ open WhiteDungeon.View.Utils.Color
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
-type SkillEmitView(gameViewSetting : GameViewSetting) =
+type SkillEmitView(_gameViewSetting : GameViewSetting) =
     inherit ObjectBaseView<unit>(HashMap.empty
         , EnabledSizeView = true
         , EnabledTextureView = false

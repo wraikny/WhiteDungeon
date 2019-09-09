@@ -92,7 +92,7 @@ let move (model : Model) enemy : Enemy * (EnemyCmd []) =
     enemy.mode |> function
     | EnemyMode.FreeMoving ->
         freeMove model.gameSetting model.dungeonModel enemy
-    | EnemyMode.Chasing (id, pos) ->
+    | EnemyMode.Chasing (_, pos) ->
         enemy
             |> chasingMove model pos
             |> fst
@@ -221,7 +221,7 @@ let updateMode (model : Model) (enemy : Enemy) : Enemy =
 
 let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
     enemy.mode |> function
-    | EnemyMode.Chasing(id, pos) ->
+    | EnemyMode.Chasing(_, pos) ->
         let setting =
             gameSetting.enemySettings
             |> HashMap.find enemy.kind
