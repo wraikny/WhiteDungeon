@@ -175,10 +175,12 @@ let onApplyAreaSkill
 
     |> fun enemy ->
         enemy.mode |> function
-        | EnemyMode.FreeMoving ->
+        | EnemyMode.FreeMoving
+        | EnemyMode.AfterChasing _
+            ->
             let invoker = areaSkill.skillBase.invokerActor
             let dir = ObjectBase.calcAngle enemy invoker
-            { enemy with lookingRadian = dir }
+            { enemy with lookingRadian = dir; moveValues = zero }
         | _ ->
             enemy
 
