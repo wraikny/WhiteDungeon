@@ -31,7 +31,7 @@ type EnemyView(gameSetting : Model.GameSetting, _gameViewSetting : GameViewSetti
     let visionObj =
         new asd.GeometryObject2D(
             Shape = visionArc,
-            Color = base.SizeView.Color,
+            Color = asd.Color(255, 255, 0, int base.SizeView.Color.A),
             IsDrawn = false,
             IsUpdated = false
         )
