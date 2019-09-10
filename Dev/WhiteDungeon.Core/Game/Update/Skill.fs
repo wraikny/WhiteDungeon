@@ -244,7 +244,7 @@ module SkillList =
 
     let inline private filterMapArea f skillList =
         let g =
-            Map.toSeq >> filterMap(fun (id, x) -> monad{
+            Map.toSeq >> Seq.choose(fun (id, x) -> monad {
                 let! x = f x
                 yield (id, x)
             }) >> Map.ofSeq
