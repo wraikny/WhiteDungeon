@@ -39,17 +39,13 @@ let inline addExp (gameSetting : GameSetting) v (player : Player) =
                 gameSetting.occupationSettings
                 |> HashMap.find player.character.currentOccupation
 
-            let growthRate =
-                let maxLv = gameSetting.maxLevel
-                if newLevel > maxLv then
-                    float32 maxLv + (gameSetting.growthRateOverMax * float32 (newLevel - maxLv))
-                else
-                    (float32 maxLv) * (Easing.calculate setting.growthEasing gameSetting.maxLevel newLevel)
-
             let status =
-                { setting.status with
-                    hp = setting.status.hp * growthRate
-                }
+                Actor.calcStatusOf
+                    setting.growthEasing
+                    gameSetting.playerGrowthRateOverMax
+                    gameSetting.maxLevel
+                    newLevel
+                    setting.status
 
             Actor.levelUp newLevel status player
         else

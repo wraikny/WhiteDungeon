@@ -115,7 +115,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
         )
 
 
-    let mutable lastFloor = maxValue<uint32>
+    let mutable lastFloor = maxValue<uint16>
 
     let mutable lastPlayerValues = None
 

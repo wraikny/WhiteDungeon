@@ -137,7 +137,7 @@ module UIItem =
 
 
 type ViewModel = {
-    dungeonFloor : uint32
+    dungeonFloor : uint16
     uiMode : GameSceneMode
 
     camera : CameraView list

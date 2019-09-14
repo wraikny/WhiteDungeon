@@ -78,7 +78,7 @@ type Character = {
     id : CharacterID
     name : string
     currentOccupation : Occupation
-    occupations : Map<Occupation, ActorStatus>
+    //occupations : Map<Occupation, ActorStatus>
 }
 
 type EnemyKind = string

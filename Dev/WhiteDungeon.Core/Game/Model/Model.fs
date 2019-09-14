@@ -46,12 +46,6 @@ type FreeMove =
 //        | WithRotate x -> WithRotateContainer x
 
 
-type EnemyInits = {
-    kind : int
-    lookAngleRadian : float32
-}
-
-
 type OccupationSetting =
     {
         status : ActorStatus
@@ -62,6 +56,8 @@ type OccupationSetting =
         skill2CoolTime : uint16
 
         growthEasing : Easing
+
+        size : float32 Vec2
     }
 
 
@@ -94,7 +90,7 @@ and GameSetting = {
     visionWallCheckCount : uint32
 
     enemyUpdateDistance : float32
-    characterSize : float32 Vec2
+    //characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : HashMap<Occupation, OccupationSetting>
     enemySettings : HashMap<EnemyKind, EnemySetting>
@@ -104,7 +100,9 @@ and GameSetting = {
     lvUpExp : uint16 -> uint16
 
     maxLevel : uint16
-    growthRateOverMax : float32
+    playerGrowthRateOverMax : float32
+
+    levelSD : float32
 }
 
 
@@ -131,7 +129,7 @@ and Model =
 
         lastCollidedGate : bool
 
-        dungeonFloor : uint32
+        dungeonFloor : uint16
     }
 with
     static member SetSkillList (x, s) =
@@ -145,6 +143,13 @@ module OccupationSetting =
         | Actor.Skill2 -> x.skill2CoolTime, x.skill2
 
 
+type EnemyInits = {
+    kind : int
+    lookAngleRadian : float32
+    levelDiff : uint16
+}
+
+
 module Model =
     let inline count (model : Model) = model.count
 
@@ -156,25 +161,35 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let cellsToEnemies (gameSetting : GameSetting) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
+    let cellsToEnemies (gameSetting : GameSetting) (dungeonFloor) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
             let kind = gameSetting.intToEnemy ei.kind
             let setting = gameSetting.enemySettings |> HashMap.find kind
+
+            let level = ei.levelDiff + dungeonFloor
+
+            let status =
+                Actor.calcStatusOf
+                    Easing.Linear
+                    1.0f
+                    gameSetting.maxLevel
+                    level
+                    setting.actorStatus
+
             enemyId
             , Actor.Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
-                1us
-                setting.actorStatus
+                level
+                status
                 kind
                 ei.lookAngleRadian
                 setting.visionDistance
                 setting.visionAngleRate
-                //(FreeMove.toContainer setting.freeMove)
         )
         |> Map.ofSeq
 
@@ -188,6 +203,7 @@ module Model =
         enemies =
             cellsToEnemies
                 gameSetting
+                1us
                 enemyCells
                 gameSetting.dungeonCellSize
 
@@ -204,7 +220,7 @@ module Model =
 
         lastCollidedGate = false
 
-        dungeonFloor = 1u
+        dungeonFloor = 1us
     }
 
 module GameSetting =
@@ -340,9 +356,13 @@ module Dungeon =
                     Random.list smallRoomsCount ( monad {
                         let! kind = Random.int 0 maxValue<int>
                         let! angle = Random.double01
+                        let! p1 = Random.double01
+                        let! p2 = Random.double01
+                        let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
                             EnemyInits.kind = kind
                             lookAngleRadian = 2.0f * Angle.pi * float32 angle
+                            levelDiff = uint16 (p1 * gameSetting.levelSD)
                         }
                     })
 

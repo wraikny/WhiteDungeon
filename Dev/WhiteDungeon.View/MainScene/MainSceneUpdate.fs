@@ -98,25 +98,30 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | GeneratedDungeonParams dungeonParams ->
             if model.uiMode = WaitingGenerating then
                 let gameModel =
-                    let size = model.setting.gameSetting.characterSize
+                    //let size = model.setting.gameSetting.characterSize
                     let players =
                         [ model.playerName, model.selectOccupation ]
                         |> Seq.indexed
                         |> Seq.map(fun (index, (name, occupation)) ->
                             let name = Option.defaultValue (sprintf "Player%d" index) name
 
-                            let status =
+                            let setting =
                                 model.setting.gameSetting.occupationSettings
                                 |> HashMap.find occupation
+
+                            let size = setting.size
+
+                            let status =
+                                setting
                                 |> fun x -> x.status
 
                             let character : Model.Character = {
                                 id = Model.CharacterID -index
                                 name = name
                                 currentOccupation = occupation
-                                occupations = [
-                                    occupation, status
-                                ] |> Map.ofList
+                                //occupations = [
+                                //    occupation, status
+                                //] |> Map.ofList
                             }
 
 

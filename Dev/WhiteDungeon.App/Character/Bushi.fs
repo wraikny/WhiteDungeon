@@ -23,6 +23,8 @@ let setting : OccupationSetting = {
             dashSpeed = 18.0f
         }
 
+    size = one .* 128.0f
+
     growthEasing = Easing.Linear
 
     skill1 = fun model player ->

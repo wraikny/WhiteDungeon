@@ -81,7 +81,7 @@ let gameSetting : Model.GameSetting = {
 
     enemyUpdateDistance = 10000.0f
 
-    characterSize = one .* 128.0f
+    //characterSize = one .* 128.0f
 
     damageCalculation = fun v invoker target ->
         v * float32 invoker.level / float32 target.level
@@ -98,5 +98,7 @@ let gameSetting : Model.GameSetting = {
     lvUpExp = fun level -> 50us * level * level
 
     maxLevel = 100us
-    growthRateOverMax = 0.5f
+    playerGrowthRateOverMax = 0.8f
+
+    levelSD = 2.0f
 }

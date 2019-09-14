@@ -63,24 +63,25 @@ with
 
 
 module Enemy =
-    let init size position id level actorStatus kind angle visionDistance visionAngleRate = {
-        actor = Actor.Actor.init size position (Actor.OfEnemyID id) level actorStatus
-        id = id
-        kind = kind
+    let init size position id level actorStatus kind angle visionDistance visionAngleRate =
+        {
+            actor = Actor.Actor.init size position (Actor.OfEnemyID id) level actorStatus
+            id = id
+            kind = kind
 
-        visionDistance = visionDistance
-        visionAngle = visionAngleRate * 2.0f * Angle.pi
+            visionDistance = visionDistance
+            visionAngle = visionAngleRate * 2.0f * Angle.pi
 
-        lookingRadian = angle
+            lookingRadian = angle
 
-        mode = FreeMoving
+            mode = FreeMoving
 
-        skillCoolTime = zero
+            skillCoolTime = zero
 
-        hateMap = Map.empty
+            hateMap = Map.empty
 
-        moveValues = zero
-    }
+            moveValues = zero
+        }
 
 
     let inline lookingDirection (enemy : Enemy) =

@@ -270,20 +270,22 @@ module Update =
             model, cmd
 
         | GeneratedDungeonParams dungeonParams ->
-            let size = model.gameSetting.characterSize
             let model =
                 model
                 |> updateEachPlayer (fun p ->
-                    let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * size)
+                    let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
                     
                     ObjectBase.map (ObjectBase.mapPosition <| fun _ -> pos) p
                 )
+
+            let dungeonFloor = model.dungeonFloor + 1us
 
             { model with
                 mode = GameSceneMode.GameMode
                 enemies =
                     Model.cellsToEnemies
                         model.gameSetting
+                        dungeonFloor
                         dungeonParams.enemyCells
                         model.gameSetting.dungeonCellSize
 
@@ -292,7 +294,7 @@ module Update =
                 dungeonBuilder = dungeonParams.dungeonBuilder
                 dungeonModel = dungeonParams.dungeonModel
                 dungeonGateCells = dungeonParams.gateCells
-                dungeonFloor = model.dungeonFloor + 1u
+                dungeonFloor = dungeonFloor
             }
             , Cmd.port ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
 

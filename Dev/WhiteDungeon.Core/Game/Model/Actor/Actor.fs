@@ -47,14 +47,25 @@ with
 
 
 module Actor =
+    let calcStatusOf easing growthRateOverMax (maxLevel : uint16) currentLevel status =
+        let growthRate =
+            if currentLevel > maxLevel then
+                float32 maxLevel + (growthRateOverMax * float32 (currentLevel - maxLevel))
+            else
+                (float32 maxLevel) * (Easing.calculate easing maxLevel currentLevel)
+
+        { status with
+            hp = status.hp * growthRate
+        }
+
     let inline init size position id level actorStatus = {
-        id = id
-        level = level
-        statusCurrent = actorStatus
-        statusDefault = actorStatus
-        objectBase = ObjectBase.init size position
-        currentMove = Walk
-    }
+            id = id
+            level = level
+            statusCurrent = actorStatus
+            statusDefault = actorStatus
+            objectBase = ObjectBase.init size position
+            currentMove = Walk
+        }
 
     let inline get (x : ^a) : Actor =
         (^a : (member actor : _) x)
