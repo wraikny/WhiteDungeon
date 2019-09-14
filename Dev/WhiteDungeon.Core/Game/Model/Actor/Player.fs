@@ -34,8 +34,8 @@ module Player =
 
     let inline character (player : Player) = player.character
 
-    let inline init size position actorStatus id character = {
-        actor = Actor.Actor.init size position (Actor.OfPlayerID id) actorStatus
+    let inline init size position level actorStatus id character = {
+        actor = Actor.Actor.init size position (Actor.OfPlayerID id) level actorStatus
         id = id
         character = character
 

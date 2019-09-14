@@ -28,6 +28,20 @@ let inline decrCoolTime (enemy : Enemy) =
         skillCoolTime = if x = 0us then 0us else x - 1us
     }
 
+
+let inline decrHateMap (gameSetting : GameSetting) (enemy : Enemy) =
+    let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
+    
+    { enemy with
+        hateMap =
+            enemy.hateMap
+            |> Map.toSeq
+            |> Seq.map (fun (k, v) -> (k, v - setting.hateDecrease) )
+            |> Seq.filter(fun (_, x) -> x > 0.0f)
+            |> Map.ofSeq
+    }
+
+
 let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
     let status = enemy |> Actor.statusCurrent
     let dir = Vec2.fromAngle enemy.lookingRadian
@@ -41,6 +55,7 @@ let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy 
     newDirection |> function
     | None -> enemy
     | Some dir -> { enemy with lookingRadian = Vec2.angle dir; moveValues = zero }
+
 
 let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy * EnemyCmd [] =
     let setting = gameSetting.enemySettings |> HashMap.find enemy.kind

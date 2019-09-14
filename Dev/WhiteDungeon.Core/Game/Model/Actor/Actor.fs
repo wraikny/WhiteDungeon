@@ -30,6 +30,7 @@ type Actor =
     {
         id : ActorID
         objectBase : ObjectBase
+        level : uint16
         statusCurrent : ActorStatus
         statusDefault : ActorStatus
         currentMove : ActorMove
@@ -42,10 +43,13 @@ with
     static member inline SetObjectBase (x, y) =
         { x with objectBase = y }
 
+    member inline x.HPRate() = x.statusCurrent.hp / x.statusDefault.hp
+
 
 module Actor =
-    let inline init size position id actorStatus = {
+    let inline init size position id level actorStatus = {
         id = id
+        level = level
         statusCurrent = actorStatus
         statusDefault = actorStatus
         objectBase = ObjectBase.init size position

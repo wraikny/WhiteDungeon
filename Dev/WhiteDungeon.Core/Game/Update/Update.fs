@@ -76,34 +76,44 @@ module Update =
             |> toList
 
         // mutable
+        let enemies = List<_>(Map.count model.enemies)
         let skillEmits = List<_>()
         let enemyCmds = List<_>()
+        
+        for (id, enemy) in (Map.toSeq model.enemies) do
+            let pos = ObjectBase.position enemy
+            let d = model.gameSetting.enemyUpdateDistance
 
-        let enemies =
-            seq {
-                for (id, enemy) in (Map.toSeq model.enemies) do
-                    let pos = ObjectBase.position enemy
-                    let d = model.gameSetting.enemyUpdateDistance
-
-                    if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
+            if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
                         
-                        let enemy, cmds = (Actor.Enemy.update model) enemy
-                        let enemy, skill = Actor.Enemy.getSKill model.gameSetting enemy
+                let enemy, cmds = (Actor.Enemy.update model) enemy
+                let enemy, skill = Actor.Enemy.getSKill model.gameSetting enemy
 
-                        // mutable
-                        skill |> Option.iter(fun skill ->
-                            skillEmits.Add(enemy, skill)
-                        )
+                // mutable
+                enemyCmds.Add(cmds)
+                skill |> Option.iter(fun skill ->
+                    skillEmits.Add(enemy, skill)
+                )
 
-                        let pos = ObjectBase.position enemy
-                        if (Actor.statusCurrent enemy).hp > 0.0f && not(pos.x = nanf || pos.y = nanf) then
-                            enemyCmds.Add(cmds)
+                let pos = ObjectBase.position enemy
 
-                            yield (id, enemy)
-                    elif not(pos.x = nanf || pos.y = nanf) then
-                        yield (id, enemy)
-            }
-            |> Map.ofSeq
+                let isAlive = (Actor.statusCurrent enemy).hp > 0.0f
+                let notNan = not(pos.x = nanf || pos.y = nanf)
+
+                match (isAlive, notNan) with
+                | _, false ->
+                #if DEBUG
+                    printfn "Enemy(%d)'s position is nanf: (%f, %f)" enemy.id.Value pos.x pos.y
+                #endif
+                    ()
+                | true, true ->
+                    enemies.Add(id, enemy)
+                | false, true ->
+                    // 経験値
+                    ()
+
+            elif not(pos.x = nanf || pos.y = nanf) then
+                enemies.Add(id, enemy)
 
         let skillList =
             seq {
@@ -128,7 +138,7 @@ module Update =
             |> Cmd.batch
 
 
-        { model with enemies = enemies; skillList = skillList }, cmd
+        { model with enemies = Map.ofSeq enemies; skillList = skillList }, cmd
 
 
     let checkGateCollision model =

@@ -84,6 +84,11 @@ with
     member inline x.objectBase = x
     static member inline SetObjectBase (_ : ObjectBase, y : ObjectBase) = y
 
+    member inline x.Area = {
+        position = x.position - (x.size ./ 2.0f)
+        size = x.size
+    }
+
 
 module ObjectBase =
     let inline init size position = {
@@ -110,11 +115,7 @@ module ObjectBase =
     let inline lastPosition x = (get x).lastPosition
     let inline velocity x = (get x).velocity
     let inline direction x = (get x).direction
-    let inline area x : float32 Rect2 =
-        {
-            position = position x - ( (size x) ./ 2.0f)
-            size = size x
-        }
+    let inline area x : float32 Rect2 = (get x).Area
 
     let inline mapSize f x = map (fun o -> {o with size = f o.size}) x
     let inline mapPosition f x =

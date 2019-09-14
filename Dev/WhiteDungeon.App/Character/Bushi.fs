@@ -17,7 +17,7 @@ open FSharpPlus.Math.Applicative
 let setting : OccupationSetting = {
     status =
         {
-            Model.ActorStatus.level = 1
+            //Model.ActorStatus.level = 1
             hp = 100.0f
             walkSpeed = 12.0f
             dashSpeed = 18.0f

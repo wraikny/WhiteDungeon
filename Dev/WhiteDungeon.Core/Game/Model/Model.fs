@@ -76,6 +76,10 @@ and EnemySetting =
 
         attackDistance : float32
         attackRange : float32
+
+        hateDecrease : float32
+
+        exPoint : int
     }
 
 
@@ -157,6 +161,7 @@ module Model =
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
+                1us
                 setting.actorStatus
                 kind
                 ei.lookAngleRadian

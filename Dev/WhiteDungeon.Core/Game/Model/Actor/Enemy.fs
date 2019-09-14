@@ -63,8 +63,8 @@ with
 
 
 module Enemy =
-    let init size position id actorStatus kind angle visionDistance visionAngleRate = {
-        actor = Actor.Actor.init size position (Actor.OfEnemyID id) actorStatus
+    let init size position id level actorStatus kind angle visionDistance visionAngleRate = {
+        actor = Actor.Actor.init size position (Actor.OfEnemyID id) level actorStatus
         id = id
         kind = kind
 

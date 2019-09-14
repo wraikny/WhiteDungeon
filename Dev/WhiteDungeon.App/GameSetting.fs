@@ -21,7 +21,7 @@ open FSharpPlus
 let enemies = [
     "Slime", {
         EnemySetting.actorStatus = {
-            Model.ActorStatus.level = 1
+            //Model.ActorStatus.level = 1
             hp = 50.0f
             walkSpeed = 2.0f
             dashSpeed = 4.0f
@@ -63,6 +63,9 @@ let enemies = [
 
         attackRange = 50.0f
         attackDistance = 300.0f
+
+        hateDecrease = 0.01f
+        exPoint = 5
     }
 ]
 
@@ -81,7 +84,7 @@ let gameSetting : Model.GameSetting = {
     characterSize = one .* 128.0f
 
     damageCalculation = fun v invoker target ->
-        v * float32 invoker.statusCurrent.level / float32 target.statusCurrent.level
+        v * float32 invoker.level / float32 target.level
 
     occupationSettings = HashMap.ofList [
         Character.Bushi.viewSetting.name, Character.Bushi.setting
