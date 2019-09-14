@@ -126,6 +126,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                                 Game.Model.Actor.Player.init
                                     size
                                     (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                                    1us
                                     status
                                     playerId
                                     character

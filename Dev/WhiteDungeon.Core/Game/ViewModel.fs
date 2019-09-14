@@ -15,73 +15,10 @@ open WhiteDungeon.Core.Game.Model.Actor
 open FSharpPlus
 
 
-type ObjectBaseView = {
-    isMoved : bool
-    area : float32 Vec2 Rect
-    direction : MoveDirection
-}
-
-module ObjectBaseView =
-    let inline fromModel (objectBase : ObjectBase) = {
-        isMoved = objectBase.isMoved
-        area =
-            objectBase
-            |> Model.ObjectBase.area
-        direction = objectBase.direction
-    }
-
-
-type ActorView = {
-    statusCurrent : Model.ActorStatus
-    statusDefault : Model.ActorStatus
-
-    objectBaseView : ObjectBaseView
-}
-
-module ActorView =
-    let inline fromModel (actor : Actor.Actor) = {
-        statusCurrent = actor.statusCurrent
-        statusDefault = actor.statusDefault
-
-        objectBaseView = actor.objectBase |> ObjectBaseView.fromModel
-    }
-
-    let inline hpRate (actorView : ActorView) =
-        float32 actorView.statusCurrent.hp / float32 actorView.statusDefault.hp
-
-
-type PlayerView = {
-    character : Model.Character
-    actorView : ActorView
-}
-
-module PlayerView =
-    let inline fromModel (player : Actor.Player) = {
-        character = player.character
-        actorView = player.actor |> ActorView.fromModel
-    }
-
-    let playersView =
-        Map.toList
-        >> map(fun (id : PlayerID, player) ->
-            (id.Value, fromModel player)
-        )
-
-type EnemyView = {
-    actorView : ActorView
-    enemy : Enemy
-}
-
-module EnemyView =
-    let inline fromModel (enemy : Actor.Enemy) = {
-        actorView = enemy.actor |> ActorView.fromModel
-        enemy = enemy
-    }
-
-    let enemiesView =
-        Map.toList
-        >> map(fun (id : EnemyID, enemy) -> (id.Value, fromModel enemy) )
-
+type ObjectBaseView = Model.ObjectBase
+type ActorView = Actor.Actor
+type PlayerView = Actor.Player
+type EnemyView = Enemy
 
 type AreaSkillEmitView = {
    baseView : ObjectBaseView
@@ -94,7 +31,7 @@ module AreaSkillEmitView =
 
     let inline fromModel (areaSkill : AreaSkill) =
         {
-            baseView = ObjectBaseView.fromModel areaSkill.objectBase
+            baseView = areaSkill.objectBase
             frameCurrent = areaSkill.frame
             frameFirst = areaSkill.frameFirst
         }
@@ -229,13 +166,9 @@ module ViewModel =
             model.players
             |> CameraView.fromPlayers
 
-        players =
-            model.players
-            |> PlayerView.playersView
+        players = [ for (i, p) in Map.toSeq model.players -> (i.Value, p) ]
 
-        enemies =
-            model.enemies
-            |> EnemyView.enemiesView
+        enemies = [ for (i, e) in Map.toSeq model.enemies -> (i.Value, e) ]
 
         areaPlayer =
             model.skillList.areaPlayer

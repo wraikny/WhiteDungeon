@@ -31,7 +31,7 @@ type SkillEmitView(_gameViewSetting : GameViewSetting) =
             this.UpdateObjectBaseView(viewModel.baseView)
 
             this.DrawingPriority <-
-                viewModel.baseView.area
+                viewModel.baseView.Area
                 |> Rect.centerPosition
                 |> Vector.y
                 |> int

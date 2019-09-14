@@ -30,4 +30,4 @@ type PlayerView(imagesMap, hpLayer) =
     interface IUpdatee<Game.ViewModel.PlayerView> with
         member this.Update(viewModel) =
             this.SetAnimationTextures(viewModel.character.currentOccupation)
-            this.UpdateActorView(viewModel.actorView)
+            this.UpdateActorView(viewModel.actor)

@@ -75,7 +75,7 @@ type ObjectBaseView< 'a
 
     member this.UpdateObjectBaseView(objectBaseView : ViewModel.ObjectBaseView) =
         // Position
-        let area = objectBaseView.area
+        let area = objectBaseView |> Model.ObjectBase.area
         let lu, rd = Rect.get_LU_RD area
         let centerPos = (lu + rd) ./ 2.0f
         let bottom = Vec2.init centerPos.x rd.y

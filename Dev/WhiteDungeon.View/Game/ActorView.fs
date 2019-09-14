@@ -45,11 +45,11 @@ type ActorView< 'a
 
 
     member this.UpdateActorView(actorView : ViewModel.ActorView) =
-        this.UpdateObjectBaseView(actorView.objectBaseView)
+        this.UpdateObjectBaseView(actorView.objectBase)
         this.UpdateHPBar(actorView)
 
     member __.UpdateHPBar(actorView : ViewModel.ActorView) =
-        let rate = ViewModel.ActorView.hpRate actorView
+        let rate = actorView.HPRate()
         let size = base.ViewSize
         hpObj.Position <- asd.Vector2DF(-size.X, -size.Y)
         hpRect.DrawingArea <- asd.RectF(asd.Vector2DF(0.0f, 0.0f), asd.Vector2DF(rate * size.X * 2.0f, -hpWidth))

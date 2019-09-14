@@ -62,7 +62,7 @@ let playerView (model : Model) =
     [
         Text(sprintf "名前: %s" <| Option.defaultValue "Player1" model.playerName)
         Text(sprintf "キャラクター: %s" occupationName)
-        Text(sprintf "レベル: %d" status.level)
+        //Text(sprintf "レベル: %d" status.level)
         Text(sprintf "体力: %.1f" status.hp)
         Text(sprintf "速さ: %.1f / %.1f" status.walkSpeed status.dashSpeed)
     ]

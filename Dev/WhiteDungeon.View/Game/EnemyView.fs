@@ -59,11 +59,11 @@ type EnemyView(gameSetting : Model.GameSetting, _gameViewSetting : GameViewSetti
 
     interface IUpdatee<Game.ViewModel.EnemyView> with
         member this.Update(viewModel) =
-            let currentKind = ValueSome viewModel.enemy.kind
+            let currentKind = ValueSome viewModel.kind
 
             if kind <> currentKind then
                 kind <- currentKind
-                enemySetting <- gameSetting.enemySettings |> HashMap.find viewModel.enemy.kind
+                enemySetting <- gameSetting.enemySettings |> HashMap.find viewModel.kind
 
                 visionArc.EndingCorner <- int (
                     enemySetting.visionAngleRate * float32 visionArc.NumberOfCorners )
@@ -72,11 +72,11 @@ type EnemyView(gameSetting : Model.GameSetting, _gameViewSetting : GameViewSetti
                 visionArc.Angle <- 90.0f - enemySetting.visionAngleRate * 180.0f
 
             
-            this.SetAnimationTextures(viewModel.enemy.kind)
-            this.UpdateActorView(viewModel.actorView)
+            this.SetAnimationTextures(viewModel.kind)
+            this.UpdateActorView(viewModel.actor)
 
             if this.EnabledVisionView then
-                let lookAngle = viewModel.enemy.lookingRadian
+                let lookAngle = viewModel.lookingRadian
 
                 visionObj.Angle <- (lookAngle |> Angle.radianToDegree)
 

@@ -131,8 +131,8 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
         let updatePlayerStatusView() =
             lastPlayerStatus <- Some playerVM
 
-            let hpCurrent = int playerVM.actorView.statusCurrent.hp
-            let hpDefault = int playerVM.actorView.statusDefault.hp
+            let hpCurrent = playerVM.actor.statusCurrent.hp
+            let hpDefault = playerVM.actor.statusDefault.hp
 
             let occSetting =
                 gameViewSetting.occupationSetting
@@ -140,9 +140,9 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
 
             playerStatusWindow.UIContents <- [
                 UI.Text (sprintf "%s / %s" playerVM.character.name occSetting.name )
-                UI.Text (sprintf "Level: %d" playerVM.actorView.statusCurrent.level)
-                UI.Text (sprintf "HP: %d/%d" hpCurrent hpDefault)
-                UI.Rect (5.0f, 0.8f * ViewModel.ActorView.hpRate playerVM.actorView)
+                UI.Text (sprintf "Level: %d" playerVM.actor.level)
+                UI.Text (sprintf "HP: %d/%d" (int hpCurrent) (int hpDefault) )
+                UI.Rect (5.0f, 0.8f * (hpCurrent / hpDefault))
             ]
 
 
