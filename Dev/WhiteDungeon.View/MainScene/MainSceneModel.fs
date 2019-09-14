@@ -60,7 +60,7 @@ type Msg =
     | SelectOccupation of Occupation
     | InputName of string
 
-    | SetDungeonParameters of int
+    | SetDungeonParameters of uint16
 
     | GenerateDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
@@ -79,8 +79,7 @@ type Model =
         playerName : string option
         selectOccupation : Occupation
 
-        gateCount : int
-        dungeonBuilder : DungeonBuilder
+        initSize : uint16
 
         setting : View.AppSetting
 
@@ -91,21 +90,6 @@ type Model =
         gameSceneRandomSeed : int
 
         msgHistory : Msg list
-    }
-
-
-let updateDungeonBuilder i (model : Model) =
-    let i1 = i + 1
-    { model with
-        gateCount = i1
-        dungeonBuilder =
-            { model.dungeonBuilder with
-                roomCount = 100 * i
-                minRoomSize = (3 * i1, 2 * i1)
-                maxRoomSize = (6 * i1, 4 * i1)
-                roomGeneratedRange = (2.0f * 30.0f * float32 i, 1.0f * 30.0f * float32 i)
-                corridorWidth = i1
-            }
     }
 
 
@@ -121,22 +105,7 @@ let initModel env (setting : View.AppSetting) =
             |> HashMap.toList
             |> fun x -> fst (x.[0])
 
-        gateCount = zero
-        dungeonBuilder =
-            {
-                seed = 0
-                roomCount = zero
-
-                roomGeneratedRange = zero, zero
-
-                minRoomSize = zero, zero
-                maxRoomSize = zero, zero
-
-                roomMoveRate = 0.3f
-                roomMeanThreshold = 1.25f
-                restoreEdgeRate = 0.2f
-                corridorWidth = 3
-            }
+        initSize = 1us
 
         setting = setting
 
@@ -148,4 +117,3 @@ let initModel env (setting : View.AppSetting) =
 
         msgHistory = []
     }
-    |> updateDungeonBuilder 1

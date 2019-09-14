@@ -62,8 +62,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 occupationListToggle = false }, Cmd.none
 
         | SetDungeonParameters i ->
-            model |> Model.updateDungeonBuilder i
-            , Cmd.none
+            { model with initSize = i }, Cmd.none
 
         | GenerateDungeon ->
             let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
@@ -71,7 +70,10 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
         | SetGameSceneRandomSeed x ->
             if model.uiMode = WaitingGenerating then
-                Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
+                let dungeonBuilder =
+                    model.setting.gameSetting.createDungeonBuilder
+                        1us model.initSize
+                Game.Model.Dungeon.generateDungeonModel dungeonBuilder
                 |> TartTask.perform (fun e ->
     #if DEBUG
                     System.Console.WriteLine(e)
@@ -84,10 +86,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
         | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
             if model.uiMode = WaitingGenerating then
+                let gateCount = model.setting.gameSetting.gateCount 1us model.initSize
                 let cmd =
                     Game.Model.Dungeon.generateDungeonParams
                         model.setting.gameSetting
-                        model.gateCount
+                        gateCount
                         dungeonBuilder
                         dungeonModel
                         GeneratedDungeonParams
@@ -144,6 +147,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         players
                         dungeonParams.dungeonBuilder
                         dungeonParams.dungeonModel
+                        model.initSize
                         dungeonParams.gateCells
                         dungeonParams.enemyCells
                         model.setting.gameSetting

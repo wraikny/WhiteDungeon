@@ -101,4 +101,30 @@ let gameSetting : Model.GameSetting = {
     playerGrowthRateOverMax = 0.8f
 
     levelSD = 2.0f
+
+    createDungeonBuilder = fun (dungeonFloor : uint16) (initSize : uint16) ->
+        let iSizef = 1.0f + float32 initSize
+        let df = float32 dungeonFloor
+        let inline f a x = (float32 x) * iSizef + df * a
+        let inline fi a x = f a x |> floor |> int
+        //let inline f0 x = f 0.0f x
+
+        {
+            seed = 0
+
+            roomCount = fi 5.0f 100
+            minRoomSize = (fi 0.05f 3, fi 0.05f 2)
+            maxRoomSize = (fi 0.1f 6, fi 0.1f 4)
+            roomGeneratedRange = (f 2.0f 60.0f, f 2.0f 30.0f)
+            corridorWidth = fi 0.02f 1
+
+            roomMoveRate = 0.3f
+            roomMeanThreshold = 1.25f
+            restoreEdgeRate = 0.2f
+        }
+
+    gateCount = fun (dungeonFloor : uint16) (initSize : uint16) ->
+        (float32 initSize) + 0.01f * (float32 dungeonFloor)
+        |> floor
+        |> int
 }

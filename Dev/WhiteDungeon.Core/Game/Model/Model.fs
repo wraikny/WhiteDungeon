@@ -103,6 +103,9 @@ and GameSetting = {
     playerGrowthRateOverMax : float32
 
     levelSD : float32
+
+    createDungeonBuilder : uint16 -> uint16 -> DungeonBuilder
+    gateCount : uint16 -> uint16 -> int
 }
 
 
@@ -130,6 +133,8 @@ and Model =
         lastCollidedGate : bool
 
         dungeonFloor : uint16
+
+        initSize : uint16
     }
 with
     static member SetSkillList (x, s) =
@@ -160,6 +165,7 @@ module Model =
     let inline dungeonModel (model : Model) = model.dungeonModel
 
     let inline gameSetting (model : Model) = model.gameSetting
+
 
     let cellsToEnemies (gameSetting : GameSetting) (dungeonFloor) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
@@ -193,7 +199,7 @@ module Model =
         )
         |> Map.ofSeq
 
-    let inline init players dungeonBuilder dungeonModel dungeonGateCells enemyCells gameSetting = {
+    let inline init players dungeonBuilder dungeonModel initSize dungeonGateCells enemyCells gameSetting = {
         gameSetting = gameSetting
         count = 0u
 
@@ -213,7 +219,6 @@ module Model =
         dungeonModel = dungeonModel
         dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
 
-
         timePassed = false
 
         mode = HowToControl
@@ -221,6 +226,7 @@ module Model =
         lastCollidedGate = false
 
         dungeonFloor = 1us
+        initSize = initSize
     }
 
 module GameSetting =

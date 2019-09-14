@@ -68,7 +68,7 @@ let playerView (model : Model) =
     ]
 
 let selectUIChara (model : Model) : Msg MenuItem list =
-    seq {
+    [
         yield HeaderText("キャラクター")
         yield Separator
 
@@ -95,45 +95,46 @@ let selectUIChara (model : Model) : Msg MenuItem list =
             yield! (playerView model)
             //yield Separator
 
-    } |> Seq.toList
+    ]
 
 
 let dungeonView (model : Model) =
-    let db = model.dungeonBuilder
+    let gameSetting = model.setting.gameSetting
+    let db = gameSetting.createDungeonBuilder 1us model.initSize
+    let gateCount = gameSetting.gateCount 1us model.initSize
     [
         Text(sprintf "生成数: %d" db.roomCount)
         Text(sprintf "部屋サイズ: %A~%A" db.minRoomSize db.maxRoomSize)
-        Text(sprintf "廊下幅: %d / 門の数: %d" db.corridorWidth model.gateCount)
+        Text(sprintf "廊下幅: %d / 門の数: %d" db.corridorWidth gateCount)
     ]
 
 
 let selectUIDungeon (model : Model) =
-    seq {
+    [
         yield HeaderText("迷宮")
         yield Separator
 
         yield! (dungeonView model)
-        for i in 1..3 ->
+        for i in 1us..3us ->
             Button(sprintf "サイズ%d" i, SetDungeonParameters i)
         //yield Separator
-    }
-    |> Seq.toList
+    ]
 
 
 let selectUICheck (model : Model) =
     [
-        [
+        yield! [
             Text("以下の内容でゲームを開始します")
             Separator
             Text(sprintf "%s / %A" (Option.defaultValue "Player1" model.playerName) model.selectOccupation)
             Separator
         ]
-        dungeonView model
-        [
+        yield! (dungeonView model)
+        yield! [
             Separator
             Button("始める", GenerateDungeon)
         ]
-    ] |> List.concat
+    ]
 
 
 let creditUISide = [
@@ -200,22 +201,24 @@ let settingUISide = [
 
 let settingUISoundVolume model =
     [
-        HeaderText "音量"
-        Separator
-        Text <| sprintf "BGM: %d/10" model.bgmVolume
-    ] @ (
+        yield! [
+            HeaderText "音量"
+            Separator
+            Text <| sprintf "BGM: %d/10" model.bgmVolume
+        ]
         let upButton = Button("上げる", AddBGMVolume 1)
         let downButton = Button("下げる", AddBGMVolume -1)
-        model.bgmVolume |> function
-        | 0 -> 
-            [ upButton; Text "下げる" ]
-        | 10 ->
-            [ Text "上げる"; downButton ]
-        | _ ->
-            [ upButton; downButton ]
+        yield! (
+            match model.bgmVolume with
+            | 0 -> 
+                [ upButton; Text "下げる" ]
+            | 10 ->
+                [ Text "上げる"; downButton ]
+            | _ ->
+                [ upButton; downButton ]
+        )
 
-    ) @ [
-        Separator
+        yield Separator
     ]
 
 

@@ -249,8 +249,11 @@ module Update =
             , Cmd.none
 
         | GenerateNewDungeon ->
+            let dungeonBuilder =
+                model.gameSetting.createDungeonBuilder
+                    model.dungeonFloor model.initSize
             //Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
-            Dungeon.generateDungeonModel model.dungeonBuilder
+            Dungeon.generateDungeonModel dungeonBuilder
             |> TartTask.perform (fun e ->
 #if DEBUG
                 System.Console.WriteLine(e)
@@ -263,7 +266,7 @@ module Update =
             let cmd =
                 Dungeon.generateDungeonParams
                     model.gameSetting
-                    (length model.dungeonGateCells)
+                    (model.gameSetting.gateCount model.dungeonFloor 1us)
                     dungeonBuilder
                     dungeonModel
                     GeneratedDungeonParams
