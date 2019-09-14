@@ -75,3 +75,5 @@ module Actor =
 
     let inline mapStatus f x =
         map (fun a -> { a with statusCurrent = f (statusCurrent x)}) x
+
+    let inline level x = (get x).level

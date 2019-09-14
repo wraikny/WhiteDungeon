@@ -45,8 +45,14 @@ type GameSceneArgs = {
     randomSeed : int
 }
 
+type private PlayerValues = {
+    status : Model.ActorStatus
+    expoint : uint16
+    occupation : Model.Occupation
+}
 
-type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
+
+type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, gameSceneArgs : GameSceneArgs) =
     inherit asd.GeometryObject2D()
 
     let ws = asd.Engine.WindowSize.To2DF()
@@ -111,7 +117,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
 
     let mutable lastFloor = maxValue<uint32>
 
-    let mutable lastPlayerStatus = None
+    let mutable lastPlayerValues = None
 
     override this.OnAdded() =
         this.AddChildWindow(dungeonFloorWindow)
@@ -126,30 +132,39 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
                 UI.Text (sprintf "Floor: %d" viewModel.dungeonFloor)
             ]
 
-        let playerVM = snd viewModel.players.[0]
+        let player = snd viewModel.players.[0]
 
-        let updatePlayerStatusView() =
-            lastPlayerStatus <- Some playerVM
+        let occSetting =
+            gameViewSetting.occupationSetting
+            |> HashMap.find player.character.currentOccupation
 
-            let hpCurrent = playerVM.actor.statusCurrent.hp
-            let hpDefault = playerVM.actor.statusDefault.hp
 
-            let occSetting =
-                gameViewSetting.occupationSetting
-                |> HashMap.find playerVM.character.currentOccupation
+        (lastPlayerValues) |> function
+        | Some {status = x; occupation = y; expoint = z } when
+            x = player.actor.statusCurrent
+            && y = player.character.currentOccupation
+            && z = player.expoint
+            -> ()
+        | _ ->
+            lastPlayerValues <- Some {
+                status = player.actor.statusCurrent
+                expoint = player.expoint
+                occupation = player.character.currentOccupation
+            }
+            
+            let hpCurrent = player.actor.statusCurrent.hp
+            let hpDefault = player.actor.statusDefault.hp
 
+            let nextExp = gameSetting.lvUpExp player.actor.level
+            
             playerStatusWindow.UIContents <- [
-                UI.Text (sprintf "%s / %s" playerVM.character.name occSetting.name )
-                UI.Text (sprintf "Level: %d" playerVM.actor.level)
+                UI.Text (sprintf "%s / %s" player.character.name occSetting.name )
+                UI.Text (sprintf "Level: %d" player.actor.level)
+                UI.Text (sprintf "Exp: %d/%d" player.expoint nextExp)
+                UI.RectWith (5.0f, 0.8f * (float32 player.expoint / float32 nextExp), asd.Color(0, 255, 0, 255))
                 UI.Text (sprintf "HP: %d/%d" (int hpCurrent) (int hpDefault) )
                 UI.Rect (5.0f, 0.8f * (hpCurrent / hpDefault))
             ]
-
-
-        lastPlayerStatus |> function
-        | None -> updatePlayerStatusView()
-        | Some x when x <> playerVM -> updatePlayerStatusView()
-        | _ -> ()
 
 
     member __.Toggle(cond, ?callback) =

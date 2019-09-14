@@ -79,6 +79,7 @@ module Update =
         let enemies = List<_>(Map.count model.enemies)
         let skillEmits = List<_>()
         let enemyCmds = List<_>()
+        let exPoints = Dictionary<_, _>()
         
         for (id, enemy) in (Map.toSeq model.enemies) do
             let pos = ObjectBase.position enemy
@@ -109,8 +110,21 @@ module Update =
                 | true, true ->
                     enemies.Add(id, enemy)
                 | false, true ->
+                    let setting = model.gameSetting.enemySettings |> HashMap.find enemy.kind
                     // 経験値
-                    ()
+                    let hates = enemy.hateMap |> Map.toList
+                    let hatesSum = hates |>> snd |> sum
+                    for (id, v) in hates do
+                        let player = model.players |> Map.find id
+                        let exp =
+                            ( float32 enemy.actor.level / float32 player.actor.level
+                            ) * v / hatesSum * float32 setting.exPoint + 1.0f
+                            |> uint16
+
+                        if exPoints.ContainsKey(id) then
+                            exPoints.[id] <- exPoints.[id] + exp
+                        else
+                            exPoints.Add(id, exp)
 
             elif not(pos.x = nanf || pos.y = nanf) then
                 enemies.Add(id, enemy)
@@ -138,7 +152,19 @@ module Update =
             |> Cmd.batch
 
 
-        { model with enemies = Map.ofSeq enemies; skillList = skillList }, cmd
+        { model with
+            enemies = Map.ofSeq enemies
+            skillList = skillList
+            players =
+                model.players
+                |> Map.map(fun id player ->
+                    exPoints.TryGetValue(id) |> function
+                    | true, v ->
+                        printfn "exp: Player(%d) got %d" id.Value v
+                        Actor.Player.addExp model.gameSetting v player
+                    | _ -> player
+                )
+        }, cmd
 
 
     let checkGateCollision model =

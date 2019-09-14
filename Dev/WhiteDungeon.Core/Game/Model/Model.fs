@@ -60,6 +60,8 @@ type OccupationSetting =
 
         skill1CoolTime : uint16
         skill2CoolTime : uint16
+
+        growthEasing : Easing
     }
 
 
@@ -79,7 +81,7 @@ and EnemySetting =
 
         hateDecrease : float32
 
-        exPoint : int
+        exPoint : uint16
     }
 
 
@@ -98,6 +100,11 @@ and GameSetting = {
     enemySettings : HashMap<EnemyKind, EnemySetting>
 
     intToEnemy : (int -> EnemyKind)
+
+    lvUpExp : uint16 -> uint16
+
+    maxLevel : uint16
+    growthRateOverMax : float32
 }
 
 

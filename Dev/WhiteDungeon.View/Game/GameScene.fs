@@ -195,7 +195,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 | ViewMsg.DamagesView x -> damagesView.Add(x)
             )
 
-    let gameUIWindows = new GameUI(gameViewSetting, gameSceneArgs)
+    let gameUIWindows = new GameUI(gameViewSetting, gameModel.gameSetting, gameSceneArgs)
     do
         messenger.ViewModel.Add(gameUIWindows.OnNext)
     //let gameUIWindows = gameUIWindows :> UI.IToggleWindow

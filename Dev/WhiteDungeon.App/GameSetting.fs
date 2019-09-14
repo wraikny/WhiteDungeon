@@ -65,7 +65,7 @@ let enemies = [
         attackDistance = 300.0f
 
         hateDecrease = 0.01f
-        exPoint = 5
+        exPoint = 5us
     }
 ]
 
@@ -94,4 +94,9 @@ let gameSetting : Model.GameSetting = {
 
     intToEnemy = fun i ->
         enemies.[i % enemiesCount] |> fst
+
+    lvUpExp = fun level -> 50us * level * level
+
+    maxLevel = 100us
+    growthRateOverMax = 0.5f
 }

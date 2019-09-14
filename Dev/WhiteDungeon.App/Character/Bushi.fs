@@ -22,6 +22,9 @@ let setting : OccupationSetting = {
             walkSpeed = 12.0f
             dashSpeed = 18.0f
         }
+
+    growthEasing = Easing.Linear
+
     skill1 = fun model player ->
         let actor = player.actor
         let dir = 

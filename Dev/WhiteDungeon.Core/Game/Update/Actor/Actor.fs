@@ -23,6 +23,17 @@ let addHP diff (actor : Actor) =
     )
 
 
+let inline levelUp newLevel status (x : ^a) =
+    x |> Actor.map(fun actor ->
+        { actor with
+            level = newLevel
+            statusDefault = status
+            statusCurrent = { status with hp = actor.HPRate() * status.hp }
+        }
+    )
+    
+
+
 open WhiteDungeon.Core.Game.Msg
 
 open wraikny.Tart.Helper.Math

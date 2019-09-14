@@ -1,8 +1,10 @@
 ﻿module WhiteDungeon.Core.Game.Update.Actor.Player
 
 //open wraikny.Tart.Helper.Extension
-
+open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper.Collections
 open WhiteDungeon.Core.Game
+open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model.Actor
 open WhiteDungeon.Core.Game.Update.Actor
 
@@ -12,6 +14,50 @@ let inline decrCoolTimes player =
     player
     |> Player.mapCoolTime Skill1 decr
     |> Player.mapCoolTime Skill2 decr
+
+
+let inline addExp (gameSetting : GameSetting) v (player : Player) =
+    if v > 0us then
+        let rec loop level exp =
+            let nextExp = gameSetting.lvUpExp level
+            if nextExp < exp then
+                loop (level + 1us) (exp - nextExp)
+            else
+                (level, exp)
+
+        let newLevel, exp = loop (Actor.level player) (player.expoint + v)
+
+        let player =
+            { player with
+                expoint = exp
+                expointSum = player.expointSum + v
+            }
+            
+
+        if newLevel > (Actor.level player) then
+            let setting =
+                gameSetting.occupationSettings
+                |> HashMap.find player.character.currentOccupation
+
+            let growthRate =
+                let maxLv = gameSetting.maxLevel
+                if newLevel > maxLv then
+                    float32 maxLv + (gameSetting.growthRateOverMax * float32 (newLevel - maxLv))
+                else
+                    (float32 maxLv) * (Easing.calculate setting.growthEasing gameSetting.maxLevel newLevel)
+
+            let status =
+                { setting.status with
+                    hp = setting.status.hp * growthRate
+                }
+
+            Actor.levelUp newLevel status player
+        else
+            player
+            
+    else
+        player
+
 
 let inline update player : Player =
     player

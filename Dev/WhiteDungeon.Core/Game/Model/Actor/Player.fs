@@ -16,6 +16,9 @@ type Player =
 
         skill1CoolTime : uint16
         skill2CoolTime : uint16
+
+        expoint : uint16
+        expointSum : uint16
     }
 
 with
@@ -41,6 +44,8 @@ module Player =
 
         skill1CoolTime = 0us
         skill2CoolTime = 0us
+        expoint = 0us
+        expointSum = 0us
     }
 
     let inline coolTime kind player =
