@@ -362,7 +362,7 @@ module Dungeon =
                         return {
                             EnemyInits.kind = kind
                             lookAngleRadian = 2.0f * Angle.pi * float32 angle
-                            levelDiff = uint16 (p1 * gameSetting.levelSD)
+                            levelDiff = uint16 (p1 * gameSetting.levelSD |> max 0.0f)
                         }
                     })
 
