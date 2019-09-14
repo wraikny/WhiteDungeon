@@ -20,8 +20,8 @@ open WhiteDungeon.View.Utils.Color
 open FSharpPlus
 open FSharpPlus.Math.Applicative
 
-type EnemyView(gameSetting : Model.GameSetting, _gameViewSetting : GameViewSetting, hpLayer) = // as this =
-    inherit ActorView<Model.EnemyKind>(HashMap.empty, hpLayer)
+type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSetting, hpLayer) = // as this =
+    inherit ActorView<Model.EnemyKind>(gameViewSetting, HashMap.empty, hpLayer)
 
     let mutable kind = ValueNone
     let mutable enemySetting = Unchecked.defaultof<Model.EnemySetting>

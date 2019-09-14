@@ -91,7 +91,7 @@ type ObjectViewSetting =
         characterImages : ActorImages<string, int Rect2>
     }
 
-type DamageViewSetting =
+type FontSetting =
     {
         font : string
         size : int
@@ -115,8 +115,10 @@ type GameViewSetting = {
 
     damageTextFrame : int
     damageTextMove : float32
-    damageView : DamageViewSetting
-    healView : DamageViewSetting
+    damageView : FontSetting
+    healView : FontSetting
+
+    actorGameText : FontSetting
 }
 
 module GameViewSetting =

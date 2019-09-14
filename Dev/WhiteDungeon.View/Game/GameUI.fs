@@ -161,9 +161,9 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
                 UI.Text (sprintf "%s / %s" player.character.name occSetting.name )
                 UI.Text (sprintf "Level: %d" player.actor.level)
                 UI.Text (sprintf "Exp: %d/%d" player.expoint nextExp)
-                UI.RectWith (5.0f, 0.8f * (float32 player.expoint / float32 nextExp), asd.Color(0, 255, 0, 255))
+                UI.RectWith (5.0f, 0.8f * (float32 player.expoint / float32 nextExp), asd.Color(200, 255, 255, 255))
                 UI.Text (sprintf "HP: %d/%d" (int hpCurrent) (int hpDefault) )
-                UI.Rect (5.0f, 0.8f * (hpCurrent / hpDefault))
+                UI.RectWith (5.0f, 0.8f * (hpCurrent / hpDefault), asd.Color(0, 255, 0, 255))
             ]
 
 

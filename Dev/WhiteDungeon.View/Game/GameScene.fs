@@ -106,7 +106,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new PlayerView(playersImagesMap, hpLayer)
+                    create = fun () -> new PlayerView(gameViewSetting, playersImagesMap, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
                 }))

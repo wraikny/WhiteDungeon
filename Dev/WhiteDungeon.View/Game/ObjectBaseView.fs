@@ -53,13 +53,21 @@ type ObjectBaseView< 'a
     
     let moveAnimation = MoveAnimation(textureObj)
 
-    let mutable texViewSize = asd.Vector2DF(0.0f, 0.0f)
+    let mutable texViewSize = asd.Vector2DF()
+
+    let onSetViewSize = Event<asd.Vector2DF>()
+
+    member __.OnSetViewSize = onSetViewSize.Publish
 
     member __.SizeView with get() = sizeView
     member __.TextureView with get() = textureObj
 
     member __.LastSize with get() = lastSize
-    member __.ViewSize with get() = texViewSize
+    member private __.ViewSize
+        with get() = texViewSize
+        and set(x) =
+            texViewSize <- x
+            onSetViewSize.Trigger(x)
 
     member __.EnabledSizeView
         with get() = sizeView.IsDrawn
@@ -102,9 +110,9 @@ type ObjectBaseView< 'a
                 textureObj.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
                 textureObj.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
                 // TODO
-                texViewSize <- texSize * asd.Vector2DF(0.5f, 1.0f) // * scale
+                this.ViewSize <- texSize * asd.Vector2DF(0.5f, 1.0f) // * scale
         else
-            texViewSize <- size
+            this.ViewSize <- size
 
     member __.SetAnimationTextures(textureKind) =
         if lastTextureKind <> Some textureKind then

@@ -22,6 +22,7 @@ open FSharpPlus
 let black = Vec3.init 0uy 0uy 0uy
 let white = Vec3.init 255uy 255uy 255uy
 
+let red = Vec3 .init 255uy 0uy 0uy
 let green = Vec3.init 0uy 255uy 0uy
 
 let ume = Vec3.init 234uy 173uy 189uy
@@ -36,9 +37,9 @@ let textFontPath = "Font/mplus-1c-light.ttf"
 
 let damageView = {
     font = "Font/mplus-1p-bold.ttf"
-    size = 50
-    sizeOutline = 10
-    color = black
+    size = 60
+    sizeOutline = 5
+    color = red
     colorOutline = white
 }
 
@@ -85,5 +86,13 @@ let gameViewSetting : View.GameViewSetting =
             damageView with
                 color = green
                 colorOutline = white
+        }
+
+        actorGameText = {
+            font = textFontPath
+            size = 50
+            sizeOutline = 3
+            color = black
+            colorOutline = black
         }
     }

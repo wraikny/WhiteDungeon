@@ -32,7 +32,7 @@ type DamagesView(gameViewSetting : GameViewSetting) =
         o.IsDrawn <- false
         objects.Push(o)
 
-    let createFont (v : DamageViewSetting) =
+    let createFont (v : FontSetting) =
         asd.Engine.Graphics.CreateDynamicFont(
             v.font,
             v.size, Vec3.toColor v.color,
