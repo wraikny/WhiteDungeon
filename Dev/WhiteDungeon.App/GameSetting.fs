@@ -66,6 +66,8 @@ let enemies = [
 
         hateDecrease = 0.01f
         exPoint = 5us
+
+        popFrequency = 10us
     }
 ]
 
@@ -81,8 +83,6 @@ let gameSetting : Model.GameSetting = {
 
     enemyUpdateDistance = 10000.0f
 
-    //characterSize = one .* 128.0f
-
     damageCalculation = fun v invoker target ->
         v * float32 invoker.level / float32 target.level
 
@@ -90,16 +90,10 @@ let gameSetting : Model.GameSetting = {
         Character.Bushi.viewSetting.name, Character.Bushi.setting
     ]
 
-    enemySettings = HashMap.ofList enemies
-
-    intToEnemy = fun i ->
-        enemies.[i % enemiesCount] |> fst
-
     lvUpExp = fun level -> 50us * level * level
 
     maxLevel = 100us
     playerGrowthRateOverMax = 0.8f
-
     levelSD = 2.0f
 
     createDungeonBuilder = fun (dungeonFloor : uint16) (initSize : uint16) ->
@@ -127,4 +121,14 @@ let gameSetting : Model.GameSetting = {
         (float32 initSize) + 0.01f * (float32 dungeonFloor)
         |> floor
         |> int
+
+    enemySettings = HashMap.ofList enemies
+    enemyFrequencySum = enemies |> Seq.sumBy(fun x -> (snd x).popFrequency)
+    enemyFrequencyRanges = [|
+        let mutable fsum = 0us
+        for (k, x) in enemies do
+            let ls = fsum
+            fsum <- fsum + x.popFrequency
+            yield ( k, (ls, fsum) )
+    |]
 }

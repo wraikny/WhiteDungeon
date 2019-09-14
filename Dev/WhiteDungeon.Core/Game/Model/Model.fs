@@ -78,6 +78,8 @@ and EnemySetting =
         hateDecrease : float32
 
         exPoint : uint16
+
+        popFrequency : uint16
     }
 
 
@@ -93,9 +95,12 @@ and GameSetting = {
     //characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : HashMap<Occupation, OccupationSetting>
-    enemySettings : HashMap<EnemyKind, EnemySetting>
 
-    intToEnemy : (int -> EnemyKind)
+    enemySettings : HashMap<EnemyKind, EnemySetting>
+    enemyFrequencySum : uint16
+    enemyFrequencyRanges : ( EnemyKind * (uint16 * uint16) ) []
+
+    //intToEnemy : (int -> EnemyKind)
 
     lvUpExp : uint16 -> uint16
 
@@ -149,7 +154,7 @@ module OccupationSetting =
 
 
 type EnemyInits = {
-    kind : int
+    kind : EnemyKind
     lookAngleRadian : float32
     levelDiff : uint16
 }
@@ -172,8 +177,7 @@ module Model =
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
-            let kind = gameSetting.intToEnemy ei.kind
-            let setting = gameSetting.enemySettings |> HashMap.find kind
+            let setting = gameSetting.enemySettings |> HashMap.find ei.kind
 
             let level = ei.levelDiff + dungeonFloor
 
@@ -192,7 +196,7 @@ module Model =
                 enemyId
                 level
                 status
-                kind
+                ei.kind
                 ei.lookAngleRadian
                 setting.visionDistance
                 setting.visionAngleRate
@@ -358,15 +362,33 @@ module Dungeon =
                 let! enemyCellIndexs =
                     Random.list smallRoomsCount smallRoomGen
 
+                let enemyKindsCount = gameSetting.enemySettings |> HashMap.count
+
+                let searchKind ki =
+                    let rec searchKind width index =
+                        let index = index |> max 0 |> min (enemyKindsCount - 1)
+                        let kind, (minV, maxV) = gameSetting.enemyFrequencyRanges.[index]
+                        if ki < minV then
+                            searchKind ( (width / 2) |> max 1 ) (index + width)
+                        elif maxV < ki then
+                            searchKind ( (width / 2) |> max 1 ) (index - width)
+                        elif ki = minV then
+                            fst gameSetting.enemyFrequencyRanges.[index - 1]
+                        else
+                            kind
+
+                    searchKind (enemyKindsCount / 4) (enemyKindsCount / 2)
+
                 let! enemyInints =
                     Random.list smallRoomsCount ( monad {
-                        let! kind = Random.int 0 maxValue<int>
+                        let! kindValue = Random.int 1 (int gameSetting.enemyFrequencySum)
+
                         let! angle = Random.double01
                         let! p1 = Random.double01
                         let! p2 = Random.double01
                         let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
-                            EnemyInits.kind = kind
+                            EnemyInits.kind = searchKind (uint16 kindValue)
                             lookAngleRadian = 2.0f * Angle.pi * float32 angle
                             levelDiff = uint16 (p1 * gameSetting.levelSD |> max 0.0f)
                         }
