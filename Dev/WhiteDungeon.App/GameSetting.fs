@@ -84,7 +84,7 @@ let gameSetting : Model.GameSetting = {
     enemyUpdateDistance = 10000.0f
 
     damageCalculation = fun v invoker target ->
-        v * float32 invoker.level / float32 target.level
+        1.0f + v * float32 invoker.level / float32 target.level
 
     occupationSettings = HashMap.ofList [
         Character.Bushi.viewSetting.name, Character.Bushi.setting
