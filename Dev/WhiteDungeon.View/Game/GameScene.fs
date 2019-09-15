@@ -12,7 +12,6 @@ open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Core.Input
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
@@ -60,14 +59,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
             [
-                Game.Msg.UpKey    , asd.Keys.W
-                Game.Msg.DownKey  , asd.Keys.S
-                Game.Msg.RightKey , asd.Keys.D
-                Game.Msg.LeftKey  , asd.Keys.A
-                Game.Msg.DashKey  , asd.Keys.LeftShift
+                UpKey    , asd.Keys.W
+                DownKey  , asd.Keys.S
+                RightKey , asd.Keys.D
+                LeftKey  , asd.Keys.A
+                DashKey  , asd.Keys.LeftShift
             ]
         |> KeyboardBuilder.build
-        :> IController<Game.Msg.PlayerInput>
+        :> IController<PlayerInput>
 
     //let controllers = [|
     //    Game.Model.PlayerID 0u, gameKeybaord
@@ -429,14 +428,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         | _ -> ()
 
 
-    member this.PushControllerInput() : Msg.Msg option =
+    member this.PushControllerInput() : Msg option =
         let getStateIs (state : asd.ButtonState) key =
             gameKeybaord.GetState(key)
             |> Option.ofNullable
             |>> ((=) state)
             |> Option.defaultValue false
 
-        Msg.PlayerInput.inputs
+        PlayerInput.inputs
         |> filter (getStateIs asd.ButtonState.Hold)
         |> function
         | [] -> None

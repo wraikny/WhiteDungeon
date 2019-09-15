@@ -6,7 +6,6 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 
 open  FSharpPlus
 

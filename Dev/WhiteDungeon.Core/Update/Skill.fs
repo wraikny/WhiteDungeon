@@ -1,12 +1,11 @@
-﻿namespace WhiteDungeon.Core.Game.Update
+﻿namespace WhiteDungeon.Core.Update
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Update
+open WhiteDungeon.Core.Update
 
 open FSharpPlus
 open wraikny.Tart.Helper.Extension

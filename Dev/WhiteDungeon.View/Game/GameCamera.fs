@@ -7,7 +7,7 @@ open wraikny.Tart.Core
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Fs.Math
-open WhiteDungeon.Core.Game
+open WhiteDungeon.Core
 open WhiteDungeon.View
 
 open System

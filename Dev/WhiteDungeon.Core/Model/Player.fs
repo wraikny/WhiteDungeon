@@ -1,10 +1,17 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 
 
 type SkillKind = Skill1 | Skill2
+
+
+type Character = {
+    id : CharacterID
+    name : string
+    currentOccupation : Occupation
+    //occupations : Map<Occupation, ActorStatus>
+}
 
 
 type Player =

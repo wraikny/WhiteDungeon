@@ -12,7 +12,6 @@ open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Core.Input
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 

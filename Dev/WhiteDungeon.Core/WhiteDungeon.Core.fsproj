@@ -9,23 +9,22 @@
     <OtherFlags>--warnon:1182</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\GameObject.fs" />
-    <Compile Include="Game\Model\Alias.fs" />
-    <Compile Include="Game\Model\ObjectBase.fs" />
-    <Compile Include="Game\Model\Actor.fs" />
-    <Compile Include="Game\Model\Skill.fs" />
-    <Compile Include="Game\Model\Player.fs" />
-    <Compile Include="Game\Model\Enemy.fs" />
-    <Compile Include="Game\Model\Model.fs" />
-    <Compile Include="Game\Msg.fs" />
-    <Compile Include="Game\ViewMsg.fs" />
-    <Compile Include="Game\Update\ObjectBase.fs" />
-    <Compile Include="Game\Update\Actor.fs" />
-    <Compile Include="Game\Update\Player.fs" />
-    <Compile Include="Game\Update\Enemy.fs" />
-    <Compile Include="Game\Update\Skill.fs" />
-    <Compile Include="Game\Update\Update.fs" />
-    <Compile Include="Game\ViewModel.fs" />
+    <Compile Include="Model\Alias.fs" />
+    <Compile Include="Model\ObjectBase.fs" />
+    <Compile Include="Model\Actor.fs" />
+    <Compile Include="Model\Skill.fs" />
+    <Compile Include="Model\Player.fs" />
+    <Compile Include="Model\Enemy.fs" />
+    <Compile Include="Model\Model.fs" />
+    <Compile Include="Msg.fs" />
+    <Compile Include="ViewMsg.fs" />
+    <Compile Include="Update\ObjectBase.fs" />
+    <Compile Include="Update\Actor.fs" />
+    <Compile Include="Update\Player.fs" />
+    <Compile Include="Update\Enemy.fs" />
+    <Compile Include="Update\Skill.fs" />
+    <Compile Include="Update\Update.fs" />
+    <Compile Include="ViewModel.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpPlus" Version="1.0.0" />

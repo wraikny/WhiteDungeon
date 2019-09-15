@@ -1,4 +1,12 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
+
+type Occupation = string
+type EnemyKind = string
+type SkillID = uint32
+
+[<Struct>]
+type CharacterID = CharacterID of int
+
 
 [<Struct>]
 type PlayerID = PlayerID of id : uint32 with

@@ -1,7 +1,6 @@
-﻿namespace WhiteDungeon.Core.Game.ViewModel
+﻿namespace WhiteDungeon.Core.ViewModel
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 // open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Helper.Math
@@ -9,7 +8,6 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 
@@ -39,7 +37,7 @@ module CameraView =
         |>> ((fun (_, p) -> p.actor.objectBase.position) >> init)
 
 
-open WhiteDungeon.Core.Game.Msg
+open WhiteDungeon.Core
 
 
 type UIItem =

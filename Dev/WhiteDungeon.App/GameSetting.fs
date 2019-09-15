@@ -8,9 +8,7 @@ open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.UI
 open WhiteDungeon
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Model
 
 open FSharpPlus.Math.Applicative
 open FSharpPlus

@@ -1,14 +1,12 @@
-﻿module WhiteDungeon.Core.Game.Update.Enemy
+﻿module WhiteDungeon.Core.Update.Enemy
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Advanced.Dungeon
 open wraikny.Tart.Core
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
-open WhiteDungeon.Core.Game.Update
-open WhiteDungeon.Core.Game.Update.Actor
+open WhiteDungeon.Core
+open WhiteDungeon.Core.Model
+open WhiteDungeon.Core.Update
 
 open FSharpPlus
 

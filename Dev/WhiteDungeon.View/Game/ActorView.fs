@@ -7,7 +7,6 @@ open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Fs.Extension

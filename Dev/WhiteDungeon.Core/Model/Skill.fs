@@ -1,10 +1,8 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
 
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
@@ -163,9 +161,6 @@ module SkillEmitBuilder =
         | AreaBuilder area ->
             AreaSkillBuilder.build (Actor.get invoker) area
             |> Area
-
-
-type SkillID = uint32
 
 
 type SkillList =

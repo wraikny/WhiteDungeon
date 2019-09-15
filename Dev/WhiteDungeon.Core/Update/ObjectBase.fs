@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.Core.Game.Update.ObjectBase
+﻿module WhiteDungeon.Core.Update.ObjectBase
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
@@ -7,7 +7,6 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 //open FSharpPlus.Math.Applicative

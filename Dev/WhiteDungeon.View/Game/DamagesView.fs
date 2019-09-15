@@ -11,7 +11,6 @@ open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 open wraikny.MilleFeuille.Fs.Component.Coroutine
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 

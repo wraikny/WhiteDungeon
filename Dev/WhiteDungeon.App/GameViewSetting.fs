@@ -7,9 +7,7 @@ open wraikny.Tart.Helper.Geometry
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.UI
 open WhiteDungeon
-open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Model
 
 open WhiteDungeon.View
 open FSharpPlus.Math.Applicative

@@ -1,15 +1,12 @@
-﻿namespace WhiteDungeon.Core.Game.Update
+﻿namespace WhiteDungeon.Core.Update
 
 open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
-
-open WhiteDungeon.Core.Game.Update
+open WhiteDungeon.Core
+open WhiteDungeon.Core.Model
 
 open FSharpPlus
 open FSharpPlus.Math.Applicative
@@ -56,7 +53,7 @@ module Update =
         |> Option.defaultValue model
 
     open wraikny.Tart.Helper.Math
-    open WhiteDungeon.Core.Game.Msg
+    open WhiteDungeon.Core
 
     let inline updateSkillList f (model : Model) : Model =
         { model with skillList = f model.skillList }
@@ -135,7 +132,7 @@ module Update =
             }
             |> Seq.fold (|>) model.skillList
 
-        let cmd : Cmd<Msg, ViewMsg.ViewMsg> =
+        let cmd : Cmd<Msg, ViewMsg> =
             seq{
                 for cmds in enemyCmds do
                     for cmd in cmds ->
@@ -182,7 +179,7 @@ module Update =
         | false ->
             { model with lastCollidedGate = false }
 
-    let update (msg : Msg.Msg) (model : Model) : Model * Cmd<Msg.Msg, ViewMsg.ViewMsg> =
+    let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         let model = { model with timePassed = false }
 
         msg |> function
@@ -215,7 +212,7 @@ module Update =
             )
 
         | PlayerInputs (playerId, inputSet) ->
-            let move, direction = Msg.PlayerInput.getPlayerMoveFromInputs inputSet
+            let move, direction = PlayerInput.getPlayerMoveFromInputs inputSet
 
             model
             |> ifThen (Vector.squaredLength direction > 0.1f) (

@@ -1,9 +1,9 @@
-﻿namespace WhiteDungeon.Core.Game.Msg
+﻿namespace WhiteDungeon.Core
 
 open wraikny.Tart.Helper.Math
 
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core
+open WhiteDungeon.Core.Model
 
 open FSharpPlus
 

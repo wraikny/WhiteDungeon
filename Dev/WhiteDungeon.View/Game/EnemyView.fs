@@ -9,7 +9,6 @@ open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille.Fs.Objects
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open wraikny.MilleFeuille.Core
 open wraikny.MilleFeuille.Fs.Math
@@ -57,7 +56,7 @@ type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSettin
         with get() = visionObj.IsDrawn
         and set(x) = visionObj.IsDrawn <- x //; visionObj.IsUpdated <- x
 
-    interface IUpdatee<Game.ViewModel.EnemyView> with
+    interface IUpdatee<ViewModel.EnemyView> with
         member this.Update(viewModel) =
             let currentKind = ValueSome viewModel.kind
 

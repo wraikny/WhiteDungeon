@@ -10,7 +10,6 @@ open wraikny.MilleFeuille.Fs.Objects
 open wraikny.MilleFeuille.Fs.Math
 open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
@@ -27,7 +26,7 @@ type SkillEmitView(_gameViewSetting : GameViewSetting) =
     do
         base.SizeView.Color <- color
 
-    interface IUpdatee<Game.ViewModel.AreaSkillEmitView> with
+    interface IUpdatee<ViewModel.AreaSkillEmitView> with
         member this.Update(viewModel) =
             //this.SetFrame(viewModel.frameCurrent, viewModel.frameFirst)
             this.UpdateObjectBaseView(viewModel.objectBase)

@@ -10,7 +10,6 @@ open wraikny.Tart.Advanced.Dungeon
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game
 
 open FSharpPlus
 
@@ -20,7 +19,7 @@ open WhiteDungeon.View.MainScene.Model
 type ViewMsg =
     | SetBGMVolume of float32
     | CloseGame
-    | StartGame of Game.Model.Model * int * float32
+    | StartGame of Model.Model * int * float32
 
 
 let bgmToFloat bgmVolume = float32 bgmVolume / 100.0f
@@ -74,7 +73,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 let dungeonBuilder =
                     model.setting.gameSetting.createDungeonBuilder
                         1us model.initSize
-                Game.Model.Dungeon.generateDungeonModel dungeonBuilder
+                Model.Dungeon.generateDungeonModel dungeonBuilder
                 |> TartTask.perform (fun e ->
     #if DEBUG
                     System.Console.WriteLine(e)
@@ -89,7 +88,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             if model.uiMode = WaitingGenerating then
                 let gateCount = model.setting.gameSetting.gateCount 1us model.initSize
                 let cmd =
-                    Game.Model.Dungeon.generateDungeonParams
+                    Model.Dungeon.generateDungeonParams
                         model.setting.gameSetting
                         gateCount
                         dungeonBuilder
@@ -121,7 +120,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let level = model.setting.gameSetting.levelOffset
 
                             let status =
-                                Game.Model.Actor.calcStatusOf
+                                Model.Actor.calcStatusOf
                                     setting.growthEasing
                                     gameSetting.playerGrowthRateOverMax
                                     gameSetting.maxLevel
@@ -138,10 +137,10 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             }
 
 
-                            let playerId = Game.Model.PlayerID (uint32 index)
+                            let playerId = Model.PlayerID (uint32 index)
 
                             let player =
-                                Game.Model.Player.init
+                                Model.Player.init
                                     size
                                     (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
                                     level
@@ -153,7 +152,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         )
                         |> Map.ofSeq
 
-                    Game.Model.Model.init
+                    Model.Model.init
                         players
                         dungeonParams.dungeonBuilder
                         dungeonParams.dungeonModel

@@ -1,9 +1,7 @@
-﻿module WhiteDungeon.Core.Game.Update.Actor
+﻿module WhiteDungeon.Core.Update.Actor
 
+open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
 
@@ -34,7 +32,7 @@ let inline levelUp newLevel status (x : ^a) =
     
 
 
-open WhiteDungeon.Core.Game.Msg
+open WhiteDungeon.Core
 
 open wraikny.Tart.Helper.Math
 
@@ -118,7 +116,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 //        actor
 //        |> setConditions conditions
 
-open WhiteDungeon.Core.Game.Update
+open WhiteDungeon.Core.Update
 
 let inline update (actor : ^a) =
     actor

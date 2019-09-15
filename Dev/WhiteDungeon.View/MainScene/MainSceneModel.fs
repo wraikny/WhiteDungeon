@@ -8,9 +8,7 @@ open wraikny.Tart.Core.Libraries
 open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
-//open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 open WhiteDungeon
 
 open FSharpPlus
@@ -64,7 +62,7 @@ type Msg =
 
     | GenerateDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
-    | GeneratedDungeonParams of Game.Model.Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonParams of Model.Dungeon.GeneratedDungeonParams
     | CloseGameMsg
     | AddBGMVolume of int
 

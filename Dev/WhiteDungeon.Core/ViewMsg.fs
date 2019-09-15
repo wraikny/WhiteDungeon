@@ -1,13 +1,12 @@
-﻿namespace WhiteDungeon.Core.Game.ViewMsg
+﻿namespace WhiteDungeon.Core
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open wraikny.Tart.Helper.Collections
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Model
 
 
 type ViewMsg =
