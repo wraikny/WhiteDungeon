@@ -67,28 +67,27 @@ type Msg =
     | AddBGMVolume of int
 
 
-type Model =
-    {
-        env : TartEnvBuilder
+type Model = {
+    env : TartEnvBuilder
 
-        uiMode : UIMode
-        occupationListToggle : bool
+    uiMode : UIMode
+    occupationListToggle : bool
 
-        playerName : string option
-        selectOccupation : Occupation
+    playerName : string option
+    selectOccupation : Occupation
 
-        initSize : uint16
+    initSize : uint16
 
-        setting : View.AppSetting
+    setting : View.AppSetting
 
-        bgmVolume : int
+    bgmVolume : int
 
-        prevModel : Model option
+    prevModel : Model option
 
-        gameSceneRandomSeed : int
+    gameSceneRandomSeed : int
 
-        msgHistory : Msg list
-    }
+    msgHistory : Msg list
+}
 
 
 let initModel env (setting : View.AppSetting) =

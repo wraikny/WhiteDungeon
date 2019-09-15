@@ -24,30 +24,27 @@ type EnemyMode =
     //| LookingAround of uint16
 
 
-type Enemy =
-    {
-        actor : Actor
-        id : EnemyID
+type Enemy = {
+    actor : Actor
+    id : EnemyID
 
-        kind : EnemyKind
+    kind : EnemyKind
 
-        visionDistance : float32
-        visionAngle : float32
+    visionDistance : float32
+    visionAngle : float32
 
-        lookingRadian : float32
+    lookingRadian : float32
 
-        mode : EnemyMode
+    mode : EnemyMode
 
-        //target : PlayerID option
+    //target : PlayerID option
 
-        skillCoolTime : uint16
+    skillCoolTime : uint16
 
-        hateMap : Map<PlayerID, float32>
+    hateMap : Map<PlayerID, float32>
 
-        moveValues : MoveValueContainer
-    }
-
-with
+    moveValues : MoveValueContainer
+} with
     member inline x.objectBase =
         x.actor.objectBase
 

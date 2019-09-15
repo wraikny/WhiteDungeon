@@ -66,16 +66,14 @@ module ActorStatus =
     let inline max a b = ActorStatus.Map2 (max, a, b)
 
      
-type Actor =
-    {
-        id : ActorID
-        objectBase : ObjectBase
-        level : uint16
-        statusCurrent : ActorStatus
-        statusDefault : ActorStatus
-        currentMove : ActorMove
-    }
-with
+type Actor = {
+    id : ActorID
+    objectBase : ObjectBase
+    level : uint16
+    statusCurrent : ActorStatus
+    statusDefault : ActorStatus
+    currentMove : ActorMove
+} with
     member inline x.actor = x
 
     static member inline SetActor (_ : Actor, y : Actor) = y

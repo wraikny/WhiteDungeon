@@ -14,21 +14,18 @@ type Character = {
 }
 
 
-type Player =
-    {
-        actor : Actor
+type Player = {
+    actor : Actor
 
-        id : PlayerID
-        character : Character
+    id : PlayerID
+    character : Character
 
-        skill1CoolTime : uint16
-        skill2CoolTime : uint16
+    skill1CoolTime : uint16
+    skill2CoolTime : uint16
 
-        expoint : uint16
-        expointSum : uint16
-    }
-
-with
+    expoint : uint16
+    expointSum : uint16
+} with
     member inline x.objectBase =
         x.actor.objectBase
 

@@ -45,41 +45,39 @@ type FreeMove =
 //        | WithRotate x -> WithRotateContainer x
 
 
-type OccupationSetting =
-    {
-        status : ActorStatus
-        skill1 : Model -> Player -> SkillEmitBuilder list
-        skill2 : Model -> Player -> SkillEmitBuilder list
+type OccupationSetting = {
+    status : ActorStatus
+    skill1 : Model -> Player -> SkillEmitBuilder list
+    skill2 : Model -> Player -> SkillEmitBuilder list
 
-        skill1CoolTime : uint16
-        skill2CoolTime : uint16
+    skill1CoolTime : uint16
+    skill2CoolTime : uint16
 
-        growthEasing : Easing
+    growthEasing : Easing
 
-        size : float32 Vec2
-    }
+    size : float32 Vec2
+}
 
 
-and EnemySetting =
-    {
-        actorStatus : ActorStatus
-        skillCoolTime : uint16
-        skill : Model -> Enemy -> SkillEmitBuilder list
+and EnemySetting = {
+    actorStatus : ActorStatus
+    skillCoolTime : uint16
+    skill : Model -> Enemy -> SkillEmitBuilder list
 
-        visionAngleRate : float32
-        visionDistance : float32
-        //chaseKind : ChaseKind
-        freeMove : FreeMove
+    visionAngleRate : float32
+    visionDistance : float32
+    //chaseKind : ChaseKind
+    freeMove : FreeMove
 
-        attackDistance : float32
-        attackRange : float32
+    attackDistance : float32
+    attackRange : float32
 
-        hateDecrease : float32
+    hateDecrease : float32
 
-        exPoint : uint16
+    exPoint : uint16
 
-        popFrequency : uint16
-    }
+    popFrequency : uint16
+}
 
 
 and GameSetting = {
@@ -112,36 +110,34 @@ and GameSetting = {
 }
 
 
-and Model =
-    {
-        count : uint32
+and Model = {
+    count : uint32
 
-        nextPlayerID : uint32
-        players : Map<PlayerID, Player>
+    nextPlayerID : uint32
+    players : Map<PlayerID, Player>
 
-        enemies : Map<EnemyID, Enemy>
+    enemies : Map<EnemyID, Enemy>
 
-        dungeonBuilder: Dungeon.DungeonBuilder
-        dungeonModel : Dungeon.DungeonModel
-        dungeonGateCells : int Vec2 Set
+    dungeonBuilder: Dungeon.DungeonBuilder
+    dungeonModel : Dungeon.DungeonModel
+    dungeonGateCells : int Vec2 Set
 
-        skillList : SkillList
+    skillList : SkillList
 
-        gameSetting : GameSetting
+    gameSetting : GameSetting
 
-        timePassed : bool
+    timePassed : bool
 
-        mode : GameSceneMode
+    mode : GameSceneMode
 
-        lastCollidedGate : bool
+    lastCollidedGate : bool
 
-        dungeonFloor : uint16
+    dungeonFloor : uint16
 
-        initSize : uint16
+    initSize : uint16
 
-        localPlayerId : PlayerID
-    }
-with
+    localPlayerId : PlayerID
+} with
     static member SetSkillList (x, s) =
         { x with skillList = s }
 

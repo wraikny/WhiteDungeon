@@ -108,20 +108,18 @@ module ActorImages =
             frontRight = textures 7
         }
 
-type ObjectViewSetting =
-    {
-        name : string
-        characterImages : ActorImages<string, int Rect2>
-    }
+type ObjectViewSetting = {
+    name : string
+    characterImages : ActorImages<string, int Rect2>
+}
 
-type FontSetting =
-    {
-        font : string
-        size : int
-        sizeOutline : int
-        color : byte Vec3
-        colorOutline : byte Vec3
-    }
+type FontSetting = {
+    font : string
+    size : int
+    sizeOutline : int
+    color : byte Vec3
+    colorOutline : byte Vec3
+}
 
 type GameViewSetting = {
     occupationSetting : HashMap<Occupation, ObjectViewSetting>

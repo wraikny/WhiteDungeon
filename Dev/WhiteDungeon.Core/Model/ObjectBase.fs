@@ -63,24 +63,22 @@ module MoveDirection =
         |> Vector.normalize
 
 
-type ObjectBase =
-    {
-        size : float32 Vec2
+type ObjectBase = {
+    size : float32 Vec2
 
-        /// center
-        position : float32 Vec2
+    /// center
+    position : float32 Vec2
 
-        lastPosition : float32 Vec2
+    lastPosition : float32 Vec2
 
-        velocity : float32 Vec2
+    velocity : float32 Vec2
 
-        direction : MoveDirection
+    direction : MoveDirection
 
-        isMoved : bool
+    isMoved : bool
 
-        radius : float32
-    }
-with
+    radius : float32
+} with
     member inline x.objectBase = x
     static member inline SetObjectBase (_ : ObjectBase, y : ObjectBase) = y
 

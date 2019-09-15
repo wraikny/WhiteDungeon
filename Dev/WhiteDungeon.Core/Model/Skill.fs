@@ -51,24 +51,22 @@ and 'ID IDSkill when 'ID : comparison = {
     frame : uint32
 }
 
-and AreaSkill =
-    {
-        skillBase : SkillBase
-        objectBase : ObjectBase
+and AreaSkill = {
+    skillBase : SkillBase
+    objectBase : ObjectBase
 
-        target : AreaTarget
-        removeWhenHitWall : bool
-        removeWhenHitActor : bool
+    target : AreaTarget
+    removeWhenHitWall : bool
+    removeWhenHitActor : bool
 
-        move : EmitMove list
+    move : EmitMove list
 
-        emits : AreaSkillBuilder []
-        collidedActors : Set<ActorID>
+    emits : AreaSkillBuilder []
+    collidedActors : Set<ActorID>
 
-        frame : uint32
-        frameFirst : uint32
-    }
-with
+    frame : uint32
+    frameFirst : uint32
+} with
     static member inline SetObjectBase (x : AreaSkill, y : ObjectBase) =
         { x with objectBase = y }
 
@@ -163,16 +161,15 @@ module SkillEmitBuilder =
             |> Area
 
 
-type SkillList =
-    {
-        nextID : SkillID
-        waitings : Map<SkillID, SkillEmit>
-        //idPlayer : Map<SkillID,PlayerID IDSkill>
-        //idEnemy : Map<SkillID, EnemyID IDSkill>
-        areaPlayer : Map<SkillID, AreaSkill>
-        areaEnemy : Map<SkillID, AreaSkill>
-        areaAll : Map<SkillID, AreaSkill>
-    }
+type SkillList = {
+    nextID : SkillID
+    waitings : Map<SkillID, SkillEmit>
+    //idPlayer : Map<SkillID,PlayerID IDSkill>
+    //idEnemy : Map<SkillID, EnemyID IDSkill>
+    areaPlayer : Map<SkillID, AreaSkill>
+    areaEnemy : Map<SkillID, AreaSkill>
+    areaAll : Map<SkillID, AreaSkill>
+}
 
 module SkillList =
     let init =
