@@ -20,25 +20,8 @@ type ActorView = Actor.Actor
 type PlayerView = Actor.Player
 type EnemyView = Enemy
 
-type AreaSkillEmitView = {
-   baseView : ObjectBaseView
-   frameCurrent : uint32
-   frameFirst : uint32
-}
+type AreaSkillEmitView = Skill.AreaSkill
 
-module AreaSkillEmitView =
-    open WhiteDungeon.Core.Game.Model.Actor.Skill
-
-    let inline fromModel (areaSkill : AreaSkill) =
-        {
-            baseView = areaSkill.objectBase
-            frameCurrent = areaSkill.frame
-            frameFirst = areaSkill.frameFirst
-        }
-
-    let fromModels  : Map<uint32, _> -> (uint32 * AreaSkillEmitView) list =
-        Map.toList
-        >> map (fun (id, a) -> (id, fromModel a))
 
 
 type CameraView = {
@@ -140,7 +123,7 @@ type ViewModel = {
     dungeonFloor : uint16
     uiMode : GameSceneMode
 
-    camera : CameraView list
+    camera : CameraView // list
     players : UpdaterViewModel<PlayerView>
     enemies : UpdaterViewModel<EnemyView>
     areaPlayer : UpdaterViewModel<AreaSkillEmitView>
@@ -159,45 +142,61 @@ module ViewModel =
     let inline getSkillAreaEnemy v = v.areaEnemy
     let inline getSkillAreaAll v = v.areaAll
 
-    let view (model : Model) : ViewModel = {
-        dungeonFloor = model.dungeonFloor
-        uiMode = model.mode
-        camera =
+    let view (model : Model) : ViewModel =
+        let inline mapToUpdateVM (x : Map< ^a, _ >) =
+            [ for (i, e) in Map.toSeq x -> ((^a : (member Value : _) i) , e) ]
+
+        let p0Pos =
             model.players
-            |> CameraView.fromPlayers
+            |> Map.find model.localPlayerId
+            |> ObjectBase.position
 
-        players = [ for (i, p) in Map.toSeq model.players -> (i.Value, p) ]
+        let inline minusP0Pos (i, p) = (i, p |> ObjectBase.map(fun o -> { o with position = o.position - p0Pos}))
 
-        enemies = [ for (i, e) in Map.toSeq model.enemies -> (i.Value, e) ]
 
-        areaPlayer =
-            model.skillList.areaPlayer
-            |> AreaSkillEmitView.fromModels
+        {
+            dungeonFloor = model.dungeonFloor
+            uiMode = model.mode
+            camera = { position = p0Pos }
 
-        areaEnemy =
-            model.skillList.areaEnemy
-            |> AreaSkillEmitView.fromModels
+            players =
+                model.players
+                |> mapToUpdateVM
+                |>> minusP0Pos
 
-        areaAll =
-            model.skillList.areaAll
-            |> AreaSkillEmitView.fromModels
+            enemies = model.enemies |> mapToUpdateVM |>> minusP0Pos
 
-        mainUIWindow =
-            model.mode |> function
-            | HowToControl -> Some UIItem.howToControll
-            | Pause -> Some UIItem.pause
-            | Stair -> Some UIItem.stair
-            | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
-            | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
-            | ErrorUI e -> Some <| UIItem.errorUI model e
-            | WaitingGenerating ->
-                Some [
-                    Separator
-                    Space 200.0f
-                    HeaderText("迷宮生成中……")
-                    Space 200.0f
-                    Separator
-                ]
-            | GameMode ->
-                None
-    }
+            areaPlayer =
+                model.skillList.areaPlayer
+                |> Map.toList
+                |>> minusP0Pos
+
+            areaEnemy =
+                model.skillList.areaEnemy
+                |> Map.toList
+                |>> minusP0Pos
+
+            areaAll =
+                model.skillList.areaAll
+                |> Map.toList
+                |>> minusP0Pos
+
+            mainUIWindow =
+                model.mode |> function
+                | HowToControl -> Some UIItem.howToControll
+                | Pause -> Some UIItem.pause
+                | Stair -> Some UIItem.stair
+                | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
+                | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
+                | ErrorUI e -> Some <| UIItem.errorUI model e
+                | WaitingGenerating ->
+                    Some [
+                        Separator
+                        Space 200.0f
+                        HeaderText("迷宮生成中……")
+                        Space 200.0f
+                        Separator
+                    ]
+                | GameMode ->
+                    None
+        }

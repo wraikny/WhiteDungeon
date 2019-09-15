@@ -30,10 +30,10 @@ type SkillEmitView(_gameViewSetting : GameViewSetting) =
     interface IUpdatee<Game.ViewModel.AreaSkillEmitView> with
         member this.Update(viewModel) =
             //this.SetFrame(viewModel.frameCurrent, viewModel.frameFirst)
-            this.UpdateObjectBaseView(viewModel.baseView)
+            this.UpdateObjectBaseView(viewModel.objectBase)
 
             this.DrawingPriority <-
-                viewModel.baseView.Area
+                viewModel.objectBase.Area
                 |> Rect.centerPosition
                 |> Vector.y
                 |> int

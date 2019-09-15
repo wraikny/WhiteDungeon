@@ -139,6 +139,8 @@ and Model =
         dungeonFloor : uint16
 
         initSize : uint16
+
+        localPlayerId : PlayerID
     }
 with
     static member SetSkillList (x, s) =
@@ -233,6 +235,8 @@ module Model =
 
         dungeonFloor = 1us
         initSize = initSize
+
+        localPlayerId = PlayerID 0u
     }
 
 module GameSetting =

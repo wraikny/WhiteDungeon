@@ -208,7 +208,10 @@ module Update =
 
             , (ds |> function
                 | [||] -> cmd
-                | _ -> Cmd.batch[ Cmd.port(ViewMsg.DamagesView ds); cmd ]
+                | _ ->
+                    //let player = m.players |> Map.find model.localPlayerId
+                    let ds = ds |>> fun(p, v) -> (p, v)
+                    Cmd.batch[ Cmd.port(ViewMsg.DamagesView ds); cmd ]
             )
 
         | PlayerInputs (playerId, inputSet) ->

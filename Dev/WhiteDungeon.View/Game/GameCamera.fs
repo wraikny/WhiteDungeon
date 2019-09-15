@@ -33,59 +33,61 @@ type GameCamera(isMapChip) =
     override this.OnUpdate() =
         targetPosition
         |> ValueOption.iter (fun targetPosition ->
-            currentPosition |> function
-            | ValueNone ->
-                currentPosition <- ValueSome targetPosition
+            let nextCurrent =
+                currentPosition |> function
+                | ValueNone -> targetPosition
 
-            | ValueSome currentPosition' ->
-                let dir = targetPosition - currentPosition'
-                let length = Vector.length dir
+                | ValueSome currentPosition' ->
+                    let dir = targetPosition - currentPosition'
+                    let length = Vector.length dir
                     
-                length |> function
-                | 0.0f -> ()
-                | x when x <= 1.0f ->
-                    currentPosition <- ValueSome targetPosition
-                | _ ->
-                    let diff = (Vector.normalize dir) .* this.Speed .* length
-                    let nextPosition = currentPosition' + diff
-                    currentPosition <- ValueSome nextPosition
+                    length |> function
+                    | 0.0f -> currentPosition'
+                    | x when x <= 1.0f -> targetPosition
+                    | _ ->
+                        let diff = (Vector.normalize dir) .* this.Speed .* length
+                        let nextPosition = currentPosition' + diff
+                        nextPosition
 
-            this.SetSrc()
-        )
+            currentPosition <- ValueSome nextCurrent
 
+            let x = nextCurrent, targetPosition
+            this.SetSrc(x)
 
 #if DEBUG
-        let pushed = asd.Engine.Keyboard.GetKeyState >> (=) asd.ButtonState.Push
+    
+            let pushed = asd.Engine.Keyboard.GetKeyState >> (=) asd.ButtonState.Push
 
-        if pushed asd.Keys.Num1 then
-            this.Zoom <- this.Zoom + 0.02f |> min 1.0f
-            this.SetSrc()
-        elif pushed asd.Keys.Num2 then
-            this.Zoom <- this.Zoom - 0.02f |> max 0.02f
-            this.SetSrc()
-        elif pushed asd.Keys.Num3 then
-            this.Zoom <- 0.4f
-            this.SetSrc()
+            if pushed asd.Keys.Num1 then
+                this.Zoom <- this.Zoom + 0.02f |> min 1.0f
+                this.SetSrc(x)
+            elif pushed asd.Keys.Num2 then
+                this.Zoom <- this.Zoom - 0.02f |> max 0.02f
+                this.SetSrc(x)
+            elif pushed asd.Keys.Num3 then
+                this.Zoom <- 0.4f
+                this.SetSrc(x)
 #endif
-
-
-    member this.SetSrc() =
-        currentPosition |> ValueOption.iter (fun srcPos ->
-            let srcPos = if isMapChip then srcPos else (srcPos .% GameViewSetting.modForCulling)
-
-            let size = asd.Engine.WindowSize.To2DF() / this.Zoom
-            let size = size.To2DI()
-
-            this.Src <- new asd.RectI(
-                (Vec2.toVector2DI (map int srcPos)) - size / 2
-                , size
-            )
         )
 
-    interface IObserver<ViewModel.CameraView list> with
-        member this.OnNext(cameras) =
+
+
+
+    member this.SetSrc(current, target) =
+        let srcPos = if isMapChip then current else current - target
+
+        let size = asd.Engine.WindowSize.To2DF() / this.Zoom
+        let size = size.To2DI()
+
+        this.Src <- new asd.RectI(
+            (Vec2.toVector2DI (map int srcPos)) - size / 2
+            , size
+        )
+
+    interface IObserver<ViewModel.CameraView> with
+        member this.OnNext(camera) =
             // TODO
-            let cameraView = cameras |> head
+            let cameraView = camera
             targetPosition <- ValueSome cameraView.position
 
         member __.OnError(e) = raise e

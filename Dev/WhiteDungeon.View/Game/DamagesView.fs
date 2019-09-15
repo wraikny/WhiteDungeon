@@ -44,6 +44,11 @@ type DamagesView(gameViewSetting : GameViewSetting) =
 
     let rand = System.Random()
 
+    let mutable cameraPosition = asd.Vector2DF()
+
+    member __.OnNext(pos) =
+        cameraPosition <- Vec2.toVector2DF pos
+
     member this.Add(damages : (float32 Vec2 * float32) []) =
         for (pos, damage) in damages do
             let obj =
@@ -66,7 +71,7 @@ type DamagesView(gameViewSetting : GameViewSetting) =
                 * float32 gameViewSetting.damageView.size * 2.0f
             let position = Vec2.toVector2DF pos + rnd
 
-            obj.Position <- position
+            obj.Position <- position - cameraPosition
 
             obj.StartCoroutine("update", seq {
 
@@ -80,7 +85,7 @@ type DamagesView(gameViewSetting : GameViewSetting) =
                         -(Easing.calculate Easing.Linear frame i)
                         * gameViewSetting.damageTextMove
 
-                    obj.Position <- position + asd.Vector2DF(0.0f, y)
+                    obj.Position <- position + asd.Vector2DF(0.0f, y) - cameraPosition
                 remove(obj)
                 yield()
             })

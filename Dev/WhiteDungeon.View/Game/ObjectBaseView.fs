@@ -90,7 +90,7 @@ type ObjectBaseView< 'a
         lastPosition <- bottom
         
         // centerPos
-        this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
+        this.Position <- Vec2.toVector2DF (map floor centerPos) // .% GameViewSetting.modForCulling)
 
         this.DrawingPriority <- int bottom.y
 

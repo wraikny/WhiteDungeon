@@ -142,6 +142,10 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
     let damagesView = new DamagesView(gameViewSetting)
     do
+        messenger.ViewModel
+            .Select(fun v -> v.camera.position)
+            .Add(damagesView.OnNext)
+
         hpLayer.AddComponent(damagesView, "DamagesView")
 
     let dungeonCamera = new GameCamera(true)
@@ -158,7 +162,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         |]
         |>> fun o ->
             messenger.ViewModel
-                .Select(fun v -> ViewModel.ViewModel.getCameras v)
+                .Select(fun v -> v.camera)
                 .Subscribe o
         |> ignore
 
