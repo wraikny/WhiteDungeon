@@ -48,7 +48,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
                 owner.Src <- area
                 owner.Angle <- angle
                 yield()
-            | textures ->
+            | _ ->
                 while true do
                     for (tex, area, angle) in textures do
                         owner.Texture <- tex
