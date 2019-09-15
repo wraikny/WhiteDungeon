@@ -23,11 +23,13 @@ type SkillEmitView(_gameViewSetting : GameViewSetting) =
         , EnabledTextureView = false
     )
 
-    let color = asd.Color(255, 0, 0, 0)
+    let color = asd.Color(255, 0, 0, 200)
+    do
+        base.SizeView.Color <- color
 
     interface IUpdatee<Game.ViewModel.AreaSkillEmitView> with
         member this.Update(viewModel) =
-            this.SetFrame(viewModel.frameCurrent, viewModel.frameFirst)
+            //this.SetFrame(viewModel.frameCurrent, viewModel.frameFirst)
             this.UpdateObjectBaseView(viewModel.baseView)
 
             this.DrawingPriority <-
