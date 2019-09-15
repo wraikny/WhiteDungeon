@@ -20,8 +20,8 @@ type MoveValueContainer = {
 
 type EnemyMode =
     | FreeMoving
-    | Chasing of PlayerID * float32 Vec2
-    | AfterChasing of float32 Vec2
+    | Chasing of PlayerID * float32 Vec2 * angle:float32
+    | AfterChasing of pos:float32 Vec2 * angle:float32
     //| LookingAround of uint16
 
 
@@ -100,7 +100,7 @@ module Enemy =
 
     let setTarget (target : Player) (enemy : Enemy) : Enemy =
         { enemy with
-            mode = Chasing(target.id, ObjectBase.position target)
+            mode = Chasing(target.id, ObjectBase.position target, ObjectBase.movingDirection target)
             lookingRadian = ObjectBase.calcAngle enemy target
         }
 

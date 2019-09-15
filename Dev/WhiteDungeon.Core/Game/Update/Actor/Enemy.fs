@@ -42,6 +42,52 @@ let inline decrHateMap (gameSetting : GameSetting) (enemy : Enemy) =
     }
 
 
+let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vec2) : bool =
+    let pos = enemy |> ObjectBase.position
+
+    (
+        let dist = (pos - point) |> Vector.squaredLength
+        dist < enemy.visionDistance * enemy.visionDistance
+    )
+    &&
+    (
+        let angle = (point - pos) |> Vec2.angle
+
+        let d =
+            (angle - enemy.lookingRadian)
+            |> Vec2.fromAngle
+            |> Vec2.angle
+        (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
+    )
+    &&
+    (
+        GameSetting.insideDungeonOfLine
+            gameSetting
+            dungeonModel
+            gameSetting.visionWallCheckCount
+            pos
+            point
+    )
+
+
+let tryGetTarget (model : Model) (targets : seq<Player>) (enemy : Enemy) : Player option =
+    targets
+    |> Seq.sortBy(fun x ->
+        enemy.hateMap
+        |> Map.tryFind x.id
+        |> Option.defaultValue 0.0f
+        |> ( * ) -1.0f
+    )
+    |> Seq.tryFind(fun x ->
+        insideVision
+            model.gameSetting
+            model.dungeonModel
+            enemy
+            (ObjectBase.position x)
+    )
+    
+
+
 let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
     let status = enemy |> Actor.statusCurrent
     let dir = Vec2.fromAngle enemy.lookingRadian
@@ -102,73 +148,72 @@ let chasingMove (model : Model) (pos) (enemy : Enemy) : Enemy * _ =
     |> fst
     , diff
 
+let updateMode (model : Model) (enemy : Enemy) : Enemy * (EnemyCmd []) =
+    let players = model.players |> Map.toSeq |> Seq.map snd |> Seq.toList
 
-let move (model : Model) enemy : Enemy * (EnemyCmd []) =
+    let trySetTarget enemy =
+        tryGetTarget model players enemy
+        |>> flip Enemy.setTarget enemy
+
     enemy.mode |> function
     | EnemyMode.FreeMoving ->
-        freeMove model.gameSetting model.dungeonModel enemy
-    | EnemyMode.Chasing (_, pos) ->
         enemy
-            |> chasingMove model pos
-            |> fst
-        , empty
-    | EnemyMode.AfterChasing pos ->
-        // TODO
-        enemy
-        |> chasingMove model pos
-        |> fun (x, diff) ->
-            if abs diff < 0.1f then
-                { enemy with mode = FreeMoving; moveValues = zero }
-            else
-                x
-            , empty
-            
-            
+        |> trySetTarget
+        |> function
+        | Some enemy -> enemy, empty
+        | None ->
+            freeMove model.gameSetting model.dungeonModel enemy
 
-let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vec2) : bool =
-    let pos = enemy |> ObjectBase.position
-
-    (
-        let dist = (pos - point) |> Vector.squaredLength
-        dist < enemy.visionDistance * enemy.visionDistance
-    )
-    &&
-    (
-        let angle = (point - pos) |> Vec2.angle
-
-        let d =
-            (angle - enemy.lookingRadian)
-            |> Vec2.fromAngle
-            |> Vec2.angle
-        (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
-    )
-    &&
-    (
-        GameSetting.insideDungeonOfLine
-            gameSetting
-            dungeonModel
-            gameSetting.visionWallCheckCount
-            pos
-            point
-    )
-        
-
-
-let tryGetTarget (model : Model) (targets : seq<Player>) (enemy : Enemy) : Player option =
-    targets
-    |> Seq.sortBy(fun x ->
-        enemy.hateMap
-        |> Map.tryFind x.id
-        |> Option.defaultValue 0.0f
-        |> ( * ) -1.0f
-    )
-    |> Seq.tryFind(fun x ->
-        insideVision
-            model.gameSetting
-            model.dungeonModel
+    | EnemyMode.Chasing (id, pos, angle) ->
+        let player = model.players |> Map.find id
+        let inVision =
+            insideVision
+                model.gameSetting
+                model.dungeonModel
+                enemy (ObjectBase.position player)
+        if inVision then
             enemy
-            (ObjectBase.position x)
-    )
+            |> Enemy.setTarget player
+            |> chasingMove model (ObjectBase.position player)
+            |> fst
+            , empty
+        else
+            enemy
+            |> trySetTarget
+            |> Option.defaultWith(fun() ->
+                { enemy with mode = AfterChasing(pos, angle) }
+            )
+            ,empty
+
+    | EnemyMode.AfterChasing (pos, angle) ->
+        enemy
+        |> trySetTarget
+        |> function
+        | Some enemy -> enemy, empty
+        | None ->
+            let enemy, diff = chasingMove model pos enemy
+            if abs diff < 0.1f then
+                { enemy with mode = FreeMoving; moveValues = zero; lookingRadian = angle }
+            else
+                enemy
+            , empty
+
+
+let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
+    enemy.mode |> function
+    | EnemyMode.Chasing(_, pos, _) ->
+        let setting =
+            gameSetting.enemySettings
+            |> HashMap.find enemy.kind
+        let atkDist = setting.attackDistance
+        let d = Vector.length(pos - ObjectBase.position enemy)
+
+        if enemy.skillCoolTime = 0us && abs (d - atkDist) < setting.attackRange then
+            { enemy with skillCoolTime = setting.skillCoolTime}, Some setting.skill
+        else
+            enemy, None
+    | _ -> enemy, None
+
 
 
 let onApplyAreaSkill
@@ -199,69 +244,9 @@ let onApplyAreaSkill
         | _ ->
             enemy
 
-    
-
-
-let updateMode (model : Model) (enemy : Enemy) : Enemy =
-    let players = model.players |> Map.toSeq |> Seq.map snd |> Seq.toList
-
-    let trySetTarget enemy =
-        tryGetTarget model players enemy
-        |>> flip Enemy.setTarget enemy
-
-    enemy.mode |> function
-    | EnemyMode.FreeMoving ->
-        enemy
-        |> trySetTarget
-        |> Option.defaultValue enemy
-    | EnemyMode.Chasing (id, pos) ->
-        let player = model.players |> Map.find id
-        let inVision =
-            insideVision
-                model.gameSetting
-                model.dungeonModel
-                enemy (ObjectBase.position player)
-        if inVision then
-            enemy |> Enemy.setTarget player
-        else
-            enemy
-            |> trySetTarget
-            |> Option.defaultWith(fun() ->
-                { enemy with mode = AfterChasing(pos) }
-            )
-
-    | EnemyMode.AfterChasing _ ->
-        enemy
-        |> trySetTarget
-        |> Option.defaultValue enemy
-
-
-let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
-    enemy.mode |> function
-    | EnemyMode.Chasing(_, pos) ->
-        let setting =
-            gameSetting.enemySettings
-            |> HashMap.find enemy.kind
-        let atkDist = setting.attackDistance
-        let d = Vector.length(pos - ObjectBase.position enemy)
-
-        if enemy.skillCoolTime = 0us && abs (d - atkDist) < setting.attackRange then
-            { enemy with skillCoolTime = setting.skillCoolTime}, Some setting.skill
-        else
-            enemy, None
-    | _ -> enemy, None
-
-
-//let updateFreeMove (model : Model) (enemy : Enemy) =
-//    enemy.freeMoveContainer |> function
-//    | NoValue -> NoValue
-//    | WithRotateContainer x
-
 
 let inline update model enemy : Enemy * _ =
     enemy
     |> Actor.update
     |> decrCoolTime
-    |> move model
-    |> fun (enemy, x) ->
-        enemy |> updateMode model, x
+    |> updateMode model

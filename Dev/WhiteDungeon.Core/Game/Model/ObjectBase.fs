@@ -117,6 +117,10 @@ module ObjectBase =
     let inline direction x = (get x).direction
     let inline area x : float32 Rect2 = (get x).Area
 
+    let inline movingDirection x =
+        (position x - lastPosition x)
+        |> Vec2.angle
+
     let inline mapSize f x = map (fun o -> {o with size = f o.size}) x
     let inline mapPosition f x =
         x |> map (fun o ->
