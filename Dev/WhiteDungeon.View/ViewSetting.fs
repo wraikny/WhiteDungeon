@@ -104,9 +104,9 @@ module ActorImages =
             left = textures 2
             backLeft = textures 3
             back = textures 4
-            frontRight = textures 5
+            backRight = textures 5
             right = textures 6
-            backRight = textures 7
+            frontRight = textures 7
         }
 
 type ObjectViewSetting =

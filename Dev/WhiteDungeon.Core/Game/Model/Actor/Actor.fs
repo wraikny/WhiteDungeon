@@ -47,15 +47,19 @@ with
 
 
 module Actor =
-    let calcStatusOf easing growthRateOverMax (maxLevel : uint16) currentLevel status =
+    let inline calcStatusOf easing growthRateOverMax (maxLevel : uint16) currentLevel status =
+        let maxSt = 0.5f * float32 maxLevel
+        
         let growthRate =
             if currentLevel > maxLevel then
-                float32 maxLevel + (growthRateOverMax * float32 (currentLevel - maxLevel))
+                maxSt + (growthRateOverMax * float32 (currentLevel - maxLevel))
             else
-                (float32 maxLevel) * (Easing.calculate easing maxLevel currentLevel)
+                maxSt * (Easing.calculate easing maxLevel currentLevel)
 
         { status with
             hp = status.hp * growthRate
+            atk = status.atk * growthRate
+            def = status.def * growthRate
         }
 
     let inline init size position id level actorStatus = {

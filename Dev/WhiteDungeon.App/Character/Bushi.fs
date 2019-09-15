@@ -17,8 +17,9 @@ open FSharpPlus.Math.Applicative
 let setting : OccupationSetting = {
     status =
         {
-            //Model.ActorStatus.level = 1
             hp = 100.0f
+            atk = 50.0f
+            def = 50.0f
             walkSpeed = 12.0f
             dashSpeed = 18.0f
         }
@@ -76,7 +77,7 @@ let setting : OccupationSetting = {
 
         let posDiff = 70.0f
         let size1, size2 = 100.0f, 120.0f
-        let damage1, damage2 = 10.0f, 20.0f
+        let damage1, damage2 = 7.5f, 10.0f
         let delay = 5u
 
         [
@@ -102,7 +103,7 @@ let setting : OccupationSetting = {
                     {
                         delay = 0u
                         effects = [|
-                            Skill.Damage 10.0f
+                            Skill.Damage 5.0f
                         |]
                     }
                 objectBase = ObjectBase.init (one .* 100.0f) pos
@@ -129,43 +130,7 @@ let setting : OccupationSetting = {
     skill2CoolTime = 60us
 }
 
-
-//let private images =
-//    let size = Rect.init (Vec2.init 0 0) (Vec2.init 256 256)
-//    let f = List.map (fun x -> (sprintf "Image/Game/bushi/%s.png" x, size, 0.0f))
-//    {
-//        sleepWalk = 8u
-//        sleepDash = 4u
-//        front = f [
-//            "Front"
-//        ]
-//        back = f [
-//            "Back"
-//        ]
-//        right = f [
-//            "Right"
-//        ]
-//        left = f [
-//            "Left"
-//        ]
-//        frontRight = f [
-//            "FrontRight"
-//        ]
-//        frontLeft = f [
-//            "FrontLeft"
-//        ]
-//        backRight = f [
-//            "BackRight"
-//        ]
-//        backLeft = f [
-//            "BackLeft"
-//        ]
-//    }
-
 let private images = ActorImages.occupationImage 8u 4u "Image/Game/Occupation/bushi.png"
-
-//let private images = ActorImages.fromGraphicmaker 8u 4u "Image/Game/Occupation/hunter.png"
-
 
 let viewSetting =
     {

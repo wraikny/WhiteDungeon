@@ -22,7 +22,9 @@ let enemies = [
     "Slime", {
         EnemySetting.actorStatus = {
             //Model.ActorStatus.level = 1
-            hp = 50.0f
+            hp = 70.0f
+            atk = 20.0f
+            def = 40.0f
             walkSpeed = 2.0f
             dashSpeed = 4.0f
         }
@@ -39,7 +41,7 @@ let enemies = [
                 AreaBuilder {
                     skillBase = {
                         delay = 0u
-                        effects = [| Skill.Damage 15.0f |]
+                        effects = [| Skill.Damage 20.0f |]
                     }
                     objectBase = ObjectBase.init (one .* 100.0f) pos
 
@@ -84,13 +86,18 @@ let gameSetting : Model.GameSetting = {
     enemyUpdateDistance = 10000.0f
 
     damageCalculation = fun v invoker target ->
-        1.0f + v * float32 invoker.level / float32 target.level
+        let invS = invoker.statusCurrent
+        let tarS = target.statusCurrent
+        1.0f + 0.5f * (2.0f + 0.5f * float32 invoker.level) * (v * (1.0f + invS.atk) / (tarS.def + 1.0f) )
 
     occupationSettings = HashMap.ofList [
         Character.Bushi.viewSetting.name, Character.Bushi.setting
     ]
 
-    lvUpExp = fun level -> 50us * level * level
+    enemyGrowthEasing = Easing.Lerp(Easing.Linear, Easing.InSine, 0.3f)
+    levelOffset = 5us
+
+    lvUpExp = fun level -> 10us * level * level
 
     maxLevel = 100us
     playerGrowthRateOverMax = 0.8f

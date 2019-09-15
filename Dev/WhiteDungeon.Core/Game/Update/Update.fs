@@ -115,10 +115,9 @@ module Update =
                     let hates = enemy.hateMap |> Map.toList
                     let hatesSum = hates |>> snd |> sum
                     for (id, v) in hates do
-                        let player = model.players |> Map.find id
+                        //let player = model.players |> Map.find id
                         let exp =
-                            ( float32 enemy.actor.level / float32 player.actor.level
-                            ) * v / hatesSum * float32 setting.exPoint + 1.0f
+                            ( float32 enemy.actor.level ) * v / hatesSum * float32 setting.exPoint + 1.0f
                             |> uint16
 
                         if exPoints.ContainsKey(id) then

@@ -1,77 +1,52 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 
-//type ObjectStatus = {
-//    hp : HP
-//}
-
-//module ObjectStatus =
-//    let hp a = a.hp
-
-
 type ActorStatus = {
-    hp : HP
-    walkSpeed : Speed
-    dashSpeed : Speed
+    hp : float32
+    atk : float32
+    def : float32
+
+    walkSpeed : float32
+    dashSpeed : float32
 } with
     static member Zero = {
-        //level = 0
         hp = 0.0f
+        atk = 0.0f
+        def = 0.0f
         walkSpeed = 0.0f
         dashSpeed = 0.0f
     }
-    static member (+) (a, b) = {
-        //level = a.level + b.level
-        hp = a.hp + b.hp
-        walkSpeed = a.walkSpeed + b.walkSpeed
-        dashSpeed = a.dashSpeed + b.dashSpeed
+
+    static member Map2 (f, a, b) = {
+        hp = f a.hp b.hp
+        atk = f a.atk b.atk
+        def = f a.def b.def
+        walkSpeed = f a.walkSpeed b.walkSpeed
+        dashSpeed = f a.dashSpeed b.dashSpeed
     }
 
-    static member (*) (a, b) = {
-        //level = a.level * b.level
-        hp = a.hp * b.hp
-        walkSpeed = a.walkSpeed * b.walkSpeed
-        dashSpeed = a.dashSpeed * b.dashSpeed
-    }
+    static member (+) (a, b) = ActorStatus.Map2 ((+), a, b)
+
+    static member (*) (a, b) = ActorStatus.Map2 (( * ), a, b)
 
 
 module ActorStatus =
-    //let inline level a = a.level
-
     let inline hp a = a.hp
 
     let inline walkSpeed a = a.walkSpeed
 
     let inline dashSpeed a = a.dashSpeed
 
-    let inline min a b = {
-        //level = min a.level b.level
-        hp = min a.hp b.hp
-        walkSpeed = min a.walkSpeed b.walkSpeed
-        dashSpeed = min a.dashSpeed b.dashSpeed
-    }
+    let inline min a b = ActorStatus.Map2 (min, a, b)
 
-    let inline max a b = {
-        //level = max a.level b.level
-        hp = max a.hp b.hp
-        walkSpeed = max a.walkSpeed b.walkSpeed
-        dashSpeed = max a.dashSpeed b.dashSpeed
-    }
+    let inline max a b = ActorStatus.Map2 (max, a, b)
         
 
-
-//type Occupation =
-//    //| Seeker
-//    | Bushi
-//with
-//    static member DefaultValue = Bushi
 type Occupation = string
 
 
 [<Struct>]
 type CharacterID = CharacterID of int
-    //with
-    //member this.Value = this |> function | CharacterID x -> x
 
 
 type Character = {
@@ -82,11 +57,3 @@ type Character = {
 }
 
 type EnemyKind = string
-//type EnemyKind =
-//    | Slime
-
-//with
-//    static member FromInt i =
-//        (i % 1) |> function
-//        | 0 -> Slime
-//        | _ -> invalidArg "i" (sprintf "%d is Out of Range" i)

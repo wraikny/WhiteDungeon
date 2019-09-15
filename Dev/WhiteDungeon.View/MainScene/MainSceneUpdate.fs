@@ -10,6 +10,7 @@ open wraikny.Tart.Advanced.Dungeon
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Model
+open WhiteDungeon.Core.Game
 
 open FSharpPlus
 
@@ -102,6 +103,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             if model.uiMode = WaitingGenerating then
                 let gameModel =
                     //let size = model.setting.gameSetting.characterSize
+
+                    let gameSetting = model.setting.gameSetting
+
                     let players =
                         [ model.playerName, model.selectOccupation ]
                         |> Seq.indexed
@@ -109,14 +113,20 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let name = Option.defaultValue (sprintf "Player%d" index) name
 
                             let setting =
-                                model.setting.gameSetting.occupationSettings
+                                gameSetting.occupationSettings
                                 |> HashMap.find occupation
 
                             let size = setting.size
 
+                            let level = model.setting.gameSetting.levelOffset
+
                             let status =
-                                setting
-                                |> fun x -> x.status
+                                Game.Model.Actor.Actor.calcStatusOf
+                                    setting.growthEasing
+                                    gameSetting.playerGrowthRateOverMax
+                                    gameSetting.maxLevel
+                                    level
+                                    setting.status
 
                             let character : Model.Character = {
                                 id = Model.CharacterID -index
@@ -134,7 +144,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                                 Game.Model.Actor.Player.init
                                     size
                                     (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
-                                    1us
+                                    level
                                     status
                                     playerId
                                     character

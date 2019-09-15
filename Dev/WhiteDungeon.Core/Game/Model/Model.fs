@@ -92,16 +92,15 @@ and GameSetting = {
     visionWallCheckCount : uint32
 
     enemyUpdateDistance : float32
-    //characterSize : float32 Vec2
     damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
     occupationSettings : HashMap<Occupation, OccupationSetting>
 
     enemySettings : HashMap<EnemyKind, EnemySetting>
     enemyFrequencySum : uint16
     enemyFrequencyRanges : ( EnemyKind * (uint16 * uint16) ) []
+    enemyGrowthEasing : Easing
 
-    //intToEnemy : (int -> EnemyKind)
-
+    levelOffset : uint16
     lvUpExp : uint16 -> uint16
 
     maxLevel : uint16
@@ -179,11 +178,11 @@ module Model =
             let enemyId = EnemyID <| uint32 index
             let setting = gameSetting.enemySettings |> HashMap.find ei.kind
 
-            let level = ei.levelDiff + dungeonFloor
+            let level = gameSetting.levelOffset + ei.levelDiff + dungeonFloor - 1us
 
             let status =
                 Actor.calcStatusOf
-                    Easing.Linear
+                    gameSetting.enemyGrowthEasing
                     1.0f
                     gameSetting.maxLevel
                     level
@@ -390,7 +389,7 @@ module Dungeon =
                         return {
                             EnemyInits.kind = searchKind (uint16 kindValue)
                             lookAngleRadian = 2.0f * Angle.pi * float32 angle
-                            levelDiff = uint16 (p1 * gameSetting.levelSD |> max 0.0f)
+                            levelDiff = uint16 ( (p1 * gameSetting.levelSD) |> max 0.0f)
                         }
                     })
 

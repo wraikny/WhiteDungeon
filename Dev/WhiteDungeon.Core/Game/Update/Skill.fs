@@ -77,7 +77,7 @@ module Effect =
         let prevHp = actor.statusCurrent.hp
         let hp = newActor.statusCurrent.hp
 
-        if abs(hp - prevHp) < 0.1f then
+        if abs(hp - prevHp) < 1.0f then
             newActor, result
         else
             let pos = newActor.objectBase.position
