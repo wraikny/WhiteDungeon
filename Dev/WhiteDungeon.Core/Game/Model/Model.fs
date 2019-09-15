@@ -155,7 +155,7 @@ module OccupationSetting =
 type EnemyInits = {
     kind : EnemyKind
     lookAngleRadian : float32
-    levelDiff : uint16
+    levelDiff : int
 }
 
 
@@ -178,7 +178,10 @@ module Model =
             let enemyId = EnemyID <| uint32 index
             let setting = gameSetting.enemySettings |> HashMap.find ei.kind
 
-            let level = gameSetting.levelOffset + ei.levelDiff + dungeonFloor - 1us
+            let level =
+                (int gameSetting.levelOffset + ei.levelDiff + int dungeonFloor - 1)
+                |> max 1
+                |> uint16
 
             let status =
                 Actor.calcStatusOf
@@ -389,7 +392,7 @@ module Dungeon =
                         return {
                             EnemyInits.kind = searchKind (uint16 kindValue)
                             lookAngleRadian = 2.0f * Angle.pi * float32 angle
-                            levelDiff = uint16 ( (p1 * gameSetting.levelSD) |> max 0.0f)
+                            levelDiff = int <| (p1 * gameSetting.levelSD)
                         }
                     })
 
