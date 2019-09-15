@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Actor
+﻿namespace WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Helper.Math
 open WhiteDungeon.Core.Model

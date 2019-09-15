@@ -37,9 +37,9 @@ module PlayerInput =
             DashKey
         ]
 
-    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : Actor.ActorMove * float32 Vec2 =
+    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : ActorMove * float32 Vec2 =
         let actorMove =
-            if inputSet |> Set.contains PlayerInput.DashKey then Actor.Dash else Actor.Walk
+            if inputSet |> Set.contains PlayerInput.DashKey then Dash else Walk
 
         let moveDirs = [|
             UpKey, Vec2.init 0.0f -1.0f
@@ -67,12 +67,12 @@ type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
-    | PlayerSkill of PlayerID * Actor.SkillKind
+    | PlayerSkill of PlayerID * SkillKind
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
     | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
 
-    | UpdateEnemyOf of EnemyID * Actor.EnemyMsg
+    | UpdateEnemyOf of EnemyID * EnemyMsg
     //#if DEBUG
     ///// for Debug
     //| AppendSkillEmits

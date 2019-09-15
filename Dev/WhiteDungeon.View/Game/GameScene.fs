@@ -399,8 +399,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                     >> (=) asd.ButtonState.Push
 
                 [|
-                    asd.MouseButtons.ButtonLeft, Model.Actor.Skill1
-                    asd.MouseButtons.ButtonRight, Model.Actor.Skill2
+                    asd.MouseButtons.ButtonLeft, Model.Skill1
+                    asd.MouseButtons.ButtonRight, Model.Skill2
                 |]
                 |> iter(fun (m, s) ->
                     if mousePushed m then
@@ -410,8 +410,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 )
 
                 [|
-                    asd.Keys.J, Model.Actor.Skill1
-                    asd.Keys.K, Model.Actor.Skill2
+                    asd.Keys.J, Model.Skill1
+                    asd.Keys.K, Model.Skill2
                 |]
                 |> iter(fun (k, s) ->
                     if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then

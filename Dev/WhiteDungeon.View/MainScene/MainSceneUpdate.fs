@@ -121,7 +121,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let level = model.setting.gameSetting.levelOffset
 
                             let status =
-                                Game.Model.Actor.Actor.calcStatusOf
+                                Game.Model.Actor.calcStatusOf
                                     setting.growthEasing
                                     gameSetting.playerGrowthRateOverMax
                                     gameSetting.maxLevel
@@ -141,7 +141,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let playerId = Game.Model.PlayerID (uint32 index)
 
                             let player =
-                                Game.Model.Actor.Player.init
+                                Game.Model.Player.init
                                     size
                                     (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
                                     level

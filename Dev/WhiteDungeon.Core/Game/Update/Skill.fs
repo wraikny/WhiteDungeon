@@ -7,8 +7,6 @@ open wraikny.Tart.Helper.Collections
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Update
-open WhiteDungeon.Core.Game.Model.Actor
-open WhiteDungeon.Core.Game.Model.Actor.Skill
 
 open FSharpPlus
 open wraikny.Tart.Helper.Extension
@@ -48,8 +46,8 @@ module Effect =
         (gameSetting : GameSetting)
         (invoker : Actor)
         (effect : Effect)
-        (actor : Actor.Actor)
-        : (Actor.Actor * SkillResult)
+        (actor : Actor)
+        : (Actor * SkillResult)
         =
         let newActor, result =
             effect |> function
@@ -60,14 +58,14 @@ module Effect =
                         invoker
                         actor
 
-                Actor.Actor.addHP -damage actor, SkillResult.empty
+                Actor.addHP -damage actor, SkillResult.empty
 
             | AddHP v ->
-                Actor.Actor.addHP v actor, SkillResult.empty
+                Actor.addHP v actor, SkillResult.empty
 
             | DamageF f ->
                 let damage = f invoker actor
-                Actor.Actor.addHP -damage actor, SkillResult.empty
+                Actor.addHP -damage actor, SkillResult.empty
 
             | F f ->
                 f invoker actor
@@ -153,7 +151,7 @@ module AreaSkill =
                 |> Set.ofSeq
         }
 
-    let inline private apply (gameSetting) (areaSkill : AreaSkill) (actor : Actor.Actor) : Actor.Actor * SkillResult =
+    let inline private apply (gameSetting) (areaSkill : AreaSkill) (actor : Actor) : Actor * SkillResult =
         areaSkill.collidedActors
         |> Set.contains actor.id
         |> function
@@ -289,7 +287,7 @@ module SkillList =
             areaAll = append areaAll skillList.areaAll
         }
 
-    let private checkCollision (players : Map<_, Actor.Player> ) (enemies : Map<_, Actor.Enemy>) (skillList : SkillList) =
+    let private checkCollision (players : Map<_, Player> ) (enemies : Map<_, Enemy>) (skillList : SkillList) =
         let playerActors =
             players
             |> Map.toSeq
@@ -317,7 +315,7 @@ module SkillList =
             Map.toSeq
             >> map(snd >> fun areaSkill ->
                 areaSkill.emits
-                |>> (AreaSkillBuilder.build areaSkill.skillBase.invokerActor >> Skill.Area)
+                |>> (AreaSkillBuilder.build areaSkill.skillBase.invokerActor >> Area)
             )
             >> Seq.concat
 
@@ -326,9 +324,9 @@ module SkillList =
         |> append (f skillList.areaEnemy)
         |> append (f skillList.areaAll)
 
-    let inline appendActorSkills (actor) (skills : ^a -> Skill.SkillEmitBuilder list) =
+    let inline appendActorSkills (actor) (skills : ^a -> SkillEmitBuilder list) =
         skills actor
-        |>> Skill.SkillEmitBuilder.build actor
+        |>> SkillEmitBuilder.build actor
         |> append
 
     let private applySkillsToModel (model : Model) : Model * _ =
@@ -347,8 +345,8 @@ module SkillList =
 
         let enemies, results =
             (model.enemies, emits)
-            |> chain (f (Actor.Enemy.onApplyAreaSkill) skillList.areaEnemy)
-            |> chain (f (Actor.Enemy.onApplyAreaSkill) skillList.areaAll)
+            |> chain (f (Enemy.onApplyAreaSkill) skillList.areaEnemy)
+            |> chain (f (Enemy.onApplyAreaSkill) skillList.areaAll)
 
         let emits =
             seq {
@@ -368,7 +366,7 @@ module SkillList =
             players = players
             enemies = enemies
         }
-        |> Skill.SkillList.map(append emits)
+        |> SkillList.map(append emits)
         , damages
         
 

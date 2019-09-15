@@ -6,9 +6,6 @@ open wraikny.Tart.Helper.Geometry
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
-
-open WhiteDungeon.Core.Game.Model.Actor.Skill
 open WhiteDungeon.View
 
 open FSharpPlus
@@ -50,12 +47,12 @@ let setting : OccupationSetting = {
             (actor.objectBase.position - actor.objectBase.lastPosition)
 
         let createSkill delay diffPos size damage =
-            Skill.AreaBuilder {
+            AreaBuilder {
                 skillBase =
                     {
                         delay = delay
                         effects = [|
-                            Skill.Damage (damage)
+                            Damage (damage)
                         |]
                     }
                 objectBase =
@@ -63,14 +60,14 @@ let setting : OccupationSetting = {
                         (one .* size)
                         (targetPos + diffPos + (float32 delay *. actorSpeed) )
 
-                target = Skill.AreaTarget.Enemies
+                target = AreaTarget.Enemies
 
                 removeWhenHitWall = false
                 removeWhenHitActor = true
 
                 move = seq {
                     //for _ in 1..20 -> Skill.Move (dir .* 3.0f)
-                    for _ in 1..20 -> Skill.Scale(one .* 1.0f)
+                    for _ in 1..20 -> Scale(one .* 1.0f)
                     //for _ in 1..20 -> Skill.Stay
                 } |> toList
             }
@@ -98,25 +95,25 @@ let setting : OccupationSetting = {
 
         let f dir =
             let dir = Vector.normalize dir
-            Skill.AreaBuilder {
+            AreaBuilder {
                 skillBase =
                     {
                         delay = 0u
                         effects = [|
-                            Skill.Damage 5.0f
+                            Damage 5.0f
                         |]
                     }
                 objectBase = ObjectBase.init (one .* 100.0f) pos
 
-                target = Skill.AreaTarget.Enemies
+                target = AreaTarget.Enemies
 
                 removeWhenHitWall = true
                 removeWhenHitActor = true
 
                 move = seq {
                     //for _ in 1..10 -> Skill.Stay
-                    for _ in 1..60 -> Skill.Move (dir .* 10.0f)
-                    for _ in 1..60 -> Skill.Scale(one .* 10.0f)
+                    for _ in 1..60 -> Move (dir .* 10.0f)
+                    for _ in 1..60 -> Scale(one .* 10.0f)
                 } |> toList
             }
 

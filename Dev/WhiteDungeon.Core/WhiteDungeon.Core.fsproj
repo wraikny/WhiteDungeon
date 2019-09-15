@@ -9,22 +9,20 @@
     <OtherFlags>--warnon:1182</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Utils\Math.fs" />
     <Compile Include="Model\GameObject.fs" />
-    <Compile Include="Model\SavedData.fs" />
     <Compile Include="Game\Model\Alias.fs" />
     <Compile Include="Game\Model\ObjectBase.fs" />
-    <Compile Include="Game\Model\Actor\Actor.fs" />
-    <Compile Include="Game\Model\Actor\Skill.fs" />
-    <Compile Include="Game\Model\Actor\Player.fs" />
-    <Compile Include="Game\Model\Actor\Enemy.fs" />
+    <Compile Include="Game\Model\Actor.fs" />
+    <Compile Include="Game\Model\Skill.fs" />
+    <Compile Include="Game\Model\Player.fs" />
+    <Compile Include="Game\Model\Enemy.fs" />
     <Compile Include="Game\Model\Model.fs" />
     <Compile Include="Game\Msg.fs" />
     <Compile Include="Game\ViewMsg.fs" />
     <Compile Include="Game\Update\ObjectBase.fs" />
-    <Compile Include="Game\Update\Actor\Actor.fs" />
-    <Compile Include="Game\Update\Actor\Player.fs" />
-    <Compile Include="Game\Update\Actor\Enemy.fs" />
+    <Compile Include="Game\Update\Actor.fs" />
+    <Compile Include="Game\Update\Player.fs" />
+    <Compile Include="Game\Update\Enemy.fs" />
     <Compile Include="Game\Update\Skill.fs" />
     <Compile Include="Game\Update\Update.fs" />
     <Compile Include="Game\ViewModel.fs" />

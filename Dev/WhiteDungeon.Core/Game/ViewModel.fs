@@ -10,17 +10,16 @@ open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core.View
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
 
 
 type ObjectBaseView = Model.ObjectBase
-type ActorView = Actor.Actor
-type PlayerView = Actor.Player
+type ActorView = Actor
+type PlayerView = Player
 type EnemyView = Enemy
 
-type AreaSkillEmitView = Skill.AreaSkill
+type AreaSkillEmitView = AreaSkill
 
 
 
@@ -33,7 +32,7 @@ module CameraView =
         position = position
     }
 
-    let inline fromPlayers (players : Map<Model.PlayerID, Model.Actor.Player>) =
+    let inline fromPlayers (players : Map<Model.PlayerID, Model.Player>) =
         players
         |> Map.toList
         |> sortBy (fun (id, _) -> id.Value)

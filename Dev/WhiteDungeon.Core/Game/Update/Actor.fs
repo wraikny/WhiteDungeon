@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.Core.Game.Update.Actor.Actor
+﻿module WhiteDungeon.Core.Game.Update.Actor
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game

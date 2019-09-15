@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Actor
+﻿namespace WhiteDungeon.Core.Game.Model
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Game.Model
@@ -38,7 +38,7 @@ module Player =
     let inline character (player : Player) = player.character
 
     let inline init size position level actorStatus id character = {
-        actor = Actor.Actor.init size position (Actor.OfPlayerID id) level actorStatus
+        actor = Actor.init size position (OfPlayerID id) level actorStatus
         id = id
         character = character
 

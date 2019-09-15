@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Actor.Skill
+﻿namespace WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
@@ -38,7 +38,7 @@ type Effect =
 
 
 and SkillBase = {
-    invokerActor : Actor.Actor
+    invokerActor : Actor
 
     delay : uint32
     effects : Effect []
@@ -65,7 +65,7 @@ and AreaSkill =
         move : EmitMove list
 
         emits : AreaSkillBuilder []
-        collidedActors : Set<Actor.ActorID>
+        collidedActors : Set<ActorID>
 
         frame : uint32
         frameFirst : uint32
@@ -91,7 +91,7 @@ and SkillBaseBuilder = {
 and IDSkillBuilder = {
     skillBase : SkillBaseBuilder
     
-    targetIDs : Actor.ActorID Set
+    targetIDs : ActorID Set
     frame : uint32
 }
 

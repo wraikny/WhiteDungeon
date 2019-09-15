@@ -49,8 +49,8 @@ type FreeMove =
 type OccupationSetting =
     {
         status : ActorStatus
-        skill1 : Model -> Actor.Player -> Skill.SkillEmitBuilder list
-        skill2 : Model -> Actor.Player -> Skill.SkillEmitBuilder list
+        skill1 : Model -> Player -> SkillEmitBuilder list
+        skill2 : Model -> Player -> SkillEmitBuilder list
 
         skill1CoolTime : uint16
         skill2CoolTime : uint16
@@ -65,7 +65,7 @@ and EnemySetting =
     {
         actorStatus : ActorStatus
         skillCoolTime : uint16
-        skill : Model -> Actor.Enemy -> Skill.SkillEmitBuilder list
+        skill : Model -> Enemy -> SkillEmitBuilder list
 
         visionAngleRate : float32
         visionDistance : float32
@@ -92,7 +92,7 @@ and GameSetting = {
     visionWallCheckCount : uint32
 
     enemyUpdateDistance : float32
-    damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
+    damageCalculation : float32 -> Actor -> Actor -> float32
     occupationSettings : HashMap<Occupation, OccupationSetting>
 
     enemySettings : HashMap<EnemyKind, EnemySetting>
@@ -126,7 +126,7 @@ and Model =
         dungeonModel : Dungeon.DungeonModel
         dungeonGateCells : int Vec2 Set
 
-        skillList : Skill.SkillList
+        skillList : SkillList
 
         gameSetting : GameSetting
 
@@ -150,8 +150,8 @@ with
 module OccupationSetting =
     let inline skillOf kind x =
         kind |> function
-        | Actor.Skill1 -> x.skill1CoolTime, x.skill1
-        | Actor.Skill2 -> x.skill2CoolTime, x.skill2
+        | Skill1 -> x.skill1CoolTime, x.skill1
+        | Skill2 -> x.skill2CoolTime, x.skill2
 
 
 type EnemyInits = {
@@ -194,7 +194,7 @@ module Model =
                     setting.actorStatus
 
             enemyId
-            , Actor.Enemy.init
+            , Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
@@ -221,7 +221,7 @@ module Model =
                 enemyCells
                 gameSetting.dungeonCellSize
 
-        skillList = Skill.SkillList.init
+        skillList = SkillList.init
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel

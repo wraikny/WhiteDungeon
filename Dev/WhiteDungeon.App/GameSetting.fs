@@ -12,9 +12,6 @@ open WhiteDungeon.Core.Game
 open WhiteDungeon.Core.Game.Model
 open WhiteDungeon.Core.Game.Model
 
-open WhiteDungeon.Core.Game.Model.Actor
-open WhiteDungeon.Core.Game.Model.Actor.Skill
-
 open FSharpPlus.Math.Applicative
 open FSharpPlus
 
@@ -41,18 +38,18 @@ let enemies = [
                 AreaBuilder {
                     skillBase = {
                         delay = 0u
-                        effects = [| Skill.Damage 20.0f |]
+                        effects = [| Damage 20.0f |]
                     }
                     objectBase = ObjectBase.init (one .* 100.0f) pos
 
-                    target = Skill.AreaTarget.Players
+                    target = AreaTarget.Players
 
                     removeWhenHitWall = true
                     removeWhenHitActor = true
 
                     move = [
-                        for _ in 1..60 -> Skill.Move (dir .* 5.0f)
-                        for _ in 1..30 -> Skill.Scale(one .* 5.0f)
+                        for _ in 1..60 -> Move (dir .* 5.0f)
+                        for _ in 1..30 -> Scale(one .* 5.0f)
                     ]
                 }
             ]

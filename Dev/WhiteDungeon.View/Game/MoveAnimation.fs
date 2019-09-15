@@ -33,7 +33,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     let mutable current = Back
 
-    let mutable currentMove = Actor.ActorMove.Walk
+    let mutable currentMove = ActorMove.Walk
 
     let anim =
         seq {
@@ -58,8 +58,8 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
                         yield!(
                             match currentMove with
-                            | Actor.Walk -> images.sleepWalk
-                            | Actor.Dash -> images.sleepDash
+                            | Walk -> images.sleepWalk
+                            | Dash -> images.sleepDash
                             |> int |> Coroutine.sleep
                         )
         }

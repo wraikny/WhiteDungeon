@@ -62,8 +62,8 @@ module Update =
         { model with skillList = f model.skillList }
 
 
-    let inline appendSkills (actor : ^a) (skills : ^a -> Skill.SkillEmitBuilder list) (model : Model) : Model =
-        model |> Skill.SkillList.map(
+    let inline appendSkills (actor : ^a) (skills : ^a -> SkillEmitBuilder list) (model : Model) : Model =
+        model |> SkillList.map(
             SkillList.appendActorSkills actor skills
         )
 
@@ -87,8 +87,8 @@ module Update =
 
             if (playerPoses |> Seq.exists(fun p -> Vector.squaredLength(p - pos) < d * d )) then
                         
-                let enemy, cmds = (Actor.Enemy.update model) enemy
-                let enemy, skill = Actor.Enemy.getSKill model.gameSetting enemy
+                let enemy, cmds = (Enemy.update model) enemy
+                let enemy, skill = Enemy.getSKill model.gameSetting enemy
 
                 // mutable
                 enemyCmds.Add(cmds)
@@ -140,7 +140,7 @@ module Update =
                 for cmds in enemyCmds do
                     for cmd in cmds ->
                         cmd |> function
-                        | Actor.Enemy.EnemyCmd.Rotate id ->
+                        | Enemy.EnemyCmd.Rotate id ->
                             Random.double01
                             |> Random.map(float32 >> (*) (Angle.pi * 2.0f))
                             |> Random.generate(fun x ->
@@ -160,7 +160,7 @@ module Update =
                     exPoints.TryGetValue(id) |> function
                     | true, v ->
                         printfn "exp: Player(%d) got %d" id.Value v
-                        Actor.Player.addExp model.gameSetting v player
+                        Player.addExp model.gameSetting v player
                     | _ -> player
                 )
         }, cmd
@@ -191,7 +191,7 @@ module Update =
         | TimePasses ->
             let m, cmd =
                 model
-                |> updateEachPlayer Actor.Player.update
+                |> updateEachPlayer Player.update
                 |> updateEnemies
             let m, ds = m |> SkillList.update
 
@@ -200,7 +200,7 @@ module Update =
             m.players
             |> Map.toSeq
             |>> snd
-            |> exists(fun (x : Actor.Player) -> x.actor.statusCurrent.hp > 0.0f)
+            |> exists(fun (x : Player) -> x.actor.statusCurrent.hp > 0.0f)
             |> function
                 | false -> { m with mode = GameFinished false }
                 | true ->
@@ -219,7 +219,7 @@ module Update =
 
             model
             |> ifThen (Vector.squaredLength direction > 0.1f) (
-                Update.Actor.Actor.move
+                Update.Actor.move
                     model.gameSetting
                     model.dungeonModel
                     move
@@ -247,7 +247,7 @@ module Update =
 
         | UpdateEnemyOf(id, msg) ->
             model
-            |> mapEnemyOf id (Actor.Enemy.updateOfMsg msg)
+            |> mapEnemyOf id (Enemy.updateOfMsg msg)
             , Cmd.none
 
         | GenerateNewDungeon ->
@@ -294,7 +294,7 @@ module Update =
                         dungeonParams.enemyCells
                         model.gameSetting.dungeonCellSize
 
-                skillList = Model.Actor.Skill.SkillList.init
+                skillList = Model.SkillList.init
 
                 dungeonBuilder = dungeonParams.dungeonBuilder
                 dungeonModel = dungeonParams.dungeonModel

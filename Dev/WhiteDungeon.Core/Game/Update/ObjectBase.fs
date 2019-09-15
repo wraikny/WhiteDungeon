@@ -45,7 +45,6 @@ let inline insideDungeon
         dungeonModel
         (getCorners (ObjectBase.get x))
 
-open WhiteDungeon.Core.Utils
 
 let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     BinarySearch.binarySearch

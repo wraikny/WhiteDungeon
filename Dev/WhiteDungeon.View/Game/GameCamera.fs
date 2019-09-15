@@ -22,7 +22,6 @@ type GameCamera(isMapChip) =
             , asd.Engine.WindowSize
         )
     )
-
     
     let mutable targetPosition = ValueNone
     let mutable currentPosition = ValueNone
@@ -69,7 +68,6 @@ type GameCamera(isMapChip) =
                 this.SetSrc(x)
 #endif
         )
-
 
 
 

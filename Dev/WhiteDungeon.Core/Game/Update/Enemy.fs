@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.Core.Game.Update.Actor.Enemy
+﻿module WhiteDungeon.Core.Game.Update.Enemy
 
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Collections
@@ -103,7 +103,7 @@ let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy 
     | Some dir -> { enemy with lookingRadian = Vec2.angle dir; moveValues = zero }
 
 
-let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy * EnemyCmd [] =
+let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) (enemy : Enemy) : Enemy * EnemyCmd [] =
     let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
 
     setting.freeMove |> function
@@ -217,7 +217,7 @@ let getSKill (gameSetting : GameSetting) (enemy : Enemy) : Enemy * _ option =
 
 
 let onApplyAreaSkill
-    (areaSkill : Skill.AreaSkill)
+    (areaSkill : AreaSkill)
     (prevEnemy : Enemy) (enemy : Enemy) : Enemy =
     areaSkill.skillBase.invokerActor.id |> function
     | ActorID.OfEnemyID _ ->
