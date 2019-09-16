@@ -13,7 +13,6 @@ open wraikny.MilleFeuille
 open wraikny.MilleFeuille.UI
 open wraikny.MilleFeuille.Input
 open wraikny.MilleFeuille
-open wraikny.MilleFeuille.Component.Coroutine
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
@@ -283,7 +282,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.CloseGame ->
                 messenger.Dispose()
-                this.StartCoroutine("CloseGame", seq {
+                this.AddCoroutine(seq {
 
                     if uiWindowsAnimating() then
                         while uiWindowsAnimating() do
@@ -297,7 +296,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.StartGame (gameModel, randomSeed, bgmVolume) ->
                 messenger.Dispose()
-                this.StartCoroutine("StartGame", seq {
+                this.AddCoroutine(seq {
                     
                     if not uiWindowMain.IsToggleOn then
                         while not uiWindowMain.IsToggleOn do

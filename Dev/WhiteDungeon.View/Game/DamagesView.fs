@@ -8,7 +8,6 @@ open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.Objects
-open wraikny.MilleFeuille.Component.Coroutine
 open WhiteDungeon.Core
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
@@ -71,7 +70,7 @@ type DamagesView(gameViewSetting : GameViewSetting) =
 
             obj.Position <- position - cameraPosition
 
-            obj.StartCoroutine("update", seq {
+            obj.AddCoroutine(seq {
 
                 let frame = gameViewSetting.damageTextFrame - 1
                 for i in 0..frame ->
