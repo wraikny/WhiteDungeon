@@ -7,12 +7,9 @@ open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Fs
+open wraikny.MilleFeuille
 open WhiteDungeon.Core
 open WhiteDungeon.View
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.View.Utils.Color
 open WhiteDungeon.Core.Model
 

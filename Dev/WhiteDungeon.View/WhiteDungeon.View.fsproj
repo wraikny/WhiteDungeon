@@ -124,8 +124,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.Core.csproj">
-      <Name>Mille-Feuille.Core</Name>
+    <ProjectReference Include="..\..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.csproj">
+      <Name>Mille-Feuille</Name>
       <Project>{73984409-a0fe-476e-99f2-61be570a752f}</Project>
       <Private>True</Private>
     </ProjectReference>

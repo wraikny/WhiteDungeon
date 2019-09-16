@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.UI
 
-open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input
+open wraikny.MilleFeuille.UI
+open wraikny.MilleFeuille.Input
 
 module Keybaord =
     let inline createUIKeyboard() =

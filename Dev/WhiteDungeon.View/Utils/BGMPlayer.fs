@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.View.Utils
 
-open wraikny.MilleFeuille.Core
+open wraikny.MilleFeuille
 
 open FSharpPlus
 

@@ -9,12 +9,11 @@ open System
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
 
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs
-open wraikny.MilleFeuille.Fs.Component.Coroutine
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.UI
+open wraikny.MilleFeuille.Input
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.Component.Coroutine
 
 open WhiteDungeon.Core
 open WhiteDungeon.View

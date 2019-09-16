@@ -6,10 +6,9 @@ open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core.View
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
-open wraikny.MilleFeuille.Fs.Component.Coroutine
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.Objects
+open wraikny.MilleFeuille.Component.Coroutine
 open WhiteDungeon.Core
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color

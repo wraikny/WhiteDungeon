@@ -146,7 +146,7 @@ module GameViewSetting =
     [<Literal>]
     let modForCulling = 40000.0f
 
-open wraikny.MilleFeuille.Fs.UI
+open wraikny.MilleFeuille.UI
 
 
 type MainSceneSetting = {

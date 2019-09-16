@@ -4,8 +4,8 @@ open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Geometry
 
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.UI
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.UI
 open WhiteDungeon
 open WhiteDungeon.Core.Model
 
