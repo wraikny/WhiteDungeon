@@ -1,4 +1,4 @@
-namespace WhiteDungeon.Core.Update
+﻿namespace WhiteDungeon.Core.Update
 
 open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections

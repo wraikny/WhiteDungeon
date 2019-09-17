@@ -1,4 +1,4 @@
-namespace WhiteDungeon.View.Game
+﻿namespace WhiteDungeon.View.Game
 
 
 open wraikny.Tart.Helper
