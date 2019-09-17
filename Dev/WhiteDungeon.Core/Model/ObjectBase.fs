@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 
 open WhiteDungeon.Core.Model
 
@@ -21,9 +21,9 @@ type MoveDirection =
 
 module MoveDirection =
     let fromVector v =
-        let pi2 = 2.0f * Angle.pi
+        let pi2 = 2.0f * Pi
         let angle = (pi2 + Vec2.angle v) % pi2
-        let a = angle * 8.0f / Angle.pi
+        let a = angle * 8.0f / Pi
         let bw s t = s <= a && a < t
         let result =
             if bw 1.0f 3.0f then

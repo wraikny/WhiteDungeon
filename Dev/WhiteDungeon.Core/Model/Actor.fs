@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Helper
 open WhiteDungeon.Core.Model
 
 type ActorID =
@@ -92,7 +92,7 @@ module Actor =
             if currentLevel > maxLevel then
                 maxSt + (growthRateOverMax * float32 (currentLevel - maxLevel))
             else
-                maxSt * (Easing.calculate easing maxLevel currentLevel)
+                maxSt * (Easing.calculate easing (int maxLevel) (int currentLevel) )
 
         { status with
             hp = status.hp * growthRate

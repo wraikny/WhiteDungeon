@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.View.MainScene.ViewModel
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries

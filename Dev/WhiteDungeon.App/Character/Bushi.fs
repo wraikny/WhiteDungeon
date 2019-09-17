@@ -1,7 +1,8 @@
 ﻿module WhiteDungeon.App.Character.Bushi
 
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model

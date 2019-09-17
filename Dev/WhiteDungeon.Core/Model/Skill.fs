@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open WhiteDungeon.Core.Model
 
 //type ConditionKind =

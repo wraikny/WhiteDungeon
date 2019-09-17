@@ -3,7 +3,6 @@
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Math.Utils
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -63,11 +62,11 @@ let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosit
 
     let diffX =
         searchDiff { diff with y = 0.0f }
-        |> Vec2.x
+        |> Vector.x
 
     let diffY =
         searchDiff { diff with x = 0.0f }
-        |> Vec2.y
+        |> Vector.y
 
     Vec2.init diffX diffY
 

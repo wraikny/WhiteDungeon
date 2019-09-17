@@ -4,6 +4,7 @@ open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
+open wraikny.Tart
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -138,11 +139,13 @@ module Update =
                     for cmd in cmds ->
                         cmd |> function
                         | Enemy.EnemyCmd.Rotate id ->
-                            Random.double01
-                            |> Random.map(float32 >> (*) (Angle.pi * 2.0f))
-                            |> Random.generate(fun x ->
-                                Msg.UpdateEnemyOf(id, EnemyMsg.RotateMsg x)
-                            )
+                            monad {
+                                let! x = Random.double01
+                                let x = pi * 2.0f * float32 x
+                                return
+                                    Msg.UpdateEnemyOf(id, EnemyMsg.RotateMsg x)
+                            }
+                            |> SideEffect.perform
                     
             }
             |> Cmd.batch
@@ -208,7 +211,7 @@ module Update =
                 | _ ->
                     //let player = m.players |> Map.find model.localPlayerId
                     let ds = ds |>> fun(p, v) -> (p, v)
-                    Cmd.batch[ Cmd.port(ViewMsg.DamagesView ds); cmd ]
+                    Cmd.batch[ Cmd.ofPort(ViewMsg.DamagesView ds); cmd ]
             )
 
         | PlayerInputs (playerId, inputSet) ->
@@ -271,11 +274,14 @@ module Update =
                     model.dungeonFloor model.initSize
             //Dungeon.generateTask model.gameSetting model.dungeonBuilder (length model.dungeonGateCells)
             Dungeon.generateDungeonModel dungeonBuilder
-            |> TartTask.perform (fun e ->
+            |> SideEffect.performWith(function
+                | Ok a -> GeneratedDungeonModel a
+                | Error e ->
 #if DEBUG
-                System.Console.WriteLine(e)
+                printfn "%A" e
 #endif
-                GenerateNewDungeon) GeneratedDungeonModel
+                GenerateNewDungeon
+            )
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
 
@@ -316,7 +322,7 @@ module Update =
                 dungeonGateCells = dungeonParams.gateCells
                 dungeonFloor = dungeonFloor
             }
-            , Cmd.port ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
+            , Cmd.ofPort ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel, dungeonParams.gateCells) )
 
 
         //#if DEBUG

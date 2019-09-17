@@ -3,7 +3,6 @@
 
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille

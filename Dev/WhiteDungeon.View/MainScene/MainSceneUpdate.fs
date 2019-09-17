@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.View.MainScene.Update
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
@@ -33,7 +33,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | UndoModel ->
             model.prevModel |> function
             | Some(x) ->
-                { x with prevModel = None; uiMode = Title }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
+                { x with prevModel = None; uiMode = Title }, Cmd.ofPort(SetBGMVolume (bgmToFloat x.bgmVolume))
             | None ->
                 model, Cmd.none
         | SetUIWithHistory uiMode ->
@@ -48,7 +48,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
         | AddBGMVolume i ->
             let v = model.bgmVolume + i |> min 10 |> max 0 
-            { model with bgmVolume = v}, Cmd.port(SetBGMVolume (bgmToFloat v))
+            { model with bgmVolume = v}, Cmd.ofPort(SetBGMVolume (bgmToFloat v))
 
         | OccupationListToggle x ->
             { model with occupationListToggle = x }, Cmd.none
@@ -65,7 +65,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
             { model with initSize = i }, Cmd.none
 
         | GenerateDungeon ->
-            let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
+            let randomCmd =
+                Random.int minValue<int> maxValue<int>
+                |> SideEffect.performWith SetGameSceneRandomSeed
             { model with uiMode = WaitingGenerating }, randomCmd
 
         | SetGameSceneRandomSeed x ->
@@ -74,11 +76,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                     model.setting.gameSetting.createDungeonBuilder
                         1us model.initSize
                 Model.Dungeon.generateDungeonModel dungeonBuilder
-                |> TartTask.perform (fun e ->
-    #if DEBUG
-                    System.Console.WriteLine(e)
-    #endif
-                    GenerateDungeon) GeneratedDungeonModel
+                |> SideEffect.performWith(function
+                    | Ok a -> GeneratedDungeonModel a
+                    | Error e ->
+#if DEBUG
+                        printfn "%A" e
+#endif
+                        GenerateDungeon
+                )
                 |> fun cmd ->
                     { model with gameSceneRandomSeed = x }, cmd
             else
@@ -161,11 +166,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         dungeonParams.enemyCells
                         model.setting.gameSetting
 
-                model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+                model, Cmd.ofPort(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
             else
                 model, Cmd.none
 
         | CloseGameMsg ->
-            model, Cmd.port CloseGame
+            model, Cmd.ofPort CloseGame
     with e ->
         { model with uiMode = ErrorUI e }, Cmd.none

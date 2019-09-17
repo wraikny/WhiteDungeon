@@ -1,9 +1,9 @@
 namespace WhiteDungeon.View.Game
 
 
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Objects
@@ -33,16 +33,17 @@ open System.Reactive.Linq
 type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
 
-    let messenger : IMessenger<_, _, _> =
-        Messenger.build
+    let messenger =
+        Messenger.Create(
             {
                 seed = gameSceneArgs.randomSeed
-            }
+            },
             {
-                init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
+                init = gameModel, Cmd.ofPort (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
+        )
     do
         //messenger.SleepTime <- 0u
 
@@ -171,7 +172,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
-        }, UpdatingOption = View.UpdatingOption.Updating)
+        }, UpdatingOption = UpdatingOption.Updating)
 
     do
         messenger.ViewMsg

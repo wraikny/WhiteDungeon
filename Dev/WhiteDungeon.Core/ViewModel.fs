@@ -4,9 +4,9 @@ open WhiteDungeon.Core
 // open WhiteDungeon.Core.Game.Model
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Core.View
+open wraikny.Tart.Core
 open WhiteDungeon.Core.Model
 
 open FSharpPlus

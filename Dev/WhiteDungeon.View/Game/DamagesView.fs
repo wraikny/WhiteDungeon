@@ -1,11 +1,8 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Geometry
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Core.View
+open wraikny.Tart.Core
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.Objects
 open WhiteDungeon.Core

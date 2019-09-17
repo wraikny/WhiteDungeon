@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.App.Setting
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.UI

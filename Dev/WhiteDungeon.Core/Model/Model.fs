@@ -4,13 +4,13 @@ open wraikny.Tart.Helper.Math
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Model
-
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Advanced
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 open wraikny.Tart.Advanced.Dungeon
-open wraikny.Tart.Helper.Geometry
+
 open FSharpPlus
 
 type GameSceneMode =
@@ -284,9 +284,9 @@ module Dungeon =
         initPosition : float32 Vec2
     }
 
-    let generateDungeonModel (dungeonBuilder : DungeonBuilder) =
-        Random.int minValue<int> maxValue<int>
-        |> TartTask.withEnv(fun seed ->
+    let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
+        (Random.int minValue<int> maxValue<int>)
+        |> SideEffect.bind(fun seed ->
             let rec loop n = async {
                 let builder = { dungeonBuilder with seed = seed + n }
                 let dungeon = DungeonBuilder.generate builder
@@ -390,7 +390,7 @@ module Dungeon =
                         let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
                             EnemyInits.kind = searchKind (uint16 kindValue)
-                            lookAngleRadian = 2.0f * Angle.pi * float32 angle
+                            lookAngleRadian = 2.0f * Pi * float32 angle
                             levelDiff = int <| (p1 * gameSetting.levelSD)
                         }
                     })
@@ -418,4 +418,4 @@ module Dungeon =
                 return! loop()
         }
 
-        flip Random.generate (loop())
+        flip SideEffect.performWith (loop())

@@ -157,14 +157,14 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
     let messenger =
         let env = { seed = Random().Next() }
-        Messenger.build env {
+        Messenger.Create(env, {
             init =
                 let initModel = Model.initModel env setting
                 
-                initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
+                initModel, Cmd.ofPort(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update
             view = ViewModel.view
-        }
+        })
 
     do
         #if DEBUG

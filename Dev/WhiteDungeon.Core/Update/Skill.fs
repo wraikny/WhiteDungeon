@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Update
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Collections
 
 open WhiteDungeon.Core.Model

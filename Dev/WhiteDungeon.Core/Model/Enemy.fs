@@ -66,7 +66,7 @@ module Enemy =
             kind = kind
 
             visionDistance = visionDistance
-            visionAngle = visionAngleRate * 2.0f * Angle.pi
+            visionAngle = visionAngleRate * 2.0f * Pi
 
             lookingRadian = angle
 
