@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.View.Game
+namespace WhiteDungeon.View.Game
 
 
 open wraikny.Tart.Helper.Utils
@@ -59,11 +59,15 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
             [
-                UpKey    , asd.Keys.W
-                DownKey  , asd.Keys.S
-                RightKey , asd.Keys.D
-                LeftKey  , asd.Keys.A
-                DashKey  , asd.Keys.LeftShift
+                Select            , asd.Keys.Space
+                Cancel            , asd.Keys.Escape
+                Dash              , asd.Keys.LeftShift
+                Direction Up      , asd.Keys.W
+                Direction Down    , asd.Keys.S
+                Direction Right   , asd.Keys.D
+                Direction Left    , asd.Keys.A
+                Skill Model.Skill1, asd.Keys.J
+                Skill Model.Skill2, asd.Keys.K
             ]
         |> KeyboardBuilder.build
         :> IController<PlayerInput>
@@ -392,55 +396,55 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 
-                // Input
-                let mousePushed =
-                    asd.Engine.Mouse.GetButtonInputState
-                    >> (=) asd.ButtonState.Push
+                //// Input
+                //let mousePushed =
+                //    asd.Engine.Mouse.GetButtonInputState
+                //    >> (=) asd.ButtonState.Push
 
-                [|
-                    asd.MouseButtons.ButtonLeft, Model.Skill1
-                    asd.MouseButtons.ButtonRight, Model.Skill2
-                |]
-                |> iter(fun (m, s) ->
-                    if mousePushed m then
-                        messenger.Enqueue(
-                            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                        )
-                )
+                //[|
+                //    asd.MouseButtons.ButtonLeft, Model.Skill1
+                //    asd.MouseButtons.ButtonRight, Model.Skill2
+                //|]
+                //|> iter(fun (m, s) ->
+                //    if mousePushed m then
+                //        messenger.Enqueue(
+                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                //        )
+                //)
 
-                [|
-                    asd.Keys.J, Model.Skill1
-                    asd.Keys.K, Model.Skill2
-                |]
-                |> iter(fun (k, s) ->
-                    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
-                        messenger.Enqueue(
-                            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                        )
-                )
+                //[|
+                //    asd.Keys.J, Model.Skill1
+                //    asd.Keys.K, Model.Skill2
+                //|]
+                //|> iter(fun (k, s) ->
+                //    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
+                //        messenger.Enqueue(
+                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                //        )
+                //)
 
-        | Model.HowToControl
-        | Model.Pause
-        | Model.GameFinished true ->
-            if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
+        | Model.HowToControl ->
+            if gameKeybaord.IsPush Select || gameKeybaord.IsPush Cancel then
                 messenger.Enqueue(Msg.SetGameMode Model.GameMode)
 
-        | _ -> ()
+        | Model.Pause
+        | Model.GameFinished true ->
+            if gameKeybaord.IsPush(Cancel) then
+                messenger.Enqueue(Msg.SetGameMode Model.GameMode)
+
+        | Model.GameFinished false
+        | Model.ErrorUI _
+        | Model.Stair _
+        | Model.WaitingGenerating -> ()
 
 
     member this.PushControllerInput() : Msg option =
-        let getStateIs (state : asd.ButtonState) key =
-            gameKeybaord.GetState(key)
-            |> Option.ofNullable
-            |>> ((=) state)
-            |> Option.defaultValue false
-
-        PlayerInput.inputs
-        |> filter (getStateIs asd.ButtonState.Hold)
+        gameKeybaord.Keys
+        |> filter gameKeybaord.IsHold
+        |> toList
         |> function
         | [] -> None
         | inputs ->
-
             (Model.PlayerID 0u, inputs |> Set.ofList)
             |> Msg.PlayerInputs
             |> Some

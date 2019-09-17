@@ -39,8 +39,8 @@ open wraikny.Tart.Helper.Math
 
 let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Vec2) (actor : Actor) : Actor =
     let speed = move |> function
-        | Walk -> actor.statusCurrent.walkSpeed
-        | Dash -> actor.statusCurrent.dashSpeed
+        | ActorMove.Walk -> actor.statusCurrent.walkSpeed
+        | ActorMove.Dash -> actor.statusCurrent.dashSpeed
 
     let direction = direction |> Vector.normalize
 

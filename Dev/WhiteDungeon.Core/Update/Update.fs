@@ -1,4 +1,4 @@
-﻿namespace WhiteDungeon.Core.Update
+namespace WhiteDungeon.Core.Update
 
 open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections
@@ -212,7 +212,36 @@ module Update =
             )
 
         | PlayerInputs (playerId, inputSet) ->
-            let move, direction = PlayerInput.getPlayerMoveFromInputs inputSet
+            let move, direction =
+                let isDash = inputSet |> Set.contains Dash
+                let dirs =
+                    inputSet
+                    |> Seq.choose(function | Direction x -> Some x | _ -> None)
+                    |> Set.ofSeq
+                PlayerInput.getPlayerMoveFromInputs isDash dirs
+
+            let skills =
+                inputSet
+                |> Seq.choose(function
+                    | Skill x -> Some x
+                    | _ -> None
+                )
+                |> toList
+
+            let player = model.players |> Map.find playerId
+
+            let fireSkill kind model =
+                let coolTime, skill =
+                    model.gameSetting.occupationSettings
+                    |> HashMap.find player.character.currentOccupation
+                    |> OccupationSetting.skillOf kind
+                            
+                
+                model
+                |> ifThen (player |> Player.coolTime kind = 0us) (
+                    mapPlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
+                    >> appendSkills player (skill model)
+                )
 
             model
             |> ifThen (Vector.squaredLength direction > 0.1f) (
@@ -224,22 +253,11 @@ module Update =
                 |> Actor.map
                 |> mapPlayerOf playerId
             )
-            , Cmd.none
-
-        | PlayerSkill (playerId, kind) ->
-            let player = (model.players |> Map.find playerId)
-
-            let coolTime, skill =
-                model.gameSetting.occupationSettings
-                |> HashMap.find player.character.currentOccupation
-                |> OccupationSetting.skillOf kind
-            
-
-            model
-            |> ifThen (player |> Player.coolTime kind = 0us) (
-                mapPlayerOf playerId (Player.mapCoolTime kind <| fun _ -> coolTime)
-                >> appendSkills player (skill model)
-            )
+            |> (
+                skills
+                |>> fireSkill
+                |> Seq.fold (>>) id
+            )  
             , Cmd.none
 
         | UpdateEnemyOf(id, msg) ->
