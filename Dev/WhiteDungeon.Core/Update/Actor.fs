@@ -1,9 +1,7 @@
-﻿module WhiteDungeon.Core.Game.Update.Actor.Actor
+﻿module WhiteDungeon.Core.Update.Actor
 
+open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
 
 open FSharpPlus
 
@@ -23,15 +21,26 @@ let addHP diff (actor : Actor) =
     )
 
 
-open WhiteDungeon.Core.Game.Msg
+let inline levelUp newLevel status (x : ^a) =
+    x |> Actor.map(fun actor ->
+        { actor with
+            level = newLevel
+            statusDefault = status
+            statusCurrent = { status with hp = actor.HPRate() * status.hp }
+        }
+    )
+    
+
+
+open WhiteDungeon.Core
 
 open wraikny.Tart.Helper.Math
 
 
 let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Vec2) (actor : Actor) : Actor =
     let speed = move |> function
-        | Walk -> actor.statusCurrent.walkSpeed
-        | Dash -> actor.statusCurrent.dashSpeed
+        | ActorMove.Walk -> actor.statusCurrent.walkSpeed
+        | ActorMove.Dash -> actor.statusCurrent.dashSpeed
 
     let direction = direction |> Vector.normalize
 
@@ -107,7 +116,7 @@ let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Ve
 //        actor
 //        |> setConditions conditions
 
-open WhiteDungeon.Core.Game.Update
+open WhiteDungeon.Core.Update
 
 let inline update (actor : ^a) =
     actor

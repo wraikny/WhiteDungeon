@@ -1,7 +1,7 @@
 module WhiteDungeon.App.Program
 
 open wraikny.Tart.Helper.Math
-open wraikny.MilleFeuille.Fs.Math
+open wraikny.MilleFeuille
 open WhiteDungeon.Core
 open WhiteDungeon.View
 

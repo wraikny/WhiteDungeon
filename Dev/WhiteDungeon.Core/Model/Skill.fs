@@ -1,10 +1,8 @@
-﻿namespace WhiteDungeon.Core.Game.Model.Actor.Skill
+﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
 
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
@@ -38,7 +36,7 @@ type Effect =
 
 
 and SkillBase = {
-    invokerActor : Actor.Actor
+    invokerActor : Actor
 
     delay : uint32
     effects : Effect []
@@ -53,24 +51,22 @@ and 'ID IDSkill when 'ID : comparison = {
     frame : uint32
 }
 
-and AreaSkill =
-    {
-        skillBase : SkillBase
-        objectBase : ObjectBase
+and AreaSkill = {
+    skillBase : SkillBase
+    objectBase : ObjectBase
 
-        target : AreaTarget
-        removeWhenHitWall : bool
-        removeWhenHitActor : bool
+    target : AreaTarget
+    removeWhenHitWall : bool
+    removeWhenHitActor : bool
 
-        move : EmitMove list
+    move : EmitMove list
 
-        emits : AreaSkillBuilder []
-        collidedActors : Set<Actor.ActorID>
+    emits : AreaSkillBuilder []
+    collidedActors : Set<ActorID>
 
-        frame : uint32
-        frameFirst : uint32
-    }
-with
+    frame : uint32
+    frameFirst : uint32
+} with
     static member inline SetObjectBase (x : AreaSkill, y : ObjectBase) =
         { x with objectBase = y }
 
@@ -91,7 +87,7 @@ and SkillBaseBuilder = {
 and IDSkillBuilder = {
     skillBase : SkillBaseBuilder
     
-    targetIDs : Actor.ActorID Set
+    targetIDs : ActorID Set
     frame : uint32
 }
 
@@ -158,26 +154,22 @@ type SkillEmitBuilder =
 
 
 module SkillEmitBuilder =
-    let build invoker (builder) : SkillEmit =
+    let inline build invoker (builder) : SkillEmit =
         builder |> function
         | AreaBuilder area ->
-            AreaSkillBuilder.build invoker area
+            AreaSkillBuilder.build (Actor.get invoker) area
             |> Area
 
 
-type SkillID = uint32
-
-
-type SkillList =
-    {
-        nextID : SkillID
-        waitings : Map<SkillID, SkillEmit>
-        //idPlayer : Map<SkillID,PlayerID IDSkill>
-        //idEnemy : Map<SkillID, EnemyID IDSkill>
-        areaPlayer : Map<SkillID, AreaSkill>
-        areaEnemy : Map<SkillID, AreaSkill>
-        areaAll : Map<SkillID, AreaSkill>
-    }
+type SkillList = {
+    nextID : SkillID
+    waitings : Map<SkillID, SkillEmit>
+    //idPlayer : Map<SkillID,PlayerID IDSkill>
+    //idEnemy : Map<SkillID, EnemyID IDSkill>
+    areaPlayer : Map<SkillID, AreaSkill>
+    areaEnemy : Map<SkillID, AreaSkill>
+    areaAll : Map<SkillID, AreaSkill>
+}
 
 module SkillList =
     let init =

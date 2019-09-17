@@ -3,16 +3,13 @@
 open wraikny
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Core.View
-open wraikny.MilleFeuille.Fs.Objects
+open wraikny.Tart.Core
+open wraikny.MilleFeuille.Objects
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
+open wraikny.MilleFeuille
 open WhiteDungeon.View.Utils.Color
 
 open FSharpPlus
@@ -53,13 +50,21 @@ type ObjectBaseView< 'a
     
     let moveAnimation = MoveAnimation(textureObj)
 
-    let mutable texViewSize = asd.Vector2DF(0.0f, 0.0f)
+    let mutable texViewSize = asd.Vector2DF()
+
+    let onSetViewSize = Event<asd.Vector2DF>()
+
+    member __.OnSetViewSize = onSetViewSize.Publish
 
     member __.SizeView with get() = sizeView
     member __.TextureView with get() = textureObj
 
     member __.LastSize with get() = lastSize
-    member __.ViewSize with get() = texViewSize
+    member private __.ViewSize
+        with get() = texViewSize
+        and set(x) =
+            texViewSize <- x
+            onSetViewSize.Trigger(x)
 
     member __.EnabledSizeView
         with get() = sizeView.IsDrawn
@@ -75,14 +80,14 @@ type ObjectBaseView< 'a
 
     member this.UpdateObjectBaseView(objectBaseView : ViewModel.ObjectBaseView) =
         // Position
-        let area = objectBaseView.area
+        let area = objectBaseView |> Model.ObjectBase.area
         let lu, rd = Rect.get_LU_RD area
         let centerPos = (lu + rd) ./ 2.0f
         let bottom = Vec2.init centerPos.x rd.y
         lastPosition <- bottom
         
         // centerPos
-        this.Position <- Vec2.toVector2DF (map floor centerPos .% GameViewSetting.modForCulling)
+        this.Position <- Vec2.toVector2DF (map floor centerPos) // .% GameViewSetting.modForCulling)
 
         this.DrawingPriority <- int bottom.y
 
@@ -97,13 +102,14 @@ type ObjectBaseView< 'a
                 moveAnimation.Next()
             
                 let texSize = textureObj.Src.Size
-                let scale = size.X / texSize.X
-                textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
+                //let scale = 1.0f // size.X / texSize.X
+                //textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
                 textureObj.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
                 textureObj.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
-                texViewSize <- texSize * scale
+                // TODO
+                this.ViewSize <- texSize * asd.Vector2DF(0.5f, 1.0f) // * scale
         else
-            texViewSize <- size
+            this.ViewSize <- size
 
     member __.SetAnimationTextures(textureKind) =
         if lastTextureKind <> Some textureKind then

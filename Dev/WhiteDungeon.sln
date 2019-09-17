@@ -9,7 +9,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "WhiteDungeon.Core", "WhiteD
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.View", "WhiteDungeon.View\WhiteDungeon.View.fsproj", "{C82A8074-A822-48DD-AAD8-C1263EC6B506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mille-Feuille.Core", "..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.Core.csproj", "{73984409-A0FE-476E-99F2-61BE570A752F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mille-Feuille", "..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.csproj", "{73984409-A0FE-476E-99F2-61BE570A752F}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mille-Feuille.Fs", "..\..\Mille-Feuille\Dev\Mille-Feuille.Fs\Mille-Feuille.Fs.fsproj", "{F0694096-423D-4328-AB20-CEF9052B2F31}"
 EndProject

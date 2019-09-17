@@ -1,7 +1,7 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 
 open WhiteDungeon.Core.Model
 
@@ -21,9 +21,9 @@ type MoveDirection =
 
 module MoveDirection =
     let fromVector v =
-        let pi2 = 2.0f * Angle.pi
+        let pi2 = 2.0f * Pi
         let angle = (pi2 + Vec2.angle v) % pi2
-        let a = angle * 8.0f / Angle.pi
+        let a = angle * 8.0f / Pi
         let bw s t = s <= a && a < t
         let result =
             if bw 1.0f 3.0f then
@@ -63,26 +63,29 @@ module MoveDirection =
         |> Vector.normalize
 
 
-type ObjectBase =
-    {
-        size : float32 Vec2
+type ObjectBase = {
+    size : float32 Vec2
 
-        /// center
-        position : float32 Vec2
+    /// center
+    position : float32 Vec2
 
-        lastPosition : float32 Vec2
+    lastPosition : float32 Vec2
 
-        velocity : float32 Vec2
+    velocity : float32 Vec2
 
-        direction : MoveDirection
+    direction : MoveDirection
 
-        isMoved : bool
+    isMoved : bool
 
-        radius : float32
-    }
-with
+    radius : float32
+} with
     member inline x.objectBase = x
     static member inline SetObjectBase (_ : ObjectBase, y : ObjectBase) = y
+
+    member inline x.Area = {
+        position = x.position - (x.size ./ 2.0f)
+        size = x.size
+    }
 
 
 module ObjectBase =
@@ -110,11 +113,11 @@ module ObjectBase =
     let inline lastPosition x = (get x).lastPosition
     let inline velocity x = (get x).velocity
     let inline direction x = (get x).direction
-    let inline area x : float32 Rect2 =
-        {
-            position = position x - ( (size x) ./ 2.0f)
-            size = size x
-        }
+    let inline area x : float32 Rect2 = (get x).Area
+
+    let inline movingDirection x =
+        (position x - lastPosition x)
+        |> Vec2.angle
 
     let inline mapSize f x = map (fun o -> {o with size = f o.size}) x
     let inline mapPosition f x =
@@ -126,4 +129,7 @@ module ObjectBase =
 
     let inline mapVelocity f x =
         x |> map (fun o -> { o with velocity = f o.velocity })
+
+    let inline calcAngle oFrom oTo =
+        Vec2.angle(position oTo - position oFrom)
 

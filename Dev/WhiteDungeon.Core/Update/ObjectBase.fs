@@ -1,13 +1,11 @@
-﻿module WhiteDungeon.Core.Game.Update.ObjectBase
+﻿module WhiteDungeon.Core.Update.ObjectBase
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
 open wraikny.Tart.Helper.Math.Utils
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
 
 open FSharpPlus
 //open FSharpPlus.Math.Applicative
@@ -45,7 +43,6 @@ let inline insideDungeon
         dungeonModel
         (getCorners (ObjectBase.get x))
 
-open WhiteDungeon.Core.Utils
 
 let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
     BinarySearch.binarySearch
@@ -65,11 +62,11 @@ let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosit
 
     let diffX =
         searchDiff { diff with y = 0.0f }
-        |> Vec2.x
+        |> Vector.x
 
     let diffY =
         searchDiff { diff with x = 0.0f }
-        |> Vec2.y
+        |> Vector.y
 
     Vec2.init diffX diffY
 
@@ -165,7 +162,7 @@ let inline moveReflectable
 
             let restLength = Vector.length diff - Vector.length diff0
 
-            diff + ( reflectedDir .* (if restLength < 1.0f then 1.0f else restLength) )
+            diff + ( reflectedDir .* (max restLength 10.0f) )
             , Some reflectedDir
         else
             diff0, None

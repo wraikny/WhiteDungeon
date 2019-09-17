@@ -1,17 +1,16 @@
-﻿namespace WhiteDungeon.Core.Game.Model
+﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Math
 
 open WhiteDungeon.Core.Model
-open WhiteDungeon.Core.Game.Model
-open WhiteDungeon.Core.Game.Model.Actor
-
+open WhiteDungeon.Core.Model
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Advanced
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
 open wraikny.Tart.Advanced.Dungeon
-open wraikny.Tart.Helper.Geometry
+
 open FSharpPlus
 
 type GameSceneMode =
@@ -38,37 +37,47 @@ type ChaseKind =
 
 type FreeMove =
     | Forward
+    | WithRotate of frame : uint16
+
+//module FreeMove =
+//    let toContainer = function
+//        | Forward -> NoValue
+//        | WithRotate x -> WithRotateContainer x
 
 
-type EnemyInits = {
-    kind : int
-    lookAngleRadian : float32
+type OccupationSetting = {
+    status : ActorStatus
+    skill1 : Model -> Player -> SkillEmitBuilder list
+    skill2 : Model -> Player -> SkillEmitBuilder list
+
+    skill1CoolTime : uint16
+    skill2CoolTime : uint16
+
+    growthEasing : Easing
+
+    size : float32 Vec2
 }
 
 
-type OccupationSetting =
-    {
-        status : ActorStatus
-        skill1 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
-        skill2 : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+and EnemySetting = {
+    actorStatus : ActorStatus
+    skillCoolTime : uint16
+    skill : Model -> Enemy -> SkillEmitBuilder list
 
-        skill1CoolTime : uint16
-        skill2CoolTime : uint16
-    }
+    visionAngleRate : float32
+    visionDistance : float32
+    //chaseKind : ChaseKind
+    freeMove : FreeMove
 
+    attackDistance : float32
+    attackRange : float32
 
-and EnemySetting =
-    {
-        actorStatus : ActorStatus
-        skill : Model -> Actor.Actor -> Skill.SkillEmitBuilder list
+    hateDecrease : float32
 
-        visionAngleRate : float32
-        visionDistance : float32
-        chaseKind : ChaseKind
-        freeMove : FreeMove
+    exPoint : uint16
 
-        attackDistance : float32
-    }
+    popFrequency : uint16
+}
 
 
 and GameSetting = {
@@ -76,42 +85,59 @@ and GameSetting = {
     minPlayerCount : int
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
-    enemyUpdateDistance : float32
-    characterSize : float32 Vec2
-    damageCalculation : float32 -> Actor.Actor -> Actor.Actor -> float32
-    occupationSettings : HashMap<Occupation, OccupationSetting>
-    enemySettings : HashMap<EnemyKind, EnemySetting>
 
-    intToEnemy : (int -> EnemyKind)
+    visionWallCheckCount : uint32
+
+    enemyUpdateDistance : float32
+    damageCalculation : float32 -> Actor -> Actor -> float32
+    occupationSettings : HashMap<Occupation, OccupationSetting>
+
+    enemySettings : HashMap<EnemyKind, EnemySetting>
+    enemyFrequencySum : uint16
+    enemyFrequencyRanges : ( EnemyKind * (uint16 * uint16) ) []
+    enemyGrowthEasing : Easing
+
+    levelOffset : uint16
+    lvUpExp : uint16 -> uint16
+
+    maxLevel : uint16
+    playerGrowthRateOverMax : float32
+
+    levelSD : float32
+
+    createDungeonBuilder : uint16 -> uint16 -> DungeonBuilder
+    gateCount : uint16 -> uint16 -> int
 }
 
 
-and Model =
-    {
-        count : uint32
+and Model = {
+    count : uint32
 
-        nextPlayerID : uint32
-        players : Map<PlayerID, Player>
+    nextPlayerID : uint32
+    players : Map<PlayerID, Player>
 
-        enemies : Map<EnemyID, Enemy>
+    enemies : Map<EnemyID, Enemy>
 
-        dungeonBuilder: Dungeon.DungeonBuilder
-        dungeonModel : Dungeon.DungeonModel
-        dungeonGateCells : int Vec2 Set
+    dungeonBuilder: Dungeon.DungeonBuilder
+    dungeonModel : Dungeon.DungeonModel
+    dungeonGateCells : int Vec2 Set
 
-        skillList : Skill.SkillList
+    skillList : SkillList
 
-        gameSetting : GameSetting
+    gameSetting : GameSetting
 
-        timePassed : bool
+    timePassed : bool
 
-        mode : GameSceneMode
+    mode : GameSceneMode
 
-        lastCollidedGate : bool
+    lastCollidedGate : bool
 
-        dungeonFloor : uint32
-    }
-with
+    dungeonFloor : uint16
+
+    initSize : uint16
+
+    localPlayerId : PlayerID
+} with
     static member SetSkillList (x, s) =
         { x with skillList = s }
 
@@ -119,8 +145,15 @@ with
 module OccupationSetting =
     let inline skillOf kind x =
         kind |> function
-        | Actor.Skill1 -> x.skill1CoolTime, x.skill1
-        | Actor.Skill2 -> x.skill2CoolTime, x.skill2
+        | Skill1 -> x.skill1CoolTime, x.skill1
+        | Skill2 -> x.skill2CoolTime, x.skill2
+
+
+type EnemyInits = {
+    kind : EnemyKind
+    lookAngleRadian : float32
+    levelDiff : int
+}
 
 
 module Model =
@@ -134,24 +167,42 @@ module Model =
 
     let inline gameSetting (model : Model) = model.gameSetting
 
-    let cellsToEnemies (gameSetting : GameSetting) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
+
+    let cellsToEnemies (gameSetting : GameSetting) (dungeonFloor) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
             let enemyId = EnemyID <| uint32 index
-            let kind = gameSetting.intToEnemy ei.kind
+            let setting = gameSetting.enemySettings |> HashMap.find ei.kind
+
+            let level =
+                (int gameSetting.levelOffset + ei.levelDiff + int dungeonFloor - 1)
+                |> max 1
+                |> uint16
+
+            let status =
+                Actor.calcStatusOf
+                    gameSetting.enemyGrowthEasing
+                    1.0f
+                    gameSetting.maxLevel
+                    level
+                    setting.actorStatus
+
             enemyId
-            , Actor.Enemy.init
+            , Enemy.init
                 (Vec2.init 100.0f 100.0f)
                 ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
-                (gameSetting.enemySettings |> HashMap.find kind).actorStatus
-                kind
+                level
+                status
+                ei.kind
                 ei.lookAngleRadian
+                setting.visionDistance
+                setting.visionAngleRate
         )
         |> Map.ofSeq
 
-    let inline init players dungeonBuilder dungeonModel dungeonGateCells enemyCells gameSetting = {
+    let inline init players dungeonBuilder dungeonModel initSize dungeonGateCells enemyCells gameSetting = {
         gameSetting = gameSetting
         count = 0u
 
@@ -161,15 +212,15 @@ module Model =
         enemies =
             cellsToEnemies
                 gameSetting
+                1us
                 enemyCells
                 gameSetting.dungeonCellSize
 
-        skillList = Skill.SkillList.init
+        skillList = SkillList.init
 
         dungeonBuilder = dungeonBuilder
         dungeonModel = dungeonModel
         dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
-
 
         timePassed = false
 
@@ -177,7 +228,10 @@ module Model =
 
         lastCollidedGate = false
 
-        dungeonFloor = 1u
+        dungeonFloor = 1us
+        initSize = initSize
+
+        localPlayerId = PlayerID 0u
     }
 
 module GameSetting =
@@ -200,12 +254,25 @@ module GameSetting =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip HashMap.containsKey cells
-        |> Seq.forall
 
     let inline insideDungeon 
         (gameSetting : GameSetting)
         (dungeonModel : Dungeon.DungeonModel) =
         insideCells gameSetting dungeonModel.cells
+        |> Seq.forall
+
+    let inline insideDungeonOfLine
+        (gameSetting : GameSetting)
+        (dungeonModel : Dungeon.DungeonModel)
+        count
+        (p1) (p2) =
+
+        let count = count - 1u
+
+        [0u..count - 1u]
+        |> Seq.map (fun x -> float32 x / float32 count)
+        |> Seq.map(fun x -> p1 .* x + p2 .* (1.0f - x))
+        |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
 
@@ -217,13 +284,14 @@ module Dungeon =
         initPosition : float32 Vec2
     }
 
-    let generateDungeonModel (dungeonBuilder : DungeonBuilder) =
-        Random.int minValue<int> maxValue<int>
-        |> TartTask.withEnv(fun seed ->
+    let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
+        (Random.int minValue<int> maxValue<int>)
+        |> SideEffect.bind(fun seed ->
             let rec loop n = async {
                 let builder = { dungeonBuilder with seed = seed + n }
                 let dungeon = DungeonBuilder.generate builder
-                if length dungeon.largeRooms > 2 then
+
+                if length dungeon.largeRooms > 3 then
                     return ( builder, dungeon )
                 else
                     return! loop(n + 1)
@@ -244,7 +312,7 @@ module Dungeon =
 
         let rec loop() = monad {
             try
-                let gen = Random.int minValue<int> maxValue<int>
+                //let gen = Random.int minValue<int> maxValue<int>
                 let genNatural = Random.int 0 maxValue<int>
                 let smallRoomGen = Random.int 0 (smallRoomsCount - 1)
                 //let largeRoomGen = Random.int 0 (largeRoomsCount - 1)
@@ -295,13 +363,35 @@ module Dungeon =
                 let! enemyCellIndexs =
                     Random.list smallRoomsCount smallRoomGen
 
+                let enemyKindsCount = gameSetting.enemySettings |> HashMap.count
+
+                let searchKind ki =
+                    let rec searchKind width index =
+                        let index = index |> max 0 |> min (enemyKindsCount - 1)
+                        let kind, (minV, maxV) = gameSetting.enemyFrequencyRanges.[index]
+                        if ki < minV then
+                            searchKind ( (width / 2) |> max 1 ) (index + width)
+                        elif maxV < ki then
+                            searchKind ( (width / 2) |> max 1 ) (index - width)
+                        elif ki = minV then
+                            fst gameSetting.enemyFrequencyRanges.[index - 1]
+                        else
+                            kind
+
+                    searchKind (enemyKindsCount / 4) (enemyKindsCount / 2)
+
                 let! enemyInints =
                     Random.list smallRoomsCount ( monad {
-                        let! kind = Random.int 0 maxValue<int>
+                        let! kindValue = Random.int 1 (int gameSetting.enemyFrequencySum)
+
                         let! angle = Random.double01
+                        let! p1 = Random.double01
+                        let! p2 = Random.double01
+                        let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
-                            EnemyInits.kind = kind
-                            lookAngleRadian = 2.0f * Angle.pi * float32 angle
+                            EnemyInits.kind = searchKind (uint16 kindValue)
+                            lookAngleRadian = 2.0f * Pi * float32 angle
+                            levelDiff = int <| (p1 * gameSetting.levelSD)
                         }
                     })
 
@@ -328,4 +418,4 @@ module Dungeon =
                 return! loop()
         }
 
-        flip Random.generate (loop())
+        flip SideEffect.performWith (loop())

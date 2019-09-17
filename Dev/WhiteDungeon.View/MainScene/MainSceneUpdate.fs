@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.View.MainScene.Update
 
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
@@ -19,7 +19,7 @@ open WhiteDungeon.View.MainScene.Model
 type ViewMsg =
     | SetBGMVolume of float32
     | CloseGame
-    | StartGame of Game.Model.Model * int * float32
+    | StartGame of Model.Model * int * float32
 
 
 let bgmToFloat bgmVolume = float32 bgmVolume / 100.0f
@@ -33,7 +33,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | UndoModel ->
             model.prevModel |> function
             | Some(x) ->
-                { x with prevModel = None; uiMode = Title }, Cmd.port(SetBGMVolume (bgmToFloat x.bgmVolume))
+                { x with prevModel = None; uiMode = Title }, Cmd.ofPort(SetBGMVolume (bgmToFloat x.bgmVolume))
             | None ->
                 model, Cmd.none
         | SetUIWithHistory uiMode ->
@@ -48,7 +48,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
         | AddBGMVolume i ->
             let v = model.bgmVolume + i |> min 10 |> max 0 
-            { model with bgmVolume = v}, Cmd.port(SetBGMVolume (bgmToFloat v))
+            { model with bgmVolume = v}, Cmd.ofPort(SetBGMVolume (bgmToFloat v))
 
         | OccupationListToggle x ->
             { model with occupationListToggle = x }, Cmd.none
@@ -62,21 +62,28 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                 occupationListToggle = false }, Cmd.none
 
         | SetDungeonParameters i ->
-            model |> Model.updateDungeonBuilder i
-            , Cmd.none
+            { model with initSize = i }, Cmd.none
 
         | GenerateDungeon ->
-            let randomCmd = Random.int minValue<int> maxValue<int> |> Random.generate SetGameSceneRandomSeed
+            let randomCmd =
+                Random.int minValue<int> maxValue<int>
+                |> SideEffect.performWith SetGameSceneRandomSeed
             { model with uiMode = WaitingGenerating }, randomCmd
 
         | SetGameSceneRandomSeed x ->
             if model.uiMode = WaitingGenerating then
-                Game.Model.Dungeon.generateDungeonModel model.dungeonBuilder
-                |> TartTask.perform (fun e ->
-    #if DEBUG
-                    System.Console.WriteLine(e)
-    #endif
-                    GenerateDungeon) GeneratedDungeonModel
+                let dungeonBuilder =
+                    model.setting.gameSetting.createDungeonBuilder
+                        1us model.initSize
+                Model.Dungeon.generateDungeonModel dungeonBuilder
+                |> SideEffect.performWith(function
+                    | Ok a -> GeneratedDungeonModel a
+                    | Error e ->
+#if DEBUG
+                        printfn "%A" e
+#endif
+                        GenerateDungeon
+                )
                 |> fun cmd ->
                     { model with gameSceneRandomSeed = x }, cmd
             else
@@ -84,10 +91,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
         | GeneratedDungeonModel (dungeonBuilder, dungeonModel) ->
             if model.uiMode = WaitingGenerating then
+                let gateCount = model.setting.gameSetting.gateCount 1us model.initSize
                 let cmd =
-                    Game.Model.Dungeon.generateDungeonParams
+                    Model.Dungeon.generateDungeonParams
                         model.setting.gameSetting
-                        model.gateCount
+                        gateCount
                         dungeonBuilder
                         dungeonModel
                         GeneratedDungeonParams
@@ -98,34 +106,49 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         | GeneratedDungeonParams dungeonParams ->
             if model.uiMode = WaitingGenerating then
                 let gameModel =
-                    let size = model.setting.gameSetting.characterSize
+                    //let size = model.setting.gameSetting.characterSize
+
+                    let gameSetting = model.setting.gameSetting
+
                     let players =
                         [ model.playerName, model.selectOccupation ]
                         |> Seq.indexed
                         |> Seq.map(fun (index, (name, occupation)) ->
                             let name = Option.defaultValue (sprintf "Player%d" index) name
 
-                            let status =
-                                model.setting.gameSetting.occupationSettings
+                            let setting =
+                                gameSetting.occupationSettings
                                 |> HashMap.find occupation
-                                |> fun x -> x.status
+
+                            let size = setting.size
+
+                            let level = model.setting.gameSetting.levelOffset
+
+                            let status =
+                                Model.Actor.calcStatusOf
+                                    setting.growthEasing
+                                    gameSetting.playerGrowthRateOverMax
+                                    gameSetting.maxLevel
+                                    level
+                                    setting.status
 
                             let character : Model.Character = {
                                 id = Model.CharacterID -index
                                 name = name
                                 currentOccupation = occupation
-                                occupations = [
-                                    occupation, status
-                                ] |> Map.ofList
+                                //occupations = [
+                                //    occupation, status
+                                //] |> Map.ofList
                             }
 
 
-                            let playerId = Game.Model.PlayerID (uint32 index)
+                            let playerId = Model.PlayerID (uint32 index)
 
                             let player =
-                                Game.Model.Actor.Player.init
+                                Model.Player.init
                                     size
                                     (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                                    level
                                     status
                                     playerId
                                     character
@@ -134,19 +157,20 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                         )
                         |> Map.ofSeq
 
-                    Game.Model.Model.init
+                    Model.Model.init
                         players
                         dungeonParams.dungeonBuilder
                         dungeonParams.dungeonModel
+                        model.initSize
                         dungeonParams.gateCells
                         dungeonParams.enemyCells
                         model.setting.gameSetting
 
-                model, Cmd.port(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
+                model, Cmd.ofPort(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
             else
                 model, Cmd.none
 
         | CloseGameMsg ->
-            model, Cmd.port CloseGame
+            model, Cmd.ofPort CloseGame
     with e ->
         { model with uiMode = ErrorUI e }, Cmd.none

@@ -4,18 +4,13 @@ open wraikny
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Core.View
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Fs
+open wraikny.Tart.Core
+open wraikny.MilleFeuille
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
 open WhiteDungeon.View.Utils.Color
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Model
 
 open FSharpPlus
 
@@ -33,7 +28,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     let mutable current = Back
 
-    let mutable currentMove = Actor.ActorMove.Walk
+    let mutable currentMove = ActorMove.Walk
 
     let anim =
         seq {
@@ -48,7 +43,7 @@ type MoveAnimation(owner : asd.TextureObject2D) =
                 owner.Src <- area
                 owner.Angle <- angle
                 yield()
-            | textures ->
+            | _ ->
                 while true do
                     for (tex, area, angle) in textures do
                         owner.Texture <- tex
@@ -58,8 +53,8 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
                         yield!(
                             match currentMove with
-                            | Actor.Walk -> images.sleepWalk
-                            | Actor.Dash -> images.sleepDash
+                            | Walk -> images.sleepWalk
+                            | Dash -> images.sleepDash
                             |> int |> Coroutine.sleep
                         )
         }

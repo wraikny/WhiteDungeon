@@ -1,9 +1,9 @@
-﻿namespace WhiteDungeon.Core.Game.Msg
+﻿namespace WhiteDungeon.Core
 
 open wraikny.Tart.Helper.Math
 
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core
+open WhiteDungeon.Core.Model
 
 open FSharpPlus
 
@@ -18,34 +18,30 @@ type InputDirection =
 
 
 type PlayerInput =
-    | RightKey
-    | LeftKey
-    | UpKey
-    | DownKey
-    | DashKey
-    //| Skill1Key
-    //| Skill2Key
+    | Select
+    | Cancel
+    | Dash
+    | Direction of InputDirection
+    | Skill of SkillKind
 
 
 module PlayerInput =
-    let inputs =
-        [
-            RightKey
-            LeftKey
-            UpKey
-            DownKey
-            DashKey
-        ]
+    let inputs = [
+        Direction Right
+        Direction Left
+        Direction Up
+        Direction Down
+        Direction Down
+    ]
 
-    let getPlayerMoveFromInputs (inputSet : PlayerInput Set) : Actor.ActorMove * float32 Vec2 =
-        let actorMove =
-            if inputSet |> Set.contains PlayerInput.DashKey then Actor.Dash else Actor.Walk
+    let getPlayerMoveFromInputs (isDash) (inputSet : InputDirection Set) : ActorMove * float32 Vec2 =
+        let actorMove = if isDash then ActorMove.Dash else ActorMove.Walk
 
         let moveDirs = [|
-            UpKey, Vec2.init 0.0f -1.0f
-            DownKey, Vec2.init 0.0f 1.0f
-            RightKey, Vec2.init 1.0f 0.0f
-            LeftKey, Vec2.init -1.0f 0.0f
+            Up, Vec2.init 0.0f -1.0f
+            Down, Vec2.init 0.0f 1.0f
+            Right, Vec2.init 1.0f 0.0f
+            Left, Vec2.init -1.0f 0.0f
         |]
 
         let direction =
@@ -67,10 +63,12 @@ type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
-    | PlayerSkill of PlayerID * Actor.SkillKind
+    //| PlayerSkill of PlayerID * SkillKind
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
     | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
+
+    | UpdateEnemyOf of EnemyID * EnemyMsg
     //#if DEBUG
     ///// for Debug
     //| AppendSkillEmits

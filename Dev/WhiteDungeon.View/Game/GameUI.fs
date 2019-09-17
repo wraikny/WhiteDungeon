@@ -3,25 +3,17 @@
 
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Input
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Core.Input
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.Input
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Extension
-open wraikny.MilleFeuille.Fs
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
 
 open FSharpPlus
 
@@ -45,8 +37,14 @@ type GameSceneArgs = {
     randomSeed : int
 }
 
+type private PlayerValues = {
+    status : Model.ActorStatus
+    expoint : uint16
+    occupation : Model.Occupation
+}
 
-type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
+
+type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, gameSceneArgs : GameSceneArgs) =
     inherit asd.GeometryObject2D()
 
     let ws = asd.Engine.WindowSize.To2DF()
@@ -109,9 +107,9 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
         )
 
 
-    let mutable lastFloor = maxValue<uint32>
+    let mutable lastFloor = maxValue<uint16>
 
-    let mutable lastPlayerStatus = None
+    let mutable lastPlayerValues = None
 
     override this.OnAdded() =
         this.AddChildWindow(dungeonFloorWindow)
@@ -126,30 +124,39 @@ type GameUI(gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
                 UI.Text (sprintf "Floor: %d" viewModel.dungeonFloor)
             ]
 
-        let playerVM = snd viewModel.players.[0]
+        let player = snd viewModel.players.[0]
 
-        let updatePlayerStatusView() =
-            lastPlayerStatus <- Some playerVM
+        let occSetting =
+            gameViewSetting.occupationSetting
+            |> HashMap.find player.character.currentOccupation
 
-            let hpCurrent = int playerVM.actorView.statusCurrent.hp
-            let hpDefault = int playerVM.actorView.statusDefault.hp
 
-            let occSetting =
-                gameViewSetting.occupationSetting
-                |> HashMap.find playerVM.character.currentOccupation
+        (lastPlayerValues) |> function
+        | Some {status = x; occupation = y; expoint = z } when
+            x = player.actor.statusCurrent
+            && y = player.character.currentOccupation
+            && z = player.expoint
+            -> ()
+        | _ ->
+            lastPlayerValues <- Some {
+                status = player.actor.statusCurrent
+                expoint = player.expoint
+                occupation = player.character.currentOccupation
+            }
+            
+            let hpCurrent = player.actor.statusCurrent.hp
+            let hpDefault = player.actor.statusDefault.hp
 
+            let nextExp = gameSetting.lvUpExp player.actor.level
+            
             playerStatusWindow.UIContents <- [
-                UI.Text (sprintf "%s / %s" playerVM.character.name occSetting.name )
-                UI.Text (sprintf "Level: %d" playerVM.actorView.statusCurrent.level)
-                UI.Text (sprintf "HP: %d/%d" hpCurrent hpDefault)
-                UI.Rect (5.0f, 0.8f * ViewModel.ActorView.hpRate playerVM.actorView)
+                UI.Text (sprintf "%s / %s" player.character.name occSetting.name )
+                UI.Text (sprintf "Level: %d" player.actor.level)
+                UI.Text (sprintf "Exp: %d/%d" player.expoint nextExp)
+                UI.RectWith (5.0f, 0.8f * (float32 player.expoint / float32 nextExp), asd.Color(200, 255, 255, 255))
+                UI.Text (sprintf "HP: %d/%d" (int hpCurrent) (int hpDefault) )
+                UI.RectWith (5.0f, 0.8f * (hpCurrent / hpDefault), asd.Color(0, 255, 0, 255))
             ]
-
-
-        lastPlayerStatus |> function
-        | None -> updatePlayerStatusView()
-        | Some x when x = playerVM -> updatePlayerStatusView()
-        | _ -> ()
 
 
     member __.Toggle(cond, ?callback) =

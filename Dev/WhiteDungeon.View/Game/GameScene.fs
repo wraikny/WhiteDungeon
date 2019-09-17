@@ -1,27 +1,24 @@
 ﻿namespace WhiteDungeon.View.Game
 
 
+open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Input
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Core.Input
+open wraikny.MilleFeuille.Objects
+open wraikny.MilleFeuille.Input
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.Input
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Extension
-open wraikny.MilleFeuille.Fs
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.Objects
 
 open FSharpPlus
 
@@ -36,16 +33,17 @@ open System.Reactive.Linq
 type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameViewSetting : GameViewSetting, gameSceneArgs : GameSceneArgs) =
     inherit Scene()
 
-    let messenger : IMessenger<_, _, _> =
-        Messenger.build
+    let messenger =
+        Messenger.Create(
             {
                 seed = gameSceneArgs.randomSeed
-            }
+            },
             {
-                init = gameModel, Cmd.port (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
+                init = gameModel, Cmd.ofPort (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
+        )
     do
         //messenger.SleepTime <- 0u
 
@@ -60,14 +58,18 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         KeyboardBuilder.init()
         |> KeyboardBuilder.bindKeysList
             [
-                Game.Msg.UpKey    , asd.Keys.W
-                Game.Msg.DownKey  , asd.Keys.S
-                Game.Msg.RightKey , asd.Keys.D
-                Game.Msg.LeftKey  , asd.Keys.A
-                Game.Msg.DashKey  , asd.Keys.LeftShift
+                Select            , asd.Keys.Space
+                Cancel            , asd.Keys.Escape
+                Dash              , asd.Keys.LeftShift
+                Direction Up      , asd.Keys.W
+                Direction Down    , asd.Keys.S
+                Direction Right   , asd.Keys.D
+                Direction Left    , asd.Keys.A
+                Skill Model.Skill1, asd.Keys.J
+                Skill Model.Skill2, asd.Keys.K
             ]
         |> KeyboardBuilder.build
-        :> IController<Game.Msg.PlayerInput>
+        :> IController<PlayerInput>
 
     //let controllers = [|
     //    Game.Model.PlayerID 0u, gameKeybaord
@@ -81,6 +83,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     let dungeonLayer = new asd.Layer2D()
     let actorLayer = new asd.Layer2D()
     let hpLayer = new asd.Layer2D()
+
+    let pauseLayers = [
+        dungeonLayer
+        actorLayer
+        hpLayer
+    ]
+
+
     //let skillEffectsLayer = new asd.Layer2D()
     let uiLayer = new asd.Layer2D()
 
@@ -98,13 +108,11 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
                 ActorsUpdater<_, _>(actorLayer, {
-                    create = fun () -> new PlayerView(playersImagesMap, hpLayer)
+                    create = fun () -> new PlayerView(gameViewSetting, playersImagesMap, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
                 }))
         |> ignore
-
-        let enemiesImagesMap = ()
 
         // Enemies
         messenger.ViewModel
@@ -134,6 +142,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                     }))
         |> ignore
 
+    let damagesView = new DamagesView(gameViewSetting)
+    do
+        messenger.ViewModel
+            .Select(fun v -> v.camera.position)
+            .Add(damagesView.OnNext)
+
+        hpLayer.AddComponent(damagesView, "DamagesView")
+
     let dungeonCamera = new GameCamera(true)
     let actorCamera = new GameCamera(false)
     let hpCamera = new GameCamera(false)
@@ -148,7 +164,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         |]
         |>> fun o ->
             messenger.ViewModel
-                .Select(fun v -> ViewModel.ViewModel.getCameras v)
+                .Select(fun v -> v.camera)
                 .Subscribe o
         |> ignore
 
@@ -156,7 +172,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
-        }, UpdatingOption = View.UpdatingOption.Updating)
+        }, UpdatingOption = UpdatingOption.Updating)
 
     do
         messenger.ViewMsg
@@ -182,9 +198,10 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
                     GC.Collect()
                 //| _ -> ()
+                | ViewMsg.DamagesView x -> damagesView.Add(x)
             )
 
-    let gameUIWindows = new GameUI(gameViewSetting, gameSceneArgs)
+    let gameUIWindows = new GameUI(gameViewSetting, gameModel.gameSetting, gameSceneArgs)
     do
         messenger.ViewModel.Add(gameUIWindows.OnNext)
     //let gameUIWindows = gameUIWindows :> UI.IToggleWindow
@@ -292,6 +309,9 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
                             (gameUIWindows :> UI.IToggleWindow).Toggle(true)
                             GC.Collect()
+
+                            pauseLayers
+                            |> Seq.iter(fun x -> x.IsUpdated <- true)
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -304,6 +324,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                             playSE(se_page)
                             uiBackRect.IsDrawn <- true
                             uiWindowMain.Toggle(true)
+                            pauseLayers
+                            |> Seq.iter(fun x -> x.IsUpdated <- false)
                             
                         if (gameUIWindows :> UI.IToggleWindow).IsToggleOn then
                             (gameUIWindows :> UI.IToggleWindow).Toggle(false, openUI)
@@ -373,55 +395,55 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 
-                // Input
-                let mousePushed =
-                    asd.Engine.Mouse.GetButtonInputState
-                    >> (=) asd.ButtonState.Push
+                //// Input
+                //let mousePushed =
+                //    asd.Engine.Mouse.GetButtonInputState
+                //    >> (=) asd.ButtonState.Push
 
-                [|
-                    asd.MouseButtons.ButtonLeft, Model.Actor.Skill1
-                    asd.MouseButtons.ButtonRight, Model.Actor.Skill2
-                |]
-                |> iter(fun (m, s) ->
-                    if mousePushed m then
-                        messenger.Enqueue(
-                            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                        )
-                )
+                //[|
+                //    asd.MouseButtons.ButtonLeft, Model.Skill1
+                //    asd.MouseButtons.ButtonRight, Model.Skill2
+                //|]
+                //|> iter(fun (m, s) ->
+                //    if mousePushed m then
+                //        messenger.Enqueue(
+                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                //        )
+                //)
 
-                [|
-                    asd.Keys.J, Model.Actor.Skill1
-                    asd.Keys.K, Model.Actor.Skill2
-                |]
-                |> iter(fun (k, s) ->
-                    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
-                        messenger.Enqueue(
-                            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                        )
-                )
+                //[|
+                //    asd.Keys.J, Model.Skill1
+                //    asd.Keys.K, Model.Skill2
+                //|]
+                //|> iter(fun (k, s) ->
+                //    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
+                //        messenger.Enqueue(
+                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
+                //        )
+                //)
 
-        | Model.HowToControl
-        | Model.Pause
-        | Model.GameFinished true ->
-            if asd.Engine.Keyboard.GetKeyState(asd.Keys.Escape) = asd.ButtonState.Push then
+        | Model.HowToControl ->
+            if gameKeybaord.IsPush Select || gameKeybaord.IsPush Cancel then
                 messenger.Enqueue(Msg.SetGameMode Model.GameMode)
 
-        | _ -> ()
+        | Model.Pause
+        | Model.GameFinished true ->
+            if gameKeybaord.IsPush(Cancel) then
+                messenger.Enqueue(Msg.SetGameMode Model.GameMode)
+
+        | Model.GameFinished false
+        | Model.ErrorUI _
+        | Model.Stair _
+        | Model.WaitingGenerating -> ()
 
 
-    member this.PushControllerInput() : Msg.Msg option =
-        let getStateIs (state : asd.ButtonState) key =
-            gameKeybaord.GetState(key)
-            |> Option.ofNullable
-            |>> ((=) state)
-            |> Option.defaultValue false
-
-        Msg.PlayerInput.inputs
-        |> filter (getStateIs asd.ButtonState.Hold)
+    member this.PushControllerInput() : Msg option =
+        gameKeybaord.Keys
+        |> filter gameKeybaord.IsHold
+        |> toList
         |> function
         | [] -> None
         | inputs ->
-
             (Model.PlayerID 0u, inputs |> Set.ofList)
             |> Msg.PlayerInputs
             |> Some

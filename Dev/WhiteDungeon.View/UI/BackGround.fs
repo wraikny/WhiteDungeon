@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.View.UI
 
-open wraikny.MilleFeuille.Core
+open wraikny.MilleFeuille
 
 type BackGroundLayer(color) =
     inherit asd.Layer2D()

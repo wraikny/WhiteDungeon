@@ -1,8 +1,17 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-type Level = int
+type Occupation = string
+type EnemyKind = string
+type SkillID = uint32
 
-type HP = float32
-type Atk = float32
-type Def = float32
-type Speed = float32
+[<Struct>]
+type CharacterID = CharacterID of int
+
+
+[<Struct>]
+type PlayerID = PlayerID of id : uint32 with
+    member inline this.Value = this |> function | PlayerID x -> x
+
+[<Struct>]
+type EnemyID = EnemyID of id : uint32 with
+    member inline this.Value = this |> function | EnemyID x -> x

@@ -2,18 +2,14 @@
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
 
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.UI
+
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.UI
 open WhiteDungeon
-open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
-open WhiteDungeon.Core.Game.Model
+open WhiteDungeon.Core.Model
 
 open WhiteDungeon.View
-open WhiteDungeon.Core.Game.Model.Actor.Skill
-
 open FSharpPlus.Math.Applicative
 open FSharpPlus
 
@@ -21,6 +17,10 @@ open FSharpPlus
 
 let black = Vec3.init 0uy 0uy 0uy
 let white = Vec3.init 255uy 255uy 255uy
+
+let red = Vec3 .init 255uy 0uy 0uy
+let green = Vec3.init 0uy 255uy 0uy
+
 let ume = Vec3.init 234uy 173uy 189uy
 let sumire = Vec3.init 85uy 69uy 98uy
 let sakura = Vec3.init 250uy 219uy 224uy
@@ -30,6 +30,14 @@ let windowSize = (Vec2.init 16 9) .* 75
 let windowRSizeUnit = (map float32 windowSize) ./ float32 windowSize.x
 
 let textFontPath = "Font/mplus-1c-light.ttf"
+
+let damageView = {
+    font = "Font/mplus-1p-bold.ttf"
+    size = 60
+    sizeOutline = 5
+    color = red
+    colorOutline = white
+}
 
 let gameViewSetting : View.GameViewSetting =
     let windowMargin = 0.02f /. windowRSizeUnit
@@ -66,4 +74,21 @@ let gameViewSetting : View.GameViewSetting =
                 playerStatusSize
 
         dungeonCellTexture = "Image/Game/cotton-c.png"
+
+        damageTextFrame = 120
+        damageTextMove = 50.0f
+        damageView = damageView
+        healView = {
+            damageView with
+                color = green
+                colorOutline = white
+        }
+
+        actorGameText = {
+            font = textFontPath
+            size = 50
+            sizeOutline = 3
+            color = black
+            colorOutline = black
+        }
     }

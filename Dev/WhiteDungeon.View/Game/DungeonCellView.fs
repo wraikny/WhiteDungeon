@@ -3,24 +3,19 @@
 
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Geometry
+
 open wraikny.Tart.Core
 open wraikny.Tart.Advanced
-open wraikny.MilleFeuille.Fs.Objects
-open wraikny.MilleFeuille.Fs.Input
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Core.Input
+open wraikny.MilleFeuille.Objects
+open wraikny.MilleFeuille.Input
+open wraikny.MilleFeuille
 
 open WhiteDungeon.Core
-open WhiteDungeon.Core.Game
 open WhiteDungeon.View
 open WhiteDungeon.View.Utils.Color
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Helper.Extension
-open wraikny.MilleFeuille.Fs
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs.Geometry
 
 open FSharpPlus
 

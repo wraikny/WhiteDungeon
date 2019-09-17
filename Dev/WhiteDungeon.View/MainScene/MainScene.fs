@@ -9,12 +9,10 @@ open System
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Math
 
-open wraikny.MilleFeuille.Core
-open wraikny.MilleFeuille.Core.UI
-open wraikny.MilleFeuille.Fs.Input
-open wraikny.MilleFeuille.Fs.Math
-open wraikny.MilleFeuille.Fs
-open wraikny.MilleFeuille.Fs.Component.Coroutine
+open wraikny.MilleFeuille
+open wraikny.MilleFeuille.UI
+open wraikny.MilleFeuille.Input
+open wraikny.MilleFeuille
 
 open WhiteDungeon.Core
 open WhiteDungeon.View
@@ -159,14 +157,14 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
     let messenger =
         let env = { seed = Random().Next() }
-        Messenger.build env {
+        Messenger.Create(env, {
             init =
                 let initModel = Model.initModel env setting
                 
-                initModel, Cmd.port(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
+                initModel, Cmd.ofPort(Update.SetBGMVolume(Update.bgmToFloat initModel.bgmVolume))
             update = Update.update
             view = ViewModel.view
-        }
+        })
 
     do
         #if DEBUG
@@ -284,7 +282,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.CloseGame ->
                 messenger.Dispose()
-                this.StartCoroutine("CloseGame", seq {
+                this.AddCoroutine(seq {
 
                     if uiWindowsAnimating() then
                         while uiWindowsAnimating() do
@@ -298,7 +296,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.StartGame (gameModel, randomSeed, bgmVolume) ->
                 messenger.Dispose()
-                this.StartCoroutine("StartGame", seq {
+                this.AddCoroutine(seq {
                     
                     if not uiWindowMain.IsToggleOn then
                         while not uiWindowMain.IsToggleOn do
