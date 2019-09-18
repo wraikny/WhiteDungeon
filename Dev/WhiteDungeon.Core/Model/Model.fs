@@ -288,14 +288,17 @@ module Dungeon =
         (Random.int minValue<int> maxValue<int>)
         |> SideEffect.bind(fun seed ->
             let rec loop n = async {
-                let builder = { dungeonBuilder with seed = seed + n }
-                let dungeon = DungeonBuilder.generate builder
+                try
+                    let builder = { dungeonBuilder with seed = seed + n }
+                    let dungeon = DungeonBuilder.generate builder
 
-                if length dungeon.largeRooms > 3 then
-                    return ( builder, dungeon )
-                else
-                    return! loop(n + 1)
-                }
+                    if length dungeon.largeRooms > 3 then
+                        return Ok( builder, dungeon )
+                    else
+                        return! loop(n + 1)
+                with e -> return Error e
+            }
+
             loop 0
         )
 
