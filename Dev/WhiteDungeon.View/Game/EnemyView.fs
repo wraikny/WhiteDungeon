@@ -1,20 +1,12 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny
-open wraikny.Tart.Helper
 open wraikny.Tart.Math
-open wraikny.Tart.Helper.Collections
+open wraikny.Tart.Helper
 
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Core
-open wraikny.MilleFeuille.Objects
 open WhiteDungeon.Core
 open WhiteDungeon.View
 open wraikny.MilleFeuille
-open WhiteDungeon.View.Utils.Color
-
 open FSharpPlus
-open FSharpPlus.Math.Applicative
 
 type EnemyView(gameSetting : Model.GameSetting, gameViewSetting : GameViewSetting, hpLayer) = // as this =
     inherit ActorView<Model.EnemyKind>(gameViewSetting, HashMap.empty, hpLayer)

@@ -5,10 +5,6 @@ open wraikny.Tart.Helper
 open wraikny.MilleFeuille
 open WhiteDungeon.Core
 open WhiteDungeon.View
-open WhiteDungeon.View.Utils.Color
-
-open FSharpPlus
-open FSharpPlus.Math.Applicative
 
 type SkillEmitView(_gameViewSetting : GameViewSetting) =
     inherit ObjectBaseView<unit>(HashMap.empty

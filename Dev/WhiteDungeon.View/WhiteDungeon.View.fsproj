@@ -76,6 +76,8 @@
     <Compile Include="UI\BackGround.fs" />
     <Compile Include="UI\Keyboard.fs" />
     <Compile Include="Game\MoveAnimation.fs" />
+    <Compile Include="Game\AreaView.fs" />
+    <Compile Include="Game\BuildingView.fs" />
     <Compile Include="Game\ObjectBaseView.fs" />
     <Compile Include="Game\ActorView.fs" />
     <Compile Include="Game\PlayerView.fs" />

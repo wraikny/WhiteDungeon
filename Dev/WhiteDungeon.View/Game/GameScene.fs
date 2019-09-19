@@ -38,12 +38,18 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 seed = gameSceneArgs.randomSeed
             },
             {
-                init = gameModel, Cmd.ofPort (ViewMsg.UpdateDungeonView(gameModel.dungeonModel, gameModel.dungeonGateCells) )
+                init = gameModel, Cmd.ofPort (ViewMsg.UpdateDungeonView(gameModel.dungeonModel) )
                 view = ViewModel.ViewModel.view
                 update = Update.Update.update
             }
         )
     do
+        messenger.ViewModel
+            .Select(fun x -> (x.players, x.buildings) )
+            .Add(fun x ->
+                if asd.Engine.Keyboard.GetKeyState asd.Keys.Y = asd.ButtonState.Push then printfn "%A" x
+            )
+
         //messenger.SleepTime <- 0u
 
         #if DEBUG
@@ -80,11 +86,13 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     let dungeonLayer = new asd.Layer2D()
+    let buildingsLayer = new asd.Layer2D()
     let actorLayer = new asd.Layer2D()
     let hpLayer = new asd.Layer2D()
 
     let pauseLayers = [
         dungeonLayer
+        buildingsLayer
         actorLayer
         hpLayer
     ]
@@ -99,6 +107,17 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     do
+
+        messenger.ViewModel
+            .Select(fun vm -> vm.buildings)
+            .Subscribe(new ActorsUpdater<_, _>(buildingsLayer, {
+                create = fun() -> new BuildingView(gameViewSetting)
+                onError = raise
+                onCompleted = fun () -> printfn "Completed Buildings"
+            }))
+        |> ignore
+
+
         let playersImagesMap =
             gameViewSetting.occupationSetting
             |> HashMap.map (fun _ x -> x.characterImages)
@@ -150,6 +169,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         hpLayer.AddComponent(damagesView, "DamagesView")
 
     let dungeonCamera = new GameCamera(true)
+    let buildingsCamera = new GameCamera(false)
     let actorCamera = new GameCamera(false)
     let hpCamera = new GameCamera(false)
     let skillEffectsCamera = new GameCamera(false)
@@ -157,6 +177,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     do
         [|
             dungeonCamera
+            buildingsCamera
             actorCamera
             hpCamera
             skillEffectsCamera
@@ -173,18 +194,16 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"
         }, UpdatingOption = UpdatingOption.Updating)
 
+
     do
         messenger.ViewMsg
             .Add(function
-                | ViewMsg.UpdateDungeonView (dungeonModel, gateCells) ->
+                | ViewMsg.UpdateDungeonView (dungeonModel) ->
                     let cellsDict = 
                         dungeonModel.cells
                         |> HashMap.toSeq
                         |>> fun (pos, id) -> (pos, DungeonCellKind.fromSpaceID id)
                         |> fun x -> Dictionary<_, _>(dict x)
-
-                    for pos in gateCells do
-                        cellsDict.[pos] <- DungeonCellKind.Gate
 
                     seq {
                         let mutable i = 0u
@@ -194,7 +213,6 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                     }
                     |> toList
                     |> (dungeonCellUpdater :> IObserver<_>).OnNext
-
                     GC.Collect()
                 //| _ -> ()
                 | ViewMsg.DamagesView x -> damagesView.Add(x)
@@ -337,6 +355,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
+        this.AddLayer(buildingsLayer)
         this.AddLayer(actorLayer)
         this.AddLayer(hpLayer)
         //this.AddLayer(skillEffectsLayer)
@@ -347,6 +366,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
         // Camera
         dungeonLayer.AddObject(dungeonCamera)
+        buildingsLayer.AddObject(buildingsCamera)
         actorLayer.AddObject(actorCamera)
         hpLayer.AddObject(hpCamera)
 
@@ -394,45 +414,18 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 this.PushControllerInput()
                 |> iter messenger.Enqueue
 
-                //// Input
-                //let mousePushed =
-                //    asd.Engine.Mouse.GetButtonInputState
-                //    >> (=) asd.ButtonState.Push
-
-                //[|
-                //    asd.MouseButtons.ButtonLeft, Model.Skill1
-                //    asd.MouseButtons.ButtonRight, Model.Skill2
-                //|]
-                //|> iter(fun (m, s) ->
-                //    if mousePushed m then
-                //        messenger.Enqueue(
-                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                //        )
-                //)
-
-                //[|
-                //    asd.Keys.J, Model.Skill1
-                //    asd.Keys.K, Model.Skill2
-                //|]
-                //|> iter(fun (k, s) ->
-                //    if asd.Engine.Keyboard.GetKeyState k = asd.ButtonState.Push then
-                //        messenger.Enqueue(
-                //            Msg.PlayerSkill(Model.PlayerID 0u, s)
-                //        )
-                //)
-
         | Model.HowToControl ->
             if gameKeybaord.IsPush Select || gameKeybaord.IsPush Cancel then
                 messenger.Enqueue(Msg.SetGameMode Model.GameMode)
 
         | Model.Pause
         | Model.GameFinished true ->
-            if gameKeybaord.IsPush(Cancel) then
+            if gameKeybaord.IsPush Cancel then
                 messenger.Enqueue(Msg.SetGameMode Model.GameMode)
 
         | Model.GameFinished false
         | Model.ErrorUI _
-        | Model.Stair _
+        | Model.GateMode _
         | Model.WaitingGenerating -> ()
 
 

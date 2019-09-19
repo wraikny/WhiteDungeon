@@ -25,6 +25,7 @@
     <Compile Include="Update\Player.fs" />
     <Compile Include="Update\Enemy.fs" />
     <Compile Include="Update\Skill.fs" />
+    <Compile Include="Update\Building.fs" />
     <Compile Include="Update\Update.fs" />
     <Compile Include="ViewModel.fs" />
   </ItemGroup>

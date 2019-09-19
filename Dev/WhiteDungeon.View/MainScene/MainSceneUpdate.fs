@@ -160,11 +160,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
                     Model.Model.init
                         players
-                        dungeonParams.dungeonBuilder
-                        dungeonParams.dungeonModel
                         model.initSize
-                        dungeonParams.gateCells
-                        dungeonParams.enemyCells
+                        dungeonParams
                         model.setting.gameSetting
 
                 model, Cmd.ofPort(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))
