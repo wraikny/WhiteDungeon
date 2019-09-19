@@ -11,13 +11,13 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WhiteDungeon.View", "WhiteD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mille-Feuille", "..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.csproj", "{73984409-A0FE-476E-99F2-61BE570A752F}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mille-Feuille.Fs", "..\..\Mille-Feuille\Dev\Mille-Feuille.Fs\Mille-Feuille.Fs.fsproj", "{F0694096-423D-4328-AB20-CEF9052B2F31}"
-EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tart.Helper", "..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj", "{933D2137-DAB6-449C-830E-1B5CE882DE19}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tart.Core", "..\..\Tart\src\Tart.Core\Tart.Core.fsproj", "{A2ABE01D-BA74-477B-BA18-BCCD0176AF27}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Tart.Advanced", "..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj", "{9CB5E16A-F983-4D20-8973-8674CBC01FE6}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mille-Feuille.Fs", "..\..\Mille-Feuille\Dev\Mille-Feuille.Fs\Mille-Feuille.Fs.fsproj", "{F0694096-423D-4328-AB20-CEF9052B2F31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,12 +57,6 @@ Global
 		{73984409-A0FE-476E-99F2-61BE570A752F}.Release|Any CPU.ActiveCfg = Release|x86
 		{73984409-A0FE-476E-99F2-61BE570A752F}.Release|x86.ActiveCfg = Release|x86
 		{73984409-A0FE-476E-99F2-61BE570A752F}.Release|x86.Build.0 = Release|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|x86.ActiveCfg = Debug|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|x86.Build.0 = Debug|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|Any CPU.ActiveCfg = Release|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|x86.ActiveCfg = Release|x86
-		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|x86.Build.0 = Release|x86
 		{933D2137-DAB6-449C-830E-1B5CE882DE19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{933D2137-DAB6-449C-830E-1B5CE882DE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{933D2137-DAB6-449C-830E-1B5CE882DE19}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -87,6 +81,12 @@ Global
 		{9CB5E16A-F983-4D20-8973-8674CBC01FE6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CB5E16A-F983-4D20-8973-8674CBC01FE6}.Release|x86.ActiveCfg = Release|Any CPU
 		{9CB5E16A-F983-4D20-8973-8674CBC01FE6}.Release|x86.Build.0 = Release|Any CPU
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|x86.ActiveCfg = Debug|x86
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Debug|x86.Build.0 = Debug|x86
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|Any CPU.ActiveCfg = Release|x86
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|x86.ActiveCfg = Release|x86
+		{F0694096-423D-4328-AB20-CEF9052B2F31}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
