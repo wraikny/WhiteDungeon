@@ -88,6 +88,7 @@ let gameSetting : Model.GameSetting = {
 
     occupationSettings = HashMap.ofList [
         Character.Bushi.viewSetting.name, Character.Bushi.setting
+        Character.Onmyoji.viewSetting.name, Character.Onmyoji.setting
     ]
 
     enemyGrowthEasing = Easing.Lerp(Easing.Linear, Easing.InSine, 0.3f)

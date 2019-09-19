@@ -51,6 +51,7 @@ let gameViewSetting : View.GameViewSetting =
         //] |> Map.ofList
         occupationSetting = [
             Character.Bushi.viewSetting
+            Character.Onmyoji.viewSetting
         ]
         |> Seq.map(fun x -> (x.name, x))
         |> HashMap.ofSeq

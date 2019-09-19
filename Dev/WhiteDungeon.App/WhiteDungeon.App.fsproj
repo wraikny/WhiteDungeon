@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Character\Bushi.fs" />
+    <Compile Include="Character\Onmyoji.fs" />
     <Compile Include="GameSetting.fs" />
     <Compile Include="GameViewSetting.fs" />
     <Compile Include="Setting.fs" />
