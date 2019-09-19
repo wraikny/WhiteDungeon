@@ -82,7 +82,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 #if DEBUG
                         printfn "%A" e
 #endif
-                        GenerateDungeon
+                        //GenerateDungeon
+                        raise e
                 )
                 |> fun cmd ->
                     { model with gameSceneRandomSeed = x }, cmd

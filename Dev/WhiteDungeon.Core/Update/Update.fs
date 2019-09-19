@@ -280,7 +280,7 @@ module Update =
 #if DEBUG
                 printfn "%A" e
 #endif
-                GenerateNewDungeon
+                raise e
             )
             |> fun cmd ->
                 { model with mode = GameSceneMode.WaitingGenerating }, cmd
