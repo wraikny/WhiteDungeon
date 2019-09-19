@@ -9,7 +9,7 @@
     <OtherFlags>--warnon:1182</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\Alias.fs" />
+    <Compile Include="Model\Basic.fs" />
     <Compile Include="Model\ObjectBase.fs" />
     <Compile Include="Model\Actor.fs" />
     <Compile Include="Model\Skill.fs" />

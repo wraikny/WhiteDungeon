@@ -14,7 +14,10 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
 
     let sources =
         bgmList
-        |>> fun path -> asd.Engine.Sound.CreateSoundSource(path, false)
+        |>> fun path ->
+            if asd.Engine.File.Exists path |> not then
+                printfn "%s is not existed" path
+            asd.Engine.Sound.CreateSoundSource(path, false)
 
     let count = length sources
     do
@@ -29,19 +32,21 @@ type BGMPlayer<'T when 'T :> asd.Scene>(name, bgmList : string list) =
 
     
     let play() =
-        let id = asd.Engine.Sound.Play sources.[index]
+        sources |> List.tryItem index |> function
+        | None -> ()
+        | Some source ->
+            let id = asd.Engine.Sound.Play source
 
-        fadeSeconds
-        |> ValueOption.iter (curry asd.Engine.Sound.FadeIn id)
+            fadeSeconds
+            |> ValueOption.iter (curry asd.Engine.Sound.FadeIn id)
 
-        asd.Engine.Sound.SetVolume(id, volume)
+            asd.Engine.Sound.SetVolume(id, volume)
 
-        bgmId <- ValueSome id
-        index <- (index + 1) % count
+            bgmId <- ValueSome id
+            index <- (index + 1) % count
 
     let update() =
-        bgmId
-        |> function
+        bgmId |> function
         | ValueSome id ->
             if not <| asd.Engine.Sound.GetIsPlaying(id) then
                 play()

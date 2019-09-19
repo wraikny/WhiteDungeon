@@ -63,7 +63,6 @@ type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
-    //| PlayerSkill of PlayerID * SkillKind
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
     | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
