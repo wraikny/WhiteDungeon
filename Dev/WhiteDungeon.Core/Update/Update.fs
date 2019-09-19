@@ -179,15 +179,16 @@ let updateEnemies model =
 
 let buildingsCollision (model : Model) =
     let player = model.players |> Map.find model.localPlayerId
+    let frame = model.inBuildingFrame
     let rec f (buildings : Building list) =
         buildings |> function
-        | [] when not model.haveEnteredBuilding -> model
-        | [] -> { model with haveEnteredBuilding = false }
+        | [] when frame = 0u -> model
+        | [] -> { model with inBuildingFrame = 0u }
         | b::bs ->
             if ObjectBase.collidedCells model.gameSetting b.cells player then
-                if model.haveEnteredBuilding then model
+                if frame > 0u then { model with inBuildingFrame = frame + 1u }
                 else
-                    { Building.onEntered b.kind model with haveEnteredBuilding = true }
+                    { Building.onEntered b.kind model with inBuildingFrame = 1u }
             else
                 f bs
 
