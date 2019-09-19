@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.App.GameViewSetting
 
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 
 open wraikny.MilleFeuille

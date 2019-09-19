@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 
 open WhiteDungeon.Core.Model

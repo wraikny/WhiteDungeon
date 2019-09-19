@@ -2,7 +2,7 @@
 
 open WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open wraikny.Tart.Advanced
 open wraikny.Tart.Helper.Collections

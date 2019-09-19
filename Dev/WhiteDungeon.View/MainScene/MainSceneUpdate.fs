@@ -1,6 +1,6 @@
 ﻿module WhiteDungeon.View.MainScene.Update
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core

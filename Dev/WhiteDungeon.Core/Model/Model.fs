@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Model
@@ -393,7 +393,7 @@ module Dungeon =
                         let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
                             EnemyInits.kind = searchKind (uint16 kindValue)
-                            lookAngleRadian = 2.0f * Pi * float32 angle
+                            lookAngleRadian = 2.0f * pi * float32 angle
                             levelDiff = int <| (p1 * gameSetting.levelSD)
                         }
                     })

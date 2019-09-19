@@ -53,7 +53,7 @@ module Update =
             |> mapEnemies (Map.add id (f enemy)))
         |> Option.defaultValue model
 
-    open wraikny.Tart.Helper.Math
+    open wraikny.Tart.Math
     open WhiteDungeon.Core
 
     let inline updateSkillList f (model : Model) : Model =

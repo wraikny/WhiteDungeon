@@ -1,8 +1,8 @@
 ﻿module WhiteDungeon.Core.Update.ObjectBase
 
 open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Math.Utils
+open wraikny.Tart.Math
+open wraikny.Tart.Math.Utils
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model

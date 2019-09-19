@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 open wraikny.Tart.Helper.Collections
 
 open wraikny.Tart.Helper.Utils

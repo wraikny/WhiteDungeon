@@ -2,9 +2,9 @@
 
 
 open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
-open wraikny.Tart.Core
+open wraikny.Tart.Helper
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Objects
 open wraikny.MilleFeuille.Input

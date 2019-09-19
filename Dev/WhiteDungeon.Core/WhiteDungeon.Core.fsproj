@@ -37,5 +37,6 @@
     <ProjectReference Include="..\..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj" />
     <ProjectReference Include="..\..\..\Tart\src\Tart.Core\Tart.Core.fsproj" />
     <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj" />
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Math\Tart.Math.fsproj" />
   </ItemGroup>
 </Project>
