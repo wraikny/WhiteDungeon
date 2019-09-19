@@ -127,7 +127,7 @@ let setting : OccupationSetting = {
     skill2CoolTime = 60us
 }
 
-let private images = ActorImages.occupationImage 8u 4u "Image/Game/Occupation/onmyoji.png"
+let private images = ActorImages.occupationImage 8u 4u "Image/Game/character/onmyoji.png"
 
 let viewSetting =
     {
