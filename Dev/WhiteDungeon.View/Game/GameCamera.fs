@@ -81,11 +81,12 @@ type GameCamera(isMapChip) =
             , size
         )
 
-    interface IObserver<ViewModel.CameraView> with
-        member this.OnNext(camera) =
-            // TODO
-            let cameraView = camera
-            targetPosition <- ValueSome cameraView.position
+    member this.OnNext(camera : ViewModel.CameraView) =
+        // TODO
+        targetPosition <- ValueSome camera.position
 
-        member __.OnError(e) = raise e
-        member __.OnCompleted() = printfn "GameCamera Completed"
+    member this.Init(pos) =
+        targetPosition <- ValueSome pos
+        currentPosition <- ValueSome pos
+        this.SetSrc(pos, pos)
+

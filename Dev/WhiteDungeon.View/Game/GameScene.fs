@@ -144,11 +144,11 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             |> ignore
 
         // SkillEffects
-        [
+        [|
             ViewModel.ViewModel.getSkillAreaPlayer
             ViewModel.ViewModel.getSkillAreaEnemy
             ViewModel.ViewModel.getSkillAreaAll
-        ]
+        |]
         |>> fun s ->
             messenger.ViewModel
                 .Select(fun v -> s v)
@@ -175,18 +175,27 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     let skillEffectsCamera = new GameCamera(false)
 
     do
-        [|
+        let cams = [|
             dungeonCamera
             buildingsCamera
             actorCamera
             hpCamera
             skillEffectsCamera
         |]
-        |>> fun o ->
+
+        messenger.Msg.Add(function
+            | GeneratedDungeonParams p ->
+                for c in cams do
+                    c.Init(p.initPosition)
+            | _ -> ()
+        )
+
+        cams
+        |> iter (fun o ->
             messenger.ViewModel
                 .Select(fun v -> v.camera)
-                .Subscribe o
-        |> ignore
+                .Add(o.OnNext)
+        )
 
     let dungeonCellUpdater = new MaptipsUpdater<_, _>({
             create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
@@ -320,15 +329,17 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             .Add(function
                 | None ->
                     if uiWindowMain.IsToggleOn then
+                        pauseLayers
+                        |> Seq.iter(fun x ->
+                            x.IsUpdated <- true
+                            x.IsDrawn <- true
+                        )
+
                         uiWindowMain.Toggle(false, fun() ->
                             bgmPlayer.Resume()
                             uiBackRect.IsDrawn <- false
-
                             (gameUIWindows :> UI.IToggleWindow).Toggle(true)
                             GC.Collect()
-
-                            pauseLayers
-                            |> Seq.iter(fun x -> x.IsUpdated <- true)
                         )
                 | Some items ->
                     uiWindowMain.UIContents <- map convert items
@@ -342,14 +353,17 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                             uiBackRect.IsDrawn <- true
                             uiWindowMain.Toggle(true)
                             pauseLayers
-                            |> Seq.iter(fun x -> x.IsUpdated <- false)
+                            |> Seq.iter(fun x ->
+                                x.IsUpdated <- false
+                                x.IsDrawn <- false
+                            )
                             
                         if (gameUIWindows :> UI.IToggleWindow).IsToggleOn then
                             (gameUIWindows :> UI.IToggleWindow).Toggle(false, openUI)
                         else
                             openUI()
 
-                    GC.Collect()
+                        GC.Collect()
             )
 
         // Layer
