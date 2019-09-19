@@ -123,12 +123,17 @@ type ViewModel = {
     camera : CameraView // list
     players : UpdaterViewModel<PlayerView>
     enemies : UpdaterViewModel<EnemyView>
+
+    buildings : UpdaterViewModel<BuildingKind * float32 Rect2>
+
     areaPlayer : UpdaterViewModel<AreaSkillEmitView>
     areaEnemy : UpdaterViewModel<AreaSkillEmitView>
     areaAll : UpdaterViewModel<AreaSkillEmitView>
 
     mainUIWindow : UIItem list option
 }
+
+open wraikny.Tart.Advanced
 
 
 module ViewModel =
@@ -150,6 +155,7 @@ module ViewModel =
 
         let inline minusP0Pos (i, p) = (i, p |> ObjectBase.map(fun o -> { o with position = o.position - p0Pos}))
 
+        let cellSize = model.gameSetting.dungeonCellSize
 
         {
             dungeonFloor = model.dungeonFloor
@@ -162,6 +168,17 @@ module ViewModel =
                 |>> minusP0Pos
 
             enemies = model.enemies |> mapToUpdateVM |>> minusP0Pos
+
+            buildings =
+                model.buildings
+                |>> fun building ->
+                    let pos =
+                        Dungeon.DungeonModel.cellToCoordinate cellSize building.luCell
+
+                    let size = (map float32 building.cellCount) * cellSize
+
+                    let area = Rect.init (pos - p0Pos) size
+                    (building.id, (building.kind, area))
 
             areaPlayer =
                 model.skillList.areaPlayer
@@ -182,7 +199,7 @@ module ViewModel =
                 model.mode |> function
                 | HowToControl -> Some UIItem.howToControll
                 | Pause -> Some UIItem.pause
-                | Stair -> Some UIItem.stair
+                | GateMode -> Some UIItem.stair
                 | GameFinished true -> Some( UIItem.gameFinished "ゲーム終了")
                 | GameFinished false -> Some( UIItem.gameFinished "ゲームオーバー")
                 | ErrorUI e -> Some <| UIItem.errorUI model e

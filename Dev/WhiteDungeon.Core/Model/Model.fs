@@ -15,7 +15,7 @@ open FSharpPlus
 
 type GameSceneMode =
     | HowToControl
-    | Stair
+    | GateMode
     | Pause
     | GameMode
     | WaitingGenerating
@@ -120,23 +120,20 @@ and Model = {
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
-    dungeonGateCells : int Vec2 Set
+    //dungeonGateCells : int Vec2 Set
+    buildings : Building list
 
     skillList : SkillList
 
-    gameSetting : GameSetting
-
     timePassed : bool
-
     mode : GameSceneMode
-
-    lastCollidedGate : bool
+    haveEnteredBuilding : bool
 
     dungeonFloor : uint16
 
     initSize : uint16
-
     localPlayerId : PlayerID
+    gameSetting : GameSetting
 } with
     static member SetSkillList (x, s) =
         { x with skillList = s }
@@ -155,6 +152,14 @@ type EnemyInits = {
     levelDiff : int
 }
 
+type DungeonParams = {
+    dungeonBuilder : DungeonBuilder
+    dungeonModel : DungeonModel
+    //gateCells : int Vec2 Set
+    buildings : Building list
+    enemyCells : (EnemyInits * int Vec2) []
+    initPosition : float32 Vec2
+}
 
 module Model =
     let inline count (model : Model) = model.count
@@ -202,7 +207,7 @@ module Model =
         )
         |> Map.ofSeq
 
-    let inline init players dungeonBuilder dungeonModel initSize dungeonGateCells enemyCells gameSetting = {
+    let inline init players initSize (dungeonParams : DungeonParams) gameSetting = {
         gameSetting = gameSetting
         count = 0u
 
@@ -213,20 +218,21 @@ module Model =
             cellsToEnemies
                 gameSetting
                 1us
-                enemyCells
+                dungeonParams.enemyCells
                 gameSetting.dungeonCellSize
 
         skillList = SkillList.init
 
-        dungeonBuilder = dungeonBuilder
-        dungeonModel = dungeonModel
-        dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
+        dungeonBuilder = dungeonParams.dungeonBuilder
+        dungeonModel = dungeonParams.dungeonModel
+        //dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
+        buildings = dungeonParams.buildings
 
         timePassed = false
 
         mode = HowToControl
-
-        lastCollidedGate = false
+        haveEnteredBuilding = false
+        //lastCollidedGate = false
 
         dungeonFloor = 1us
         initSize = initSize
@@ -275,14 +281,6 @@ module GameSetting =
         |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
-
-    type GeneratedDungeonParams = {
-        dungeonBuilder : DungeonBuilder
-        dungeonModel : DungeonModel
-        gateCells : int Vec2 Set
-        enemyCells : (EnemyInits * int Vec2) []
-        initPosition : float32 Vec2
-    }
 
     let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
         (Random.int minValue<int> maxValue<int>)
@@ -346,9 +344,11 @@ module Dungeon =
                             cell
                     }
 
-                let gateCells =
-                    (toLargeRoomCells largeRoomValues.[1..gateCount])
-                    |> Set.ofSeq
+                let gateBuildings =
+                    toLargeRoomCells largeRoomValues.[1..gateCount]
+                    |> Seq.indexed
+                    |>> fun (i, c) -> Building.init one c (uint32 i) Gate
+                    |> toList
 
                 (*
                 let itemCells =
@@ -412,7 +412,7 @@ module Dungeon =
                 return {
                     dungeonBuilder = dungeonBuilder
                     dungeonModel = dungeonModel
-                    gateCells = gateCells
+                    buildings = gateBuildings
                     enemyCells = enemyCells
                     initPosition = initPosition
                 }

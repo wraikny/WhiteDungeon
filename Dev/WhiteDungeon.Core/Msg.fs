@@ -65,7 +65,7 @@ type Msg =
     | PlayerInputs of PlayerID * PlayerInput Set
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
-    | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonParams of Model.DungeonParams
 
     | UpdateEnemyOf of EnemyID * EnemyMsg
     //#if DEBUG

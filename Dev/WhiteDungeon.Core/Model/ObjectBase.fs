@@ -22,7 +22,7 @@ type ObjectBase = {
 
     isMoved : bool
 
-    radius : float32
+    //radius : float32
 } with
     member inline x.objectBase = x
     static member inline SetObjectBase (_ : ObjectBase, y : ObjectBase) = y
@@ -42,7 +42,7 @@ module ObjectBase =
         direction = Front
         isMoved = false
 
-        radius = (Vector.length size) * 0.5f
+        //radius = (Vector.length size) * 0.5f
     }
 
     let inline get (x : ^a) : ObjectBase =
