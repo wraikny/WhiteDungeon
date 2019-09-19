@@ -113,7 +113,7 @@ let gameSetting : Model.GameSetting = {
             roomCount = fi 5.0f 60
             minRoomSize = (fi 0.05f 3, fi 0.05f 2)
             maxRoomSize = (fi 0.1f 6, fi 0.1f 4)
-            roomGeneratedRange = (f 2.0f 40.0f, f 2.0f 60.0f)
+            roomGeneratedRange = (f 2.0f 50.0f, f 2.0f 50.0f)
             corridorWidth = fi 0.02f 1
 
             roomMoveRate = 0.3f
