@@ -9,6 +9,9 @@ open WhiteDungeon.Core.Model
 
 open FSharpPlus
 
-let onEntered (kind : BuildingKind) (model : Model) : Model =
+let whenInside (kind : BuildingKind) (model : Model) : Model =
+    let frame = model.inBuildingFrame
     kind |> function
-    | Gate -> { model with mode = GateMode }
+    | Gate when frame = 60u ->
+        { model with mode = GateMode }
+    | Gate -> model

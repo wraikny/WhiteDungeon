@@ -128,6 +128,7 @@ and Model = {
     timePassed : bool
     mode : GameSceneMode
     inBuildingFrame : uint32
+    currentBuilding : Building option
     //haveEnteredBuilding : bool
 
     dungeonFloor : uint16
@@ -233,8 +234,7 @@ module Model =
 
         mode = HowToControl
         inBuildingFrame = 0u
-        //haveEnteredBuilding = false
-        //lastCollidedGate = false
+        currentBuilding = None
 
         dungeonFloor = 1us
         initSize = initSize

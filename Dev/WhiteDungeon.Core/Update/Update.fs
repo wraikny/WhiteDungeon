@@ -183,12 +183,13 @@ let buildingsCollision (model : Model) =
     let rec f (buildings : Building list) =
         buildings |> function
         | [] when frame = 0u -> model
-        | [] -> { model with inBuildingFrame = 0u }
+        | [] -> { model with inBuildingFrame = 0u; currentBuilding = None }
         | b::bs ->
             if ObjectBase.collidedCells model.gameSetting b.cells player then
-                if frame > 0u then { model with inBuildingFrame = frame + 1u }
-                else
-                    { Building.onEntered b.kind model with inBuildingFrame = 1u }
+                { Building.whenInside b.kind model with
+                        inBuildingFrame = frame + 1u
+                        currentBuilding = Some b
+                }
             else
                 f bs
 
