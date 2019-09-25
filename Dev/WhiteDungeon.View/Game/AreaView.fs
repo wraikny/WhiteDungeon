@@ -62,7 +62,7 @@ type AreaView() =
     //member __.LastSize with get() = lastSize
 
     member this.UpdateAreaView(area : float32 Rect2) =
-        let lu, rd = Rect.get_LU_RD area
+        let lu, rd = Rect.lurd area
         let centerPos = (lu + rd) ./ 2.0f
         let bottom = Vec2.init centerPos.x rd.y
         lastPosition <- bottom
