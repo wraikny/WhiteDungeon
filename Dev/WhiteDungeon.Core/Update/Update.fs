@@ -4,7 +4,7 @@ open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
-open wraikny.Tart
+open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -180,20 +180,19 @@ let updateEnemies model =
 let buildingsCollision (model : Model) =
     let player = model.players |> Map.find model.localPlayerId
     let frame = model.inBuildingFrame
-    let rec f (buildings : Building list) =
-        buildings |> function
-        | [] when frame = 0u -> model
-        | [] -> { model with inBuildingFrame = 0u; currentBuilding = None }
-        | b::bs ->
-            if ObjectBase.collidedCells model.gameSetting b.cells player then
-                { Building.whenInside b.kind model with
-                        inBuildingFrame = frame + 1u
-                        currentBuilding = Some b
-                }
-            else
-                f bs
 
-    f model.buildings
+    let pos = ObjectBase.position player
+
+    model.buildingCells
+    |> HashMap.tryFind(DungeonModel.coordinateToCell model.gameSetting.dungeonCellSize pos)
+    |> function
+    | Some b ->
+        { Building.whenInside b.kind model with
+            inBuildingFrame = frame + 1u
+            currentBuilding = Some b
+        }
+    | None when frame = 0u -> model
+    | _ -> { model with inBuildingFrame = 0u; currentBuilding = None }
 
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
@@ -312,33 +311,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
         model, cmd
 
     | GeneratedDungeonParams dungeonParams ->
-        let model =
-            model
-            |> updateEachPlayer (fun p ->
-                let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
-                    
-                ObjectBase.map (ObjectBase.mapPosition <| fun _ -> pos) p
-            )
-
-        let dungeonFloor = model.dungeonFloor + 1us
-
-        { model with
-            mode = GameSceneMode.GameMode
-            enemies =
-                Model.cellsToEnemies
-                    model.gameSetting
-                    dungeonFloor
-                    dungeonParams.enemyCells
-                    model.gameSetting.dungeonCellSize
-
-            skillList = Model.SkillList.init
-
-            dungeonBuilder = dungeonParams.dungeonBuilder
-            dungeonModel = dungeonParams.dungeonModel
-            //dungeonGateCells = dungeonParams.gateCells
-            buildings = dungeonParams.buildings
-            dungeonFloor = dungeonFloor
-        }
+        model |> Model.updateDungeon dungeonParams
         , Cmd.ofPort ( ViewMsg.UpdateDungeonView(dungeonParams.dungeonModel) )
 
 

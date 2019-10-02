@@ -121,7 +121,9 @@ and Model = {
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
     //dungeonGateCells : int Vec2 Set
+
     buildings : Building list
+    buildingCells: HashMap<int Vec2, Building>
 
     skillList : SkillList
 
@@ -158,7 +160,10 @@ type DungeonParams = {
     dungeonBuilder : DungeonBuilder
     dungeonModel : DungeonModel
     //gateCells : int Vec2 Set
+
     buildings : Building list
+    buildingCells: HashMap<int Vec2, Building>
+
     enemyCells : (EnemyInits * int Vec2) []
     initPosition : float32 Vec2
 }
@@ -209,6 +214,36 @@ module Model =
         )
         |> Map.ofSeq
 
+    let inline updateDungeon (dungeonParams : DungeonParams) (model: Model) =
+        let players =
+            model.players
+            |> Map.map (fun _ p ->
+                let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
+                    
+                ObjectBase.mapPosition (fun _ -> pos) p
+            )
+        
+        let dungeonFloor = model.dungeonFloor + 1us
+
+        { model with
+            players = players
+            mode = GameSceneMode.GameMode
+            enemies =
+                cellsToEnemies
+                    model.gameSetting
+                    dungeonFloor
+                    dungeonParams.enemyCells
+                    model.gameSetting.dungeonCellSize
+
+            skillList = SkillList.init
+
+            dungeonBuilder = dungeonParams.dungeonBuilder
+            dungeonModel = dungeonParams.dungeonModel
+            buildings = dungeonParams.buildings
+            buildingCells = dungeonParams.buildingCells
+            dungeonFloor = dungeonFloor
+        }
+
     let inline init players initSize (dungeonParams : DungeonParams) gameSetting = {
         gameSetting = gameSetting
         count = 0u
@@ -229,6 +264,7 @@ module Model =
         dungeonModel = dungeonParams.dungeonModel
         //dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
         buildings = dungeonParams.buildings
+        buildingCells = dungeonParams.buildingCells
 
         timePassed = false
 
@@ -243,9 +279,6 @@ module Model =
     }
 
 module GameSetting =
-    open wraikny.Tart.Advanced
-    open wraikny.Tart.Helper.Collections
-
     let inline collidedWithCell (gameSetting) cell =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
@@ -283,7 +316,6 @@ module GameSetting =
         |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
-
     let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
         (Random.int minValue<int> maxValue<int>)
         |> SideEffect.bind(fun seed ->
@@ -337,20 +369,30 @@ module Dungeon =
                     |> Rect.centerPosition
 
 
-                let toLargeRoomCells values =
+                let toLargeRoomCells size values =
                     seq {
                         for (i, v) in values ->
                             let room = snd largeRooms.[i]
-                            let cells = room |> Space.cells
+                            let cells = room |> Space.cellsFor size
                             let cell = fst cells.[ v % length cells]
                             cell
                     }
 
-                let gateBuildings =
-                    toLargeRoomCells largeRoomValues.[1..gateCount]
+                let gateBuildings: Building list =
+                    let size = Vec2.init 2 2
+                    toLargeRoomCells size largeRoomValues.[1..gateCount]
                     |> Seq.indexed
-                    |>> fun (i, c) -> Building.init one c (uint32 i) Gate
-                    |> toList
+                    |>> fun (i, c) ->
+                        Building.init gameSetting.dungeonCellSize size c (uint32 i) Gate
+                    |> Seq.toList
+
+                let buildingCells =
+                    seq {
+                        for b in gateBuildings do
+                            for cell in b.cells ->
+                                (cell, b)
+                    }
+                    |> HashMap.ofSeq
 
                 (*
                 let itemCells =
@@ -415,6 +457,7 @@ module Dungeon =
                     dungeonBuilder = dungeonBuilder
                     dungeonModel = dungeonModel
                     buildings = gateBuildings
+                    buildingCells = buildingCells
                     enemyCells = enemyCells
                     initPosition = initPosition
                 }

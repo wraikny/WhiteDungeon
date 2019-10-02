@@ -174,10 +174,7 @@ module ViewModel =
                 |>> fun building ->
                     let pos =
                         Dungeon.DungeonModel.cellToCoordinate cellSize building.luCell
-
-                    let size = (map float32 building.cellCount) * cellSize
-
-                    let area = Rect.init (pos - p0Pos) size
+                    let area = Rect.init (pos - p0Pos) building.size
                     (building.id, (building.kind, area))
 
             areaPlayer =

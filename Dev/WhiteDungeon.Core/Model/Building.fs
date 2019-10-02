@@ -17,11 +17,12 @@ type Building = {
     luCell : int Vec2
     cellCount : int Vec2
     cells : Set<int Vec2>
+    size: float32 Vec2
 }
 
 
 module Building =
-    let inline init cellCount luCell id kind = {
+    let inline init cellSize cellCount luCell id kind = {
         id = id
         kind = kind
         cellCount = cellCount
@@ -34,6 +35,8 @@ module Building =
                     yield Vec2.init (x + luCell.x) (y + luCell.y)
             }
             |> Set.ofSeq
+
+        size = (map float32 cellCount) * cellSize
     }
 
     let inline kind x = x.kind
