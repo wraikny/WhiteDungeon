@@ -187,12 +187,13 @@ let buildingsCollision (model : Model) =
     |> HashMap.tryFind(DungeonModel.coordinateToCell model.gameSetting.dungeonCellSize pos)
     |> function
     | Some b ->
-        { Building.whenInside b.kind model with
+        let model, cmd = Building.whenInside b.kind model
+        { model with
             inBuildingFrame = frame + 1u
             currentBuilding = Some b
-        }
-    | None when frame = 0u -> model
-    | _ -> { model with inBuildingFrame = 0u; currentBuilding = None }
+        }, cmd
+    | None when frame = 0u -> model, Cmd.none
+    | _ -> { model with inBuildingFrame = 0u; currentBuilding = None }, Cmd.none
 
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
@@ -202,32 +203,32 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
     | SetGameMode mode ->
         { model with mode = mode }, Cmd.none
     | TimePasses ->
-        let m, cmd =
+        let m, actorsCmd =
             model
             |> updateEachPlayer Player.update
             |> updateEnemies
-        let m, ds = m |> SkillList.update
+
+        let m, damages = m |> SkillList.update
+
+        let damagesCmd =
+            let ds = damages |>> fun(p, v) -> (p, v)
+            Cmd.ofPort(ViewMsg.DamagesView ds)
 
         let m = { m with timePassed = true }
 
-        m.players
-        |> Map.toSeq
-        |>> snd
-        |> exists(fun (x : Player) -> x.actor.statusCurrent.hp > 0.0f)
-        |> function
-            | false -> { m with mode = GameFinished false }
-            | true ->
-                //checkGateCollision m
-                m
-                |> buildingsCollision
+        let model, buildingCmd =
 
-        , (ds |> function
-            | [||] -> cmd
-            | _ ->
-                //let player = m.players |> Map.find model.localPlayerId
-                let ds = ds |>> fun(p, v) -> (p, v)
-                Cmd.batch[ Cmd.ofPort(ViewMsg.DamagesView ds); cmd ]
-        )
+            m.players
+            |> Map.toSeq
+            |>> snd
+            |> exists(fun (x : Player) -> x.actor.statusCurrent.hp > 0.0f)
+            |> function
+                | false -> { m with mode = GameFinished false }, Cmd.none
+                | true ->
+                    m |> buildingsCollision
+
+        model
+        , Cmd.batch[ actorsCmd; damagesCmd; buildingCmd ]
 
     | PlayerInputs (playerId, inputSet) ->
         let move, direction =

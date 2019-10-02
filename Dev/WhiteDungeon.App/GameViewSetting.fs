@@ -56,6 +56,10 @@ let gameViewSetting : View.GameViewSetting =
         |> Seq.map(fun x -> (x.name, x))
         |> HashMap.ofSeq
 
+        buildingTextuers = HashMap.ofList [
+             Gate, ("Image/Game/building/torii.png", Rect.init (Vec2.init 0 0) (Vec2.init 512 512))
+        ]
+
         bgms = [
             "bgm/gensei_no_rakuen.ogg"
             "bgm/buriki_no_coffee_maker.ogg"

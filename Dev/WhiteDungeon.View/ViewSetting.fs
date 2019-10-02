@@ -134,6 +134,8 @@ type GameViewSetting = {
 
     dungeonCellTexture : string
 
+    buildingTextuers: HashMap<BuildingKind, string * int Rect2>
+
     damageTextFrame : int
     damageTextMove : float32
     damageView : FontSetting

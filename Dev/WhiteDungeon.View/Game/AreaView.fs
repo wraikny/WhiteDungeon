@@ -44,6 +44,22 @@ type AreaView() =
         )
         base.AddDrawnChildWithoutColor(sizeView)
 
+    let mutable texViewSize = asd.Vector2DF()
+    let onSetViewSize = Event<asd.Vector2DF>()
+
+    member __.OnSetViewSize = onSetViewSize.Publish
+
+    member this.SetTextureSize(texSize: asd.Vector2DF, areaHeight) =
+        textureObj.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
+        textureObj.Position <- asd.Vector2DF(0.0f, areaHeight * 0.5f)
+        this.ViewSize <- texSize
+
+    member private __.ViewSize
+        with get() = texViewSize
+        and set(x) =
+            texViewSize <- x
+            onSetViewSize.Trigger(x)
+
     member __.EnabledSizeView
         with get() = sizeView.IsDrawn
         and set(x) =

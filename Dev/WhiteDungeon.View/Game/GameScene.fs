@@ -86,14 +86,14 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     let dungeonLayer = new asd.Layer2D()
-    let buildingsLayer = new asd.Layer2D()
-    let actorLayer = new asd.Layer2D()
+    //let buildingsLayer = new asd.Layer2D()
+    let gameObjectsLayer = new asd.Layer2D()
     let hpLayer = new asd.Layer2D()
 
     let pauseLayers = [
         dungeonLayer
-        buildingsLayer
-        actorLayer
+        //buildingsLayer
+        gameObjectsLayer
         hpLayer
     ]
 
@@ -107,10 +107,9 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
 
     do
-
         messenger.ViewModel
             .Select(fun vm -> vm.buildings)
-            .Subscribe(new ActorsUpdater<_, _>(buildingsLayer, {
+            .Subscribe(new ActorsUpdater<_, _>(gameObjectsLayer, {
                 create = fun() -> new BuildingView(gameViewSetting)
                 onError = raise
                 onCompleted = fun () -> printfn "Completed Buildings"
@@ -125,7 +124,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
-                ActorsUpdater<_, _>(actorLayer, {
+                ActorsUpdater<_, _>(gameObjectsLayer, {
                     create = fun () -> new PlayerView(gameViewSetting, playersImagesMap, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
@@ -136,7 +135,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getEnemies)
             .Subscribe(
-                ActorsUpdater<_, _>(actorLayer, {
+                ActorsUpdater<_, _>(gameObjectsLayer, {
                     create = fun () -> new EnemyView(gameModel.gameSetting, gameViewSetting, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Enemies Updater"
@@ -153,7 +152,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             messenger.ViewModel
                 .Select(fun v -> s v)
                 .Subscribe(
-                    ActorsUpdater<_, _>(actorLayer, {
+                    ActorsUpdater<_, _>(gameObjectsLayer, {
                             create = fun () -> new SkillEmitView(gameViewSetting)
                             onError = raise
                             onCompleted = fun () -> printfn "Completed %A" s
@@ -169,7 +168,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         hpLayer.AddComponent(damagesView, "DamagesView")
 
     let dungeonCamera = new GameCamera(true)
-    let buildingsCamera = new GameCamera(false)
+    //let buildingsCamera = new GameCamera(false)
     let actorCamera = new GameCamera(false)
     let hpCamera = new GameCamera(false)
     let skillEffectsCamera = new GameCamera(false)
@@ -177,7 +176,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     do
         let cams = [|
             dungeonCamera
-            buildingsCamera
+            //buildingsCamera
             actorCamera
             hpCamera
             skillEffectsCamera
@@ -369,8 +368,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         // Layer
         this.AddLayer(backLayer)
         this.AddLayer(dungeonLayer)
-        this.AddLayer(buildingsLayer)
-        this.AddLayer(actorLayer)
+        //this.AddLayer(buildingsLayer)
+        this.AddLayer(gameObjectsLayer)
         this.AddLayer(hpLayer)
         //this.AddLayer(skillEffectsLayer)
         this.AddLayer(uiLayer)
@@ -380,8 +379,8 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
 
         // Camera
         dungeonLayer.AddObject(dungeonCamera)
-        buildingsLayer.AddObject(buildingsCamera)
-        actorLayer.AddObject(actorCamera)
+        //buildingsLayer.AddObject(buildingsCamera)
+        gameObjectsLayer.AddObject(actorCamera)
         hpLayer.AddObject(hpCamera)
 
         //skillEffectsLayer.AddObject(skillEffectsCamera)

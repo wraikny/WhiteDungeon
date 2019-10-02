@@ -50,18 +50,18 @@ type ActorView< 'a
 
         hpObj.AddDrawnChildWithoutColor(levelText)
 
-    let mutable lastSize = asd.Vector2DF()
+    let mutable lastWidth = 0.0f
     let mutable lastRate = 0.0f
     let mutable lastLevel = 0us
 
     let updateHPBarRate(rate) =
-        hpRect.DrawingArea <- asd.RectF(asd.Vector2DF(0.0f, 0.0f), asd.Vector2DF(rate * lastSize.X * 2.0f, -hpWidth))
+        hpRect.DrawingArea <- asd.RectF(asd.Vector2DF(0.0f, 0.0f), asd.Vector2DF(rate * lastWidth, -hpWidth))
     
     do
         base.OnSetViewSize.Add(fun size ->
-            hpObj.Position <- asd.Vector2DF(-size.X, -size.Y)
+            hpObj.Position <- asd.Vector2DF(-size.X * 0.5f, -size.Y)
             updateHPBarRate(lastRate)
-            lastSize <- size
+            lastWidth <- size.X
         )
 
     override __.OnAdded() =

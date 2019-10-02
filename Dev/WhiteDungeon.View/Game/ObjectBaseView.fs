@@ -25,18 +25,6 @@ type ObjectBaseView< 'a
 
     let moveAnimation = MoveAnimation(base.TextureView)
 
-    let mutable texViewSize = asd.Vector2DF()
-
-    let onSetViewSize = Event<asd.Vector2DF>()
-
-    member __.OnSetViewSize = onSetViewSize.Publish
-
-    member private __.ViewSize
-        with get() = texViewSize
-        and set(x) =
-            texViewSize <- x
-            onSetViewSize.Trigger(x)
-
     member this.UpdateObjectBaseView(objectBaseView : ViewModel.ObjectBaseView) =
         // Position
         let area = objectBaseView |> Model.ObjectBase.area
@@ -49,15 +37,9 @@ type ObjectBaseView< 'a
             if changedDir || objectBaseView.isMoved then
                 moveAnimation.Next()
             
-                let texSize = base.TextureView.Src.Size
-                //let scale = 1.0f // size.X / texSize.X
-                //textureObj.Scale <- scale * asd.Vector2DF(1.0f, 1.0f)
-                base.TextureView.CenterPosition <- texSize * asd.Vector2DF(0.5f, 1.0f)
-                base.TextureView.Position <- asd.Vector2DF(0.0f, size.Y * 0.5f)
-                // TODO
-                this.ViewSize <- texSize * asd.Vector2DF(0.5f, 1.0f) // * scale
+                base.SetTextureSize(base.TextureView.Src.Size, size.Y)
         else
-            this.ViewSize <- size
+            base.SetTextureSize(size, size.Y)
 
     member __.SetAnimationTextures(textureKind) =
         if lastTextureKind <> Some textureKind then
