@@ -9,7 +9,7 @@
     <OtherFlags>--warnon:1182</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\Alias.fs" />
+    <Compile Include="Model\Basic.fs" />
     <Compile Include="Model\ObjectBase.fs" />
     <Compile Include="Model\Actor.fs" />
     <Compile Include="Model\Skill.fs" />
@@ -25,6 +25,7 @@
     <Compile Include="Update\Player.fs" />
     <Compile Include="Update\Enemy.fs" />
     <Compile Include="Update\Skill.fs" />
+    <Compile Include="Update\Building.fs" />
     <Compile Include="Update\Update.fs" />
     <Compile Include="ViewModel.fs" />
   </ItemGroup>
@@ -37,5 +38,6 @@
     <ProjectReference Include="..\..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj" />
     <ProjectReference Include="..\..\..\Tart\src\Tart.Core\Tart.Core.fsproj" />
     <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj" />
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Math\Tart.Math.fsproj" />
   </ItemGroup>
 </Project>

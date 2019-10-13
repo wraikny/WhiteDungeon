@@ -76,6 +76,8 @@
     <Compile Include="UI\BackGround.fs" />
     <Compile Include="UI\Keyboard.fs" />
     <Compile Include="Game\MoveAnimation.fs" />
+    <Compile Include="Game\AreaView.fs" />
+    <Compile Include="Game\BuildingView.fs" />
     <Compile Include="Game\ObjectBaseView.fs" />
     <Compile Include="Game\ActorView.fs" />
     <Compile Include="Game\PlayerView.fs" />
@@ -147,6 +149,11 @@
     <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj">
       <Name>Tart.Helper</Name>
       <Project>{933d2137-dab6-449c-830e-1b5ce882de19}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Tart\src\Tart.Math\Tart.Math.fsproj">
+      <Name>Tart.Math</Name>
+      <Project>{0cd820bd-290c-47e2-beaa-ab58a34ab1e4}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\WhiteDungeon.Core\WhiteDungeon.Core.fsproj">

@@ -1,6 +1,6 @@
 ﻿module WhiteDungeon.View.MainScene.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
@@ -61,7 +61,7 @@ type Msg =
 
     | GenerateDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
-    | GeneratedDungeonParams of Model.Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonParams of DungeonParams
     | CloseGameMsg
     | AddBGMVolume of int
 

@@ -2,9 +2,9 @@
 
 
 open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
-open wraikny.Tart.Core
+open wraikny.Tart.Helper
 open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Objects
 open wraikny.MilleFeuille.Input
@@ -30,7 +30,7 @@ type DungeonCellKind =
     | Corridor
     | SmallRoom
     | LargeRoom
-    | Gate
+    //| Gate
 
 module DungeonCellKind =
     let fromSpaceID = function
@@ -58,8 +58,8 @@ type DungeonCellView(cellSize : float32 Vec2, path : string) =
                     ColorPalette.ume
                 | LargeRoom ->
                     ColorPalette.sakura
-                | Gate ->
-                    ColorPalette.black
+                //| Gate ->
+                //    ColorPalette.black
 
             let pos =
                 Dungeon.DungeonModel.cellToCoordinate cellSize cell

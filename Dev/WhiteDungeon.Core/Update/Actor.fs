@@ -34,7 +34,7 @@ let inline levelUp newLevel status (x : ^a) =
 
 open WhiteDungeon.Core
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 
 let move (gameSetting) (dungeonModel) (move : ActorMove) (direction : float32 Vec2) (actor : Actor) : Actor =

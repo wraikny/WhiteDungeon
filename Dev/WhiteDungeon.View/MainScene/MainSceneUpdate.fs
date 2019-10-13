@@ -1,6 +1,6 @@
 ﻿module WhiteDungeon.View.MainScene.Update
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
@@ -82,7 +82,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 #if DEBUG
                         printfn "%A" e
 #endif
-                        GenerateDungeon
+                        //GenerateDungeon
+                        raise e
                 )
                 |> fun cmd ->
                     { model with gameSceneRandomSeed = x }, cmd
@@ -159,11 +160,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
                     Model.Model.init
                         players
-                        dungeonParams.dungeonBuilder
-                        dungeonParams.dungeonModel
                         model.initSize
-                        dungeonParams.gateCells
-                        dungeonParams.enemyCells
+                        dungeonParams
                         model.setting.gameSetting
 
                 model, Cmd.ofPort(ViewMsg.StartGame (gameModel, model.gameSceneRandomSeed, bgmToFloat model.bgmVolume))

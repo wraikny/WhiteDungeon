@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -63,10 +63,9 @@ type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
-    //| PlayerSkill of PlayerID * SkillKind
     | GenerateNewDungeon
     | GeneratedDungeonModel of DungeonBuilder * DungeonModel
-    | GeneratedDungeonParams of Dungeon.GeneratedDungeonParams
+    | GeneratedDungeonParams of Model.DungeonParams
 
     | UpdateEnemyOf of EnemyID * EnemyMsg
     //#if DEBUG

@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.App.GameViewSetting
 
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 
 open wraikny.MilleFeuille
@@ -51,9 +51,14 @@ let gameViewSetting : View.GameViewSetting =
         //] |> Map.ofList
         occupationSetting = [
             Character.Bushi.viewSetting
+            Character.Onmyoji.viewSetting
         ]
         |> Seq.map(fun x -> (x.name, x))
         |> HashMap.ofSeq
+
+        buildingTextuers = HashMap.ofList [
+             Gate, ("Image/Game/building/torii.png", Rect.init (Vec2.init 0 0) (Vec2.init 512 512))
+        ]
 
         bgms = [
             "bgm/gensei_no_rakuen.ogg"

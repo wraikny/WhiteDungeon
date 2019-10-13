@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Model
@@ -15,7 +15,7 @@ open FSharpPlus
 
 type GameSceneMode =
     | HowToControl
-    | Stair
+    | GateMode
     | Pause
     | GameMode
     | WaitingGenerating
@@ -120,23 +120,24 @@ and Model = {
 
     dungeonBuilder: Dungeon.DungeonBuilder
     dungeonModel : Dungeon.DungeonModel
-    dungeonGateCells : int Vec2 Set
+    //dungeonGateCells : int Vec2 Set
+
+    buildings : Building list
+    buildingCells: HashMap<int Vec2, Building>
 
     skillList : SkillList
 
-    gameSetting : GameSetting
-
     timePassed : bool
-
     mode : GameSceneMode
-
-    lastCollidedGate : bool
+    inBuildingFrame : uint32
+    currentBuilding : Building option
+    //haveEnteredBuilding : bool
 
     dungeonFloor : uint16
 
     initSize : uint16
-
     localPlayerId : PlayerID
+    gameSetting : GameSetting
 } with
     static member SetSkillList (x, s) =
         { x with skillList = s }
@@ -155,6 +156,17 @@ type EnemyInits = {
     levelDiff : int
 }
 
+type DungeonParams = {
+    dungeonBuilder : DungeonBuilder
+    dungeonModel : DungeonModel
+    //gateCells : int Vec2 Set
+
+    buildings : Building list
+    buildingCells: HashMap<int Vec2, Building>
+
+    enemyCells : (EnemyInits * int Vec2) []
+    initPosition : float32 Vec2
+}
 
 module Model =
     let inline count (model : Model) = model.count
@@ -202,7 +214,37 @@ module Model =
         )
         |> Map.ofSeq
 
-    let inline init players dungeonBuilder dungeonModel initSize dungeonGateCells enemyCells gameSetting = {
+    let inline updateDungeon (dungeonParams : DungeonParams) (model: Model) =
+        let players =
+            model.players
+            |> Map.map (fun _ p ->
+                let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
+                    
+                ObjectBase.mapPosition (fun _ -> pos) p
+            )
+        
+        let dungeonFloor = model.dungeonFloor + 1us
+
+        { model with
+            players = players
+            mode = GameSceneMode.GameMode
+            enemies =
+                cellsToEnemies
+                    model.gameSetting
+                    dungeonFloor
+                    dungeonParams.enemyCells
+                    model.gameSetting.dungeonCellSize
+
+            skillList = SkillList.init
+
+            dungeonBuilder = dungeonParams.dungeonBuilder
+            dungeonModel = dungeonParams.dungeonModel
+            buildings = dungeonParams.buildings
+            buildingCells = dungeonParams.buildingCells
+            dungeonFloor = dungeonFloor
+        }
+
+    let inline init players initSize (dungeonParams : DungeonParams) gameSetting = {
         gameSetting = gameSetting
         count = 0u
 
@@ -213,20 +255,22 @@ module Model =
             cellsToEnemies
                 gameSetting
                 1us
-                enemyCells
+                dungeonParams.enemyCells
                 gameSetting.dungeonCellSize
 
         skillList = SkillList.init
 
-        dungeonBuilder = dungeonBuilder
-        dungeonModel = dungeonModel
-        dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
+        dungeonBuilder = dungeonParams.dungeonBuilder
+        dungeonModel = dungeonParams.dungeonModel
+        //dungeonGateCells = Seq.toList dungeonGateCells |> Set.ofSeq
+        buildings = dungeonParams.buildings
+        buildingCells = dungeonParams.buildingCells
 
         timePassed = false
 
         mode = HowToControl
-
-        lastCollidedGate = false
+        inBuildingFrame = 0u
+        currentBuilding = None
 
         dungeonFloor = 1us
         initSize = initSize
@@ -235,9 +279,6 @@ module Model =
     }
 
 module GameSetting =
-    open wraikny.Tart.Advanced
-    open wraikny.Tart.Helper.Collections
-
     let inline collidedWithCell (gameSetting) cell =
         Dungeon.DungeonModel.coordinateToCell
             gameSetting.dungeonCellSize
@@ -275,15 +316,6 @@ module GameSetting =
         |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
-
-    type GeneratedDungeonParams = {
-        dungeonBuilder : DungeonBuilder
-        dungeonModel : DungeonModel
-        gateCells : int Vec2 Set
-        enemyCells : (EnemyInits * int Vec2) []
-        initPosition : float32 Vec2
-    }
-
     let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
         (Random.int minValue<int> maxValue<int>)
         |> SideEffect.bind(fun seed ->
@@ -337,18 +369,30 @@ module Dungeon =
                     |> Rect.centerPosition
 
 
-                let toLargeRoomCells values =
+                let toLargeRoomCells size values =
                     seq {
                         for (i, v) in values ->
                             let room = snd largeRooms.[i]
-                            let cells = room |> Space.cells
+                            let cells = room |> Space.cellsFor size
                             let cell = fst cells.[ v % length cells]
                             cell
                     }
 
-                let gateCells =
-                    (toLargeRoomCells largeRoomValues.[1..gateCount])
-                    |> Set.ofSeq
+                let gateBuildings: Building list =
+                    let size = Vec2.init 2 2
+                    toLargeRoomCells size largeRoomValues.[1..gateCount]
+                    |> Seq.indexed
+                    |>> fun (i, c) ->
+                        Building.init gameSetting.dungeonCellSize size c (uint32 i) Gate
+                    |> Seq.toList
+
+                let buildingCells =
+                    seq {
+                        for b in gateBuildings do
+                            for cell in b.cells ->
+                                (cell, b)
+                    }
+                    |> HashMap.ofSeq
 
                 (*
                 let itemCells =
@@ -393,7 +437,7 @@ module Dungeon =
                         let p1, _ = Utils.boxMullersMethod (float32 p1) (float32 p2)
                         return {
                             EnemyInits.kind = searchKind (uint16 kindValue)
-                            lookAngleRadian = 2.0f * Pi * float32 angle
+                            lookAngleRadian = 2.0f * pi * float32 angle
                             levelDiff = int <| (p1 * gameSetting.levelSD)
                         }
                     })
@@ -412,7 +456,8 @@ module Dungeon =
                 return {
                     dungeonBuilder = dungeonBuilder
                     dungeonModel = dungeonModel
-                    gateCells = gateCells
+                    buildings = gateBuildings
+                    buildingCells = buildingCells
                     enemyCells = enemyCells
                     initPosition = initPosition
                 }

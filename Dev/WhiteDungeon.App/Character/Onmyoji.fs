@@ -1,4 +1,4 @@
-﻿module WhiteDungeon.App.Character.Bushi
+﻿module WhiteDungeon.App.Character.Onmyoji
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Math
@@ -127,10 +127,10 @@ let setting : OccupationSetting = {
     skill2CoolTime = 60us
 }
 
-let private images = ActorImages.occupationImage 8u 4u "Image/Game/character/bushi.png"
+let private images = ActorImages.occupationImage 8u 4u "Image/Game/character/onmyoji.png"
 
 let viewSetting =
     {
-        name = "武士"
+        name = "陰陽師"
         characterImages = images
     }

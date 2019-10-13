@@ -1,8 +1,8 @@
 ﻿module WhiteDungeon.Core.Update.ObjectBase
 
 open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Math
-open wraikny.Tart.Helper.Math.Utils
+open wraikny.Tart.Math
+open wraikny.Tart.Math.Utils
 open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -15,21 +15,21 @@ let inline setDirection (direction) (obj : ObjectBase) =
     { obj with direction = direction }
 
 
-let inline getCorners (obj : ObjectBase) =
+let inline getCorners (obj) =
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.get_LU_RD
+    let lu, rd = area |> Rect.lurd
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
     [|lu; rd; ld; ru|]
 
 
-let collidedCell (gameSetting : GameSetting) (cell) obj =
+let inline collidedCell (gameSetting : GameSetting) (cell) obj =
     GameSetting.collidedWithCell
         gameSetting
         cell
         (getCorners obj)
 
 
-let collidedCells (gameSetting : GameSetting) (cells) obj =
+let inline collidedCells (gameSetting : GameSetting) (cells) obj =
     GameSetting.collidedWiithCells
         gameSetting
         cells
@@ -78,7 +78,7 @@ let inline private moveWithBS
     =
     let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.get_LU_RD
+    let lu, rd = area |> Rect.lurd
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
@@ -124,7 +124,7 @@ let inline moveReflectable
     =
     let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.get_LU_RD
+    let lu, rd = area |> Rect.lurd
     let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]

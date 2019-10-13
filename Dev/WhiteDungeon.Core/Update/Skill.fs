@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Update
 
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 open wraikny.Tart.Helper.Collections
 
@@ -133,7 +133,7 @@ module AreaSkill =
     let inline isCollided (areaSkill : AreaSkill) (x) : bool =
         let objArea = ObjectBase.area x
         let skillAra = ObjectBase.area areaSkill
-        Rect2.isCollided objArea skillAra
+        Rect.isCollided2 objArea skillAra
         //|> fun t ->
         //    if t then
         //        let actorId = (Actor.get x).id

@@ -1,7 +1,7 @@
 ﻿module WhiteDungeon.Core.Update.Player
 
 //open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 open wraikny.Tart.Helper.Collections
 open WhiteDungeon.Core.Model
 

@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Model
 
 open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 open WhiteDungeon.Core.Model
 
 open FSharpPlus
@@ -66,7 +66,7 @@ module Enemy =
             kind = kind
 
             visionDistance = visionDistance
-            visionAngle = visionAngleRate * 2.0f * Pi
+            visionAngle = visionAngleRate * 2.0f * pi
 
             lookingRadian = angle
 

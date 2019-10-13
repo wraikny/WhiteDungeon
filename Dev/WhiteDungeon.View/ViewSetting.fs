@@ -2,7 +2,7 @@
 
 open wraikny.Tart.Helper
 open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Helper.Math
+open wraikny.Tart.Math
 
 
 open WhiteDungeon.Core.Model
@@ -133,6 +133,8 @@ type GameViewSetting = {
     gameUIPlayerArea : float32 Rect2
 
     dungeonCellTexture : string
+
+    buildingTextuers: HashMap<BuildingKind, string * int Rect2>
 
     damageTextFrame : int
     damageTextMove : float32
