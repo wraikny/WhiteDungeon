@@ -8,7 +8,7 @@ open WhiteDungeon.View
 open WhiteDungeon.App.Setting
 
 open System
-
+open System.Threading
 
 [<EntryPoint>]
 let main _ =
@@ -35,6 +35,9 @@ let main _ =
 
             asd.Engine.ChangeScene(scene)
 
+            let sc = QueueSynchronizationContext()
+            SynchronizationContext.SetSynchronizationContext(sc)
+
             let rec loop n =
                 if n < 0 then
                     ()
@@ -42,6 +45,7 @@ let main _ =
                     try
 
                         while asd.Engine.DoEvents() do
+                            sc.Execute()
                             asd.Engine.Update()
                     with e ->
                         errorHandler.CallBack(e)
