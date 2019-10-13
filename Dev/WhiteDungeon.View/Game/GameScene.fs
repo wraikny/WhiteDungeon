@@ -1,10 +1,8 @@
 ﻿namespace WhiteDungeon.View.Game
 
-
+open Affogato.Collections
 open wraikny.Tart.Helper
-open wraikny.Tart.Math
 open wraikny.Tart.Core
-open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Objects
 open wraikny.MilleFeuille.Input
 open wraikny.MilleFeuille
@@ -109,7 +107,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
     do
         messenger.ViewModel
             .Select(fun vm -> vm.buildings)
-            .Subscribe(new ActorsUpdater<_, _>(gameObjectsLayer, {
+            .Subscribe(new ActorsUpdater<_, _, _>(gameObjectsLayer, {
                 create = fun() -> new BuildingView(gameViewSetting)
                 onError = raise
                 onCompleted = fun () -> printfn "Completed Buildings"
@@ -124,7 +122,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getPlayers)
             .Subscribe(
-                ActorsUpdater<_, _>(gameObjectsLayer, {
+                ActorsUpdater<_, _, _>(gameObjectsLayer, {
                     create = fun () -> new PlayerView(gameViewSetting, playersImagesMap, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Players Updater"
@@ -135,7 +133,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
         messenger.ViewModel
             .Select(ViewModel.ViewModel.getEnemies)
             .Subscribe(
-                ActorsUpdater<_, _>(gameObjectsLayer, {
+                ActorsUpdater<_, _, _>(gameObjectsLayer, {
                     create = fun () -> new EnemyView(gameModel.gameSetting, gameViewSetting, hpLayer)
                     onError = raise
                     onCompleted = fun () -> printfn "Completed Enemies Updater"
@@ -152,7 +150,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
             messenger.ViewModel
                 .Select(fun v -> s v)
                 .Subscribe(
-                    ActorsUpdater<_, _>(gameObjectsLayer, {
+                    ActorsUpdater<_, _, _>(gameObjectsLayer, {
                             create = fun () -> new SkillEmitView(gameViewSetting)
                             onError = raise
                             onCompleted = fun () -> printfn "Completed %A" s
@@ -196,7 +194,7 @@ type GameScene(errorHandler : Utils.ErrorHandler,gameModel : Model.Model, gameVi
                 .Add(o.OnNext)
         )
 
-    let dungeonCellUpdater = new MaptipsUpdater<_, _>({
+    let dungeonCellUpdater = new MaptipsUpdater<_, _, _>({
             create = fun() -> new DungeonCellView(gameModel.gameSetting.dungeonCellSize, gameViewSetting.dungeonCellTexture)
             onError = raise
             onCompleted = fun () -> printfn "Completed Dungeon MapChips"

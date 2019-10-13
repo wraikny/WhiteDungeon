@@ -1,9 +1,7 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Math
-open WhiteDungeon.Core.Model
-open wraikny.Tart.Advanced
+
+open Affogato
 
 open FSharpPlus
 
@@ -14,10 +12,10 @@ type BuildingKind =
 type Building = {
     id : uint32
     kind : BuildingKind
-    luCell : int Vec2
-    cellCount : int Vec2
-    cells : Set<int Vec2>
-    size: float32 Vec2
+    luCell : int Vector2
+    cellCount : int Vector2
+    cells : Set<int Vector2>
+    size: float32 Vector2
 }
 
 
@@ -32,7 +30,7 @@ module Building =
             seq {
                 for x in 0 .. cellCount.x-1 do
                 for y in 0 .. cellCount.y-1 do
-                    yield Vec2.init (x + luCell.x) (y + luCell.y)
+                    yield Vector2.init (x + luCell.x) (y + luCell.y)
             }
             |> Set.ofSeq
 

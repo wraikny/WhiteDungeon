@@ -80,7 +80,7 @@ module ActorStatus =
     let inline max a b = ActorStatus.Map2 (max, a, b)
 
 
-open wraikny.Tart.Math
+open Affogato
 open FSharpPlus
 
 
@@ -99,7 +99,7 @@ type MoveDirection =
 module MoveDirection =
     let fromVector v =
         let pi2 = 2.0f * pi
-        let angle = (pi2 + Vec2.angle v) % pi2
+        let angle = (pi2 + Vector2.angle v) % pi2
         let a = angle * 8.0f / pi
         let bw s t = s <= a && a < t
         let result =
@@ -135,6 +135,6 @@ module MoveDirection =
         | FrontLeft -> (-1, 1)
         | BackRight -> (1, -1)
         | BackLeft -> (-1, -1)
-        |> uncurry Vec2.init
+        |> uncurry Vector2.init
         |>> float32
         |> Vector.normalize

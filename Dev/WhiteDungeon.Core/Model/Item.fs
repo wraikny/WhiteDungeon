@@ -1,7 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Math
+open Affogato
 open WhiteDungeon.Core.Model
 
 open FSharpPlus

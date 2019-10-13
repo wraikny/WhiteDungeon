@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny
-open wraikny.Tart.Math
+open Affogato
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
 open wraikny.MilleFeuille.Objects
@@ -77,7 +77,7 @@ type GameCamera(isMapChip) =
         let size = size.To2DI()
 
         this.Src <- new asd.RectI(
-            (Vec2.toVector2DI (map int srcPos)) - size / 2
+            (Vector2.toVector2DI (map int srcPos)) - size / 2
             , size
         )
 

@@ -1,9 +1,6 @@
 ﻿module WhiteDungeon.App.Character.Onmyoji
 
-open wraikny.Tart.Helper
-open wraikny.Tart.Math
-
-
+open Affogato
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 open WhiteDungeon.View
@@ -31,13 +28,13 @@ let setting : OccupationSetting = {
             actor.objectBase.direction
             |> Model.MoveDirection.toVector
 
-        let verticalDir = Vec2.init -dir.y dir.x
+        let verticalDir = Vector2.init -dir.y dir.x
 
         let attackDir = Vector.normalize(dir + verticalDir)
 
         let area = actor.objectBase |> ObjectBase.area
-        let centerPos = area |> Rect.centerPosition
-        let topPos = Vec2.init centerPos.x area.position.y
+        let centerPos = area |> Rectangle.centerPosition
+        let topPos = Vector2.init centerPos.x area.position.y
 
         let targetPos = topPos + dir .* 150.0f
 
@@ -89,7 +86,7 @@ let setting : OccupationSetting = {
             |> Model.MoveDirection.toVector
 
         let verticalDir =
-            Vec2.init -dir.y dir.x
+            Vector2.init -dir.y dir.x
 
         let pos = actor.objectBase.position + (100.0f *. dir)
 

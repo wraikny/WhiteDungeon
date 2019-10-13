@@ -1,21 +1,17 @@
 ﻿namespace WhiteDungeon.Core.Update
 
-open wraikny.Tart.Math
-
-open wraikny.Tart.Helper.Collections
-
+open Affogato
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Update
 
 open FSharpPlus
-open wraikny.Tart.Helper.Extension
 
 open System.Collections.Generic
 
 type SkillResult =
     {
         emits : SkillEmit []
-        damages : (float32 Vec2 * float32) []
+        damages : (float32 Vector2 * float32) []
     }
 
 module SkillResult =
@@ -133,7 +129,7 @@ module AreaSkill =
     let inline isCollided (areaSkill : AreaSkill) (x) : bool =
         let objArea = ObjectBase.area x
         let skillAra = ObjectBase.area areaSkill
-        Rect.isCollided2 objArea skillAra
+        Rectangle.isCollided2 objArea skillAra
         //|> fun t ->
         //    if t then
         //        let actorId = (Actor.get x).id

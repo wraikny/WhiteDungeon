@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny
-open wraikny.Tart.Math
+open Affogato
 open wraikny.Tart.Helper.Collections
 
 open wraikny.Tart.Helper.Utils
@@ -17,8 +17,8 @@ open FSharpPlus
 type AreaView() =
     inherit asd.GeometryObject2D()
 
-    let mutable lastPosition : float32 Vec2 = zero
-    let mutable lastSize : float32 Vec2 = zero
+    let mutable lastPosition : float32 Vector2 = zero
+    let mutable lastSize : float32 Vector2 = zero
 
     let sizeViewRect = new asd.RectangleShape()
     let sizeView =
@@ -77,18 +77,18 @@ type AreaView() =
 
     //member __.LastSize with get() = lastSize
 
-    member this.UpdateAreaView(area : float32 Rect2) =
-        let lu, rd = Rect.lurd area
+    member this.UpdateAreaView(area : float32 Rectangle2) =
+        let lu, rd = Rectangle.lurd area
         let centerPos = (lu + rd) ./ 2.0f
-        let bottom = Vec2.init centerPos.x rd.y
+        let bottom = Vector2.init centerPos.x rd.y
         lastPosition <- bottom
         
         // centerPos
-        this.Position <- Vec2.toVector2DF (map floor centerPos) // .% GameViewSetting.modForCulling)
+        this.Position <- Vector2.toVector2DF (map floor centerPos) // .% GameViewSetting.modForCulling)
 
         this.DrawingPriority <- int bottom.y
 
         // Size
         lastSize <- area.size
-        let size = Vec2.toVector2DF area.size
+        let size = Vector2.toVector2DF area.size
         sizeViewRect.DrawingArea <- asd.RectF(-size/2.0f, size)

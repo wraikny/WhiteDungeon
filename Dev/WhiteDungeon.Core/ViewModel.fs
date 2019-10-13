@@ -3,8 +3,7 @@
 open WhiteDungeon.Core
 // open WhiteDungeon.Core.Game.Model
 
-open wraikny.Tart.Math
-
+open Affogato
 open wraikny.Tart.Helper
 open wraikny.Tart.Core
 open WhiteDungeon.Core.Model
@@ -22,7 +21,7 @@ type AreaSkillEmitView = AreaSkill
 
 
 type CameraView = {
-    position : float32 Vec2
+    position : float32 Vector2
 }
 
 module CameraView =
@@ -121,20 +120,19 @@ type ViewModel = {
     uiMode : GameSceneMode
 
     camera : CameraView // list
-    players : UpdaterViewModel<PlayerView>
-    enemies : UpdaterViewModel<EnemyView>
+    players : UpdaterViewModel<uint32, PlayerView>
+    enemies : UpdaterViewModel<uint32, EnemyView>
 
-    buildings : UpdaterViewModel<BuildingKind * float32 Rect2>
+    buildings : UpdaterViewModel<uint32, BuildingKind * float32 Rectangle2>
 
-    areaPlayer : UpdaterViewModel<AreaSkillEmitView>
-    areaEnemy : UpdaterViewModel<AreaSkillEmitView>
-    areaAll : UpdaterViewModel<AreaSkillEmitView>
+    areaPlayer : UpdaterViewModel<uint32, AreaSkillEmitView>
+    areaEnemy : UpdaterViewModel<uint32, AreaSkillEmitView>
+    areaAll : UpdaterViewModel<uint32, AreaSkillEmitView>
 
     mainUIWindow : UIItem list option
 }
 
-open wraikny.Tart.Advanced
-
+open Affogato.Advanced
 
 module ViewModel =
     let inline getCameras v = v.camera
@@ -173,8 +171,8 @@ module ViewModel =
                 model.buildings
                 |>> fun building ->
                     let pos =
-                        Dungeon.DungeonModel.cellToCoordinate cellSize building.luCell
-                    let area = Rect.init (pos - p0Pos) building.size
+                        Dungeon.Model.cellToCoordinate cellSize building.luCell
+                    let area = Rectangle.init (pos - p0Pos) building.size
                     (building.id, (building.kind, area))
 
             areaPlayer =

@@ -98,7 +98,7 @@
       <HintPath>..\Lib\Altseed.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.4.7.0\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="FSharpPlus">
       <HintPath>..\packages\FSharpPlus.1.0.0\lib\net45\FSharpPlus.dll</HintPath>
@@ -125,6 +125,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Affogato\src\Affogato.Advanced\Affogato.Advanced.fsproj">
+      <Name>Affogato.Advanced</Name>
+      <Project>{f7ea87aa-4cfb-46c3-a8c3-6b81be812432}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Affogato\src\Affogato\Affogato.fsproj">
+      <Name>Affogato</Name>
+      <Project>{bd0370fe-4393-441d-93fb-e18f1cbd5469}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Mille-Feuille\Dev\Mille-Feuille.Core\Mille-Feuille.csproj">
       <Name>Mille-Feuille</Name>
       <Project>{73984409-a0fe-476e-99f2-61be570a752f}</Project>
@@ -135,11 +145,6 @@
       <Project>{f0694096-423d-4328-ab20-cef9052b2f31}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Tart\src\Tart.Advanced\Tart.Advanced.fsproj">
-      <Name>Tart.Advanced</Name>
-      <Project>{9cb5e16a-f983-4d20-8973-8674cbc01fe6}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Tart\src\Tart.Core\Tart.Core.fsproj">
       <Name>Tart.Core</Name>
       <Project>{a2abe01d-ba74-477b-ba18-bccd0176af27}</Project>
@@ -148,11 +153,6 @@
     <ProjectReference Include="..\..\..\Tart\src\Tart.Helper\Tart.Helper.fsproj">
       <Name>Tart.Helper</Name>
       <Project>{933d2137-dab6-449c-830e-1b5ce882de19}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Tart\src\Tart.Math\Tart.Math.fsproj">
-      <Name>Tart.Math</Name>
-      <Project>{0cd820bd-290c-47e2-beaa-ab58a34ab1e4}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\WhiteDungeon.Core\WhiteDungeon.Core.fsproj">

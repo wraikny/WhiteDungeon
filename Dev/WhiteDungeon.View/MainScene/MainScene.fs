@@ -7,7 +7,7 @@ open FSharpPlus
 open System
 
 open wraikny.Tart.Helper
-open wraikny.Tart.Math
+open Affogato
 
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.UI
@@ -36,7 +36,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
         let shape = new asd.RectangleShape(DrawingArea = area)
         new asd.GeometryObject2D(
             Shape = shape,
-            Color = Vec3.toColor menuSetting.backColor
+            Color = Vector3.toColor menuSetting.backColor
         )
 
 #if DEBUG
@@ -70,7 +70,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
     let inputFont =
         asd.Engine.Graphics.CreateDynamicFont(
             menuSetting.inputFont,
-            menuSetting.inputFontSize, Vec3.toColor menuSetting.inputFontColor,
+            menuSetting.inputFontSize, Vector3.toColor menuSetting.inputFontColor,
             0, asd.Color()
         )
 
@@ -88,15 +88,15 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
             buttonFont = buttonFont
             inputFont = inputFont
 
-            frameColor = Vec4.toColor menuSetting.frameColor
+            frameColor = Vector4.toColor menuSetting.frameColor
             button = menuSetting.buttonColor
             inputColor = menuSetting.inputColor
             inputFocusColor = menuSetting.inputFocusColor
 
             rectColor = ColorPalette.sumire
 
-            centerPositionRate = Vec2.init 0.5f 0.5f
-            togglePositionRate = Vec2.init 0.5f 0.0f
+            centerPositionRate = Vector2.init 0.5f 0.5f
+            togglePositionRate = Vector2.init 0.5f 0.0f
             windowSize = UI.WindowSetting.WindowSize.FixWidth mainWindowWidth
             //toggleDirection = UI.WindowSetting.ToggleDirection.Center(UI.WindowSetting.Y)
             toggleDirection = UI.WindowSetting.ToggleDirection.Y
@@ -111,7 +111,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
     let uiWindowMain =
         new UI.MouseWindow(windowSetting, mouse,
-            Position = Vec2.toVector2DF (setting.windowSize |>> float32 |> ( *. ) 0.5f )
+            Position = Vector2.toVector2DF (setting.windowSize |>> float32 |> ( *. ) 0.5f )
         )
 
 
@@ -126,8 +126,8 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
             { windowSetting with
                 itemMargin = 15.0f
 
-                centerPositionRate = Vec2.init 0.0f 0.5f
-                togglePositionRate = Vec2.init 0.0f 0.5f
+                centerPositionRate = Vector2.init 0.0f 0.5f
+                togglePositionRate = Vector2.init 0.0f 0.5f
                 windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
                 toggleDirection = UI.WindowSetting.ToggleDirection.X
             }
@@ -144,8 +144,8 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
         let sideSetting =
             { windowSetting with
                 itemMargin = 30.0f
-                centerPositionRate = Vec2.init 1.0f 0.5f
-                togglePositionRate = Vec2.init 1.0f 0.5f
+                centerPositionRate = Vector2.init 1.0f 0.5f
+                togglePositionRate = Vector2.init 1.0f 0.5f
                 windowSize = UI.WindowSetting.WindowSize.Fixed(asd.Vector2DF(width, window2Height), false)
                 toggleDirection = UI.WindowSetting.ToggleDirection.X
             }
@@ -282,7 +282,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.CloseGame ->
                 messenger.Dispose()
-                this.AddCoroutine(seq {
+                this.AddCoroutineAsParallel(seq {
 
                     if uiWindowsAnimating() then
                         while uiWindowsAnimating() do
@@ -296,7 +296,7 @@ type MainScene(errorHandler : Utils.ErrorHandler, setting : AppSetting) =
 
             | Update.StartGame (gameModel, randomSeed, bgmVolume) ->
                 messenger.Dispose()
-                this.AddCoroutine(seq {
+                this.AddCoroutineAsParallel(seq {
                     
                     if not uiWindowMain.IsToggleOn then
                         while not uiWindowMain.IsToggleOn do

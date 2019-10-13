@@ -1,7 +1,6 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Math
+open Affogato
 open WhiteDungeon.Core.Model
 
 open FSharpPlus
@@ -19,8 +18,8 @@ type MoveValueContainer = {
 
 type EnemyMode =
     | FreeMoving
-    | Chasing of PlayerID * float32 Vec2 * angle:float32
-    | AfterChasing of pos:float32 Vec2 * angle:float32
+    | Chasing of PlayerID * float32 Vector2 * angle:float32
+    | AfterChasing of pos:float32 Vector2 * angle:float32
     //| LookingAround of uint16
 
 
@@ -82,7 +81,7 @@ module Enemy =
 
     let inline lookingDirection (enemy : Enemy) =
         enemy.lookingRadian
-        |> Vec2.fromAngle
+        |> Vector2.ofAngle
 
     let addHate targetId hate (enemy : Enemy) =
         { enemy with

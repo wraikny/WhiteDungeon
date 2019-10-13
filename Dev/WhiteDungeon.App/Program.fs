@@ -1,6 +1,6 @@
 module WhiteDungeon.App.Program
 
-open wraikny.Tart.Math
+open Affogato
 open wraikny.MilleFeuille
 open WhiteDungeon.Core
 open WhiteDungeon.View
@@ -13,7 +13,7 @@ open System
 [<EntryPoint>]
 let main _ =
     try
-        let windowSize = appSetting.windowSize |> Vec2.toVector2DI
+        let windowSize = appSetting.windowSize |> Vector2.toVector2DI
         asd.Engine.Initialize(
             "九十九のラビリンス"
             , windowSize.X, windowSize.Y
