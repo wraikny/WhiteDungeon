@@ -1,7 +1,8 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny
-open wraikny.Tart.Math
+open Affogato
+open Affogato.Collections
 open wraikny.Tart.Helper.Collections
 
 open wraikny.Tart.Helper.Utils
@@ -30,7 +31,7 @@ type ObjectBaseView< 'a
         let area = objectBaseView |> Model.ObjectBase.area
         base.UpdateAreaView(area)
 
-        let size = area.size |> Vec2.toVector2DF
+        let size = area.size |> Vector2.toVector2DF
 
         if base.TextureView.IsDrawn then
             let changedDir = moveAnimation.SetDirection(objectBaseView.direction)

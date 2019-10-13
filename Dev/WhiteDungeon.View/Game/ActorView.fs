@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny
-open wraikny.Tart.Math
+open Affogato
 
 open wraikny.Tart.Helper.Utils
 open wraikny.Tart.Core
@@ -24,8 +24,8 @@ type ActorView< 'a
         let v = gameViewSetting.actorGameText
         asd.Engine.Graphics.CreateDynamicFont(
             v.font,
-            v.size, Vec3.toColor v.color,
-            v.sizeOutline, Vec3.toColor v.colorOutline
+            v.size, Vector3.toColor v.color,
+            v.sizeOutline, Vector3.toColor v.colorOutline
         )
 
     let levelText =

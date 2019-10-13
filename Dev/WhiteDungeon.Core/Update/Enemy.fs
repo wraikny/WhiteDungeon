@@ -1,8 +1,8 @@
 ﻿module WhiteDungeon.Core.Update.Enemy
 
-open wraikny.Tart.Math
-open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Advanced.Dungeon
+open Affogato
+open Affogato.Collections
+open Affogato.Advanced
 open wraikny.Tart.Core
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -40,7 +40,7 @@ let inline decrHateMap (gameSetting : GameSetting) (enemy : Enemy) =
     }
 
 
-let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vec2) : bool =
+let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 Vector2) : bool =
     let pos = enemy |> ObjectBase.position
 
     (
@@ -49,12 +49,12 @@ let insideVision (gameSetting) (dungeonModel) (enemy : Enemy) (point : float32 V
     )
     &&
     (
-        let angle = (point - pos) |> Vec2.angle
+        let angle = (point - pos) |> Vector2.angle
 
         let d =
             (angle - enemy.lookingRadian)
-            |> Vec2.fromAngle
-            |> Vec2.angle
+            |> Vector2.ofAngle
+            |> Vector2.angle
         (d * d < enemy.visionAngle * enemy.visionAngle / 4.0f)
     )
     &&
@@ -86,9 +86,9 @@ let tryGetTarget (model : Model) (targets : seq<Player>) (enemy : Enemy) : Playe
     
 
 
-let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy : Enemy =
+let moveForward (gameSetting : GameSetting) (dungeonModel : Dungeon.Model) enemy : Enemy =
     let status = enemy |> Actor.statusCurrent
-    let dir = Vec2.fromAngle enemy.lookingRadian
+    let dir = Vector2.ofAngle enemy.lookingRadian
     let enemy, newDirection =
         enemy
         |> ObjectBase.moveReflectable
@@ -98,10 +98,10 @@ let moveForward (gameSetting : GameSetting) (dungeonModel : DungeonModel) enemy 
 
     newDirection |> function
     | None -> enemy
-    | Some dir -> { enemy with lookingRadian = Vec2.angle dir; moveValues = zero }
+    | Some dir -> { enemy with lookingRadian = Vector2.angle dir; moveValues = zero }
 
 
-let freeMove (gameSetting : GameSetting) (dungeonModel : DungeonModel) (enemy : Enemy) : Enemy * EnemyCmd [] =
+let freeMove (gameSetting : GameSetting) (dungeonModel : Dungeon.Model) (enemy : Enemy) : Enemy * EnemyCmd [] =
     let setting = gameSetting.enemySettings |> HashMap.find enemy.kind
 
     setting.freeMove |> function

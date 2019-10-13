@@ -1,6 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny.Tart.Math
+open Affogato
+open Affogato.Collections
 open wraikny.Tart.Helper
 open wraikny.MilleFeuille
 open WhiteDungeon.Core
@@ -23,7 +24,7 @@ type SkillEmitView(_gameViewSetting : GameViewSetting) =
 
             this.DrawingPriority <-
                 viewModel.objectBase.Area
-                |> Rect.centerPosition
+                |> Rectangle.centerPosition
                 |> Vector.y
                 |> int
 

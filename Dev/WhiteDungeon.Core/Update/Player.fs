@@ -1,8 +1,8 @@
 ﻿module WhiteDungeon.Core.Update.Player
 
 //open wraikny.Tart.Helper.Extension
-open wraikny.Tart.Math
-open wraikny.Tart.Helper.Collections
+open Affogato
+open Affogato.Collections
 open WhiteDungeon.Core.Model
 
 

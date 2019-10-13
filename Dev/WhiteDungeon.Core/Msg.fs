@@ -1,7 +1,6 @@
 ﻿namespace WhiteDungeon.Core
 
-open wraikny.Tart.Math
-
+open Affogato
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 
@@ -34,14 +33,14 @@ module PlayerInput =
         Direction Down
     ]
 
-    let getPlayerMoveFromInputs (isDash) (inputSet : InputDirection Set) : ActorMove * float32 Vec2 =
+    let getPlayerMoveFromInputs (isDash) (inputSet : InputDirection Set) : ActorMove * float32 Vector2 =
         let actorMove = if isDash then ActorMove.Dash else ActorMove.Walk
 
         let moveDirs = [|
-            Up, Vec2.init 0.0f -1.0f
-            Down, Vec2.init 0.0f 1.0f
-            Right, Vec2.init 1.0f 0.0f
-            Left, Vec2.init -1.0f 0.0f
+            Up, Vector2.init 0.0f -1.0f
+            Down, Vector2.init 0.0f 1.0f
+            Right, Vector2.init 1.0f 0.0f
+            Left, Vector2.init -1.0f 0.0f
         |]
 
         let direction =
@@ -56,15 +55,14 @@ module PlayerInput =
         actorMove, direction
 
 
-open wraikny.Tart.Advanced.Dungeon
-
+open Affogato.Advanced
 
 type Msg =
     | SetGameMode of Model.GameSceneMode
     | TimePasses
     | PlayerInputs of PlayerID * PlayerInput Set
     | GenerateNewDungeon
-    | GeneratedDungeonModel of DungeonBuilder * DungeonModel
+    | GeneratedDungeonModel of Dungeon.Builder * Dungeon.Model
     | GeneratedDungeonParams of Model.DungeonParams
 
     | UpdateEnemyOf of EnemyID * EnemyMsg

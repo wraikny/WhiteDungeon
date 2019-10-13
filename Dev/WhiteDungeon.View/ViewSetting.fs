@@ -1,13 +1,11 @@
 ﻿namespace WhiteDungeon.View
 
-open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Math
-
+open Affogato
+open Affogato.Collections
 
 open WhiteDungeon.Core.Model
 
-open  FSharpPlus
+open FSharpPlus
 
 type TexParam<'a, 'b> = 'a * 'b * float32
 
@@ -65,12 +63,12 @@ module ActorImages =
 
     // http://www.silversecond.com/WolfRPGEditor/
     let fromGraphicmaker sleepWalk sleepDash (path : string) =
-        let size = Vec2.init 32 64
+        let size = Vector2.init 32 64
         let textures xi yi =
             [1; 2; 1; 0]
             |>> fun i ->
                 ( path
-                , Rect.init (size * (Vec2.init (i + xi * 3) yi)) size
+                , Rectangle.init (size * (Vector2.init (i + xi * 3) yi)) size
                 , 0.0f)
             
         {
@@ -87,12 +85,12 @@ module ActorImages =
         }
 
     let occupationImage sleepWalk sleepDash (path : string) =
-        let size = Vec2.init 256 256
+        let size = Vector2.init 256 256
         let textures yi =
             [1; 2; 1; 0]
             |>> fun i ->
                 ( path
-                , Rect.init (size * (Vec2.init i yi)) size
+                , Rectangle.init (size * (Vector2.init i yi)) size
                 , 0.0f)
 
         {
@@ -110,31 +108,31 @@ module ActorImages =
 
 type ObjectViewSetting = {
     name : string
-    characterImages : ActorImages<string, int Rect2>
+    characterImages : ActorImages<string, int Rectangle2>
 }
 
 type FontSetting = {
     font : string
     size : int
     sizeOutline : int
-    color : byte Vec3
-    colorOutline : byte Vec3
+    color : byte Vector3
+    colorOutline : byte Vector3
 }
 
 type GameViewSetting = {
     occupationSetting : HashMap<Occupation, ObjectViewSetting>
     bgms : string list
 
-    gameUIFrameColor : byte Vec4
-    gameUITextColor : byte Vec3
+    gameUIFrameColor : byte Vector4
+    gameUITextColor : byte Vector3
     gameUITextFont : string
     gameUITextSize : int 
-    gameUIDungeonFloor : float32 Rect2
-    gameUIPlayerArea : float32 Rect2
+    gameUIDungeonFloor : float32 Rectangle2
+    gameUIPlayerArea : float32 Rectangle2
 
     dungeonCellTexture : string
 
-    buildingTextuers: HashMap<BuildingKind, string * int Rect2>
+    buildingTextuers: HashMap<BuildingKind, string * int Rectangle2>
 
     damageTextFrame : int
     damageTextMove : float32
@@ -152,8 +150,8 @@ open wraikny.MilleFeuille.UI
 
 
 type MainSceneSetting = {
-    backColor : byte Vec3
-    frameColor : byte Vec4
+    backColor : byte Vector3
+    frameColor : byte Vector4
     buttonColor : ButtonColor
     inputColor : ButtonColor
     inputFocusColor : ButtonColor
@@ -161,7 +159,7 @@ type MainSceneSetting = {
     textSize : int
 
     inputFont : string
-    inputFontColor : byte Vec3
+    inputFontColor : byte Vector3
     inputFontSize : int
 
     windowWidthWRate : float32
@@ -178,7 +176,7 @@ type MainSceneSetting = {
 
 
 type AppSetting = {
-    windowSize : int Vec2
+    windowSize : int Vector2
 
     menuSceneSetting : MainSceneSetting
 

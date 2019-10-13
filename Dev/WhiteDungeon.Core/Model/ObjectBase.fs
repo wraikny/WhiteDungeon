@@ -1,22 +1,19 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Math
-
-
 open WhiteDungeon.Core.Model
-
+open Affogato
 open FSharpPlus
 
 
 type ObjectBase = {
-    size : float32 Vec2
+    size : float32 Vector2
 
     /// center
-    position : float32 Vec2
+    position : float32 Vector2
 
-    lastPosition : float32 Vec2
+    lastPosition : float32 Vector2
 
-    velocity : float32 Vec2
+    velocity : float32 Vector2
 
     direction : MoveDirection
 
@@ -58,11 +55,11 @@ module ObjectBase =
     let inline lastPosition x = (get x).lastPosition
     let inline velocity x = (get x).velocity
     let inline direction x = (get x).direction
-    let inline area x : float32 Rect2 = (get x).Area
+    let inline area x : float32 Rectangle2 = (get x).Area
 
     let inline movingDirection x =
         (position x - lastPosition x)
-        |> Vec2.angle
+        |> Vector2.angle
 
     let inline mapSize f x = map (fun o -> {o with size = f o.size}) x
     let inline mapPosition f x =
@@ -76,5 +73,5 @@ module ObjectBase =
         x |> map (fun o -> { o with velocity = f o.velocity })
 
     let inline calcAngle oFrom oTo =
-        Vec2.angle(position oTo - position oFrom)
+        Vector2.angle(position oTo - position oFrom)
 

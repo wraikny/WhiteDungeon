@@ -1,8 +1,8 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny.Tart.Math
+open Affogato
+open Affogato.Collections
 open wraikny.Tart.Helper
-open wraikny.Tart.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.View
 open wraikny.MilleFeuille
@@ -13,7 +13,7 @@ type BuildingView(gameViewSetting : GameViewSetting) =
 
     let mutable lastKind = ValueNone
 
-    interface IUpdatee<Model.BuildingKind * float32 Rect2> with
+    interface IUpdatee<Model.BuildingKind * float32 Rectangle2> with
         member __.Update(x) =
             let kind, area = x
             let vk = ValueSome kind
@@ -26,7 +26,7 @@ type BuildingView(gameViewSetting : GameViewSetting) =
                 base.TextureView.Src <-
                     textureArea
                     |>> map float32
-                    |> Rect.toRectF
+                    |> Rectangle.toRectF
                 base.SetTextureSize(base.TextureView.Src.Size, area.size.y)
                 
             base.UpdateAreaView(area)

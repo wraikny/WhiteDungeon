@@ -1,15 +1,12 @@
 ﻿module WhiteDungeon.View.MainScene.ViewModel
 
-open wraikny.Tart.Math
-
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
-open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
-
+open Affogato.Collections
 
 open FSharpPlus
 

@@ -1,11 +1,9 @@
 ﻿namespace WhiteDungeon.View.Game
 
 
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Math
-
+open Affogato
+open Affogato.Advanced
 open wraikny.Tart.Helper
-open wraikny.Tart.Advanced
 open wraikny.MilleFeuille.Objects
 open wraikny.MilleFeuille.Input
 open wraikny.MilleFeuille
@@ -39,13 +37,13 @@ module DungeonCellKind =
         | Dungeon.Large _ -> LargeRoom
 
 
-type DungeonCellView(cellSize : float32 Vec2, path : string) =
+type DungeonCellView(cellSize : float32 Vector2, path : string) =
     inherit asd.Chip2D()
 
     do
         base.Texture <- asd.Engine.Graphics.CreateTexture2D(path)
 
-    interface IUpdatee<int Vec2 * DungeonCellKind> with
+    interface IUpdatee<int Vector2 * DungeonCellKind> with
         member this.Update(viewModel) =
             let cell, kind = viewModel
 
@@ -62,7 +60,7 @@ type DungeonCellView(cellSize : float32 Vec2, path : string) =
                 //    ColorPalette.black
 
             let pos =
-                Dungeon.DungeonModel.cellToCoordinate cellSize cell
-            this.Position <- Vec2.toVector2DF pos
+                Dungeon.Model.cellToCoordinate cellSize cell
+            this.Position <- Vector2.toVector2DF pos
 
-            this.Scale <- (Vec2.toVector2DF cellSize) / this.Texture.Size.To2DF()
+            this.Scale <- (Vector2.toVector2DF cellSize) / this.Texture.Size.To2DF()

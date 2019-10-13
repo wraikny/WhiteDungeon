@@ -1,8 +1,7 @@
 ﻿module WhiteDungeon.App.GameSetting
 
-open wraikny.Tart.Helper
-open wraikny.Tart.Math
-
+open Affogato
+open Affogato.Collections
 
 open wraikny.Tart.Helper.Collections
 open wraikny.MilleFeuille
@@ -30,7 +29,7 @@ let enemies = [
             let actor = enemy.actor
             let dir = 
                 enemy.lookingRadian
-                |> Vec2.fromAngle
+                |> Vector2.ofAngle
 
             let pos = actor.objectBase.position + (100.0f *. dir)
             [
@@ -91,7 +90,7 @@ let gameSetting : Model.GameSetting = {
         Character.Onmyoji.viewSetting.name, Character.Onmyoji.setting
     ]
 
-    enemyGrowthEasing = Easing.Lerp(Easing.Linear, Easing.InSine, 0.3f)
+    enemyGrowthEasing = Easing.Mix(Easing.Linear, Easing.InSine, 0.3f)
     levelOffset = 5us
 
     lvUpExp = fun level -> 10us * level * level
@@ -119,6 +118,7 @@ let gameSetting : Model.GameSetting = {
             roomMoveRate = 0.3f
             roomMeanThreshold = 1.25f
             restoreEdgeRate = 0.1f
+            displayLog = false
         }
 
     gateCount = fun (dungeonFloor : uint16) (initSize : uint16) ->

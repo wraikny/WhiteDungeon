@@ -1,17 +1,10 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny
 open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Math
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Core
-open wraikny.MilleFeuille
-open WhiteDungeon.Core
+open Affogato
 open WhiteDungeon.View
-open WhiteDungeon.View.Utils.Color
 open WhiteDungeon.Core.Model
-
+open wraikny.MilleFeuille
 open FSharpPlus
 
 
@@ -63,12 +56,12 @@ type MoveAnimation(owner : asd.TextureObject2D) =
 
     member __.Move with get() = currentMove and set(x) = currentMove <- x
 
-    member __.SetAnimationTextures(images' : ActorImages<string, int Rect2>) =
+    member __.SetAnimationTextures(images' : ActorImages<string, int Rectangle2>) =
         images <-
             images'
             |> ActorImages.map(fun (path, area, angle) ->
                 asd.Engine.Graphics.CreateTexture2D(path),
-                (Rect.toRectI area).ToF(),
+                (Rectangle.toRectI area).ToF(),
                 angle
             )
         

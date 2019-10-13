@@ -1,13 +1,12 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Math
-
+open Affogato
 open WhiteDungeon.Core.Model
 
 //type ConditionKind =
 //    | StatusAdd of ActorStatus
 //    | StatusMul of ActorStatus
-//    | Move of (int * float32 Vec2)
+//    | Move of (int * float32 Vector2)
 
 //type Condition =
 //    {
@@ -105,8 +104,8 @@ and AreaSkillBuilder = {
 
 and EmitMove =
     | Stay
-    | Move of float32 Vec2
-    | Scale of float32 Vec2
+    | Move of float32 Vector2
+    | Scale of float32 Vector2
     | Generate of (AreaSkill -> AreaSkillBuilder [])
 
 module SkillBaseBuilder =

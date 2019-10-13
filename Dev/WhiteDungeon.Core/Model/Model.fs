@@ -1,15 +1,13 @@
 ﻿namespace WhiteDungeon.Core.Model
 
-open wraikny.Tart.Math
-
 open WhiteDungeon.Core.Model
 open WhiteDungeon.Core.Model
 open wraikny.Tart.Helper
-open wraikny.Tart.Helper.Collections
-open wraikny.Tart.Advanced
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
-open wraikny.Tart.Advanced.Dungeon
+open Affogato
+open Affogato.Advanced
+open Affogato.Collections
 
 open FSharpPlus
 
@@ -55,7 +53,7 @@ type OccupationSetting = {
 
     growthEasing : Easing
 
-    size : float32 Vec2
+    size : float32 Vector2
 }
 
 
@@ -81,7 +79,7 @@ and EnemySetting = {
 
 
 and GameSetting = {
-    dungeonCellSize : float32 Vec2
+    dungeonCellSize : float32 Vector2
     minPlayerCount : int
     maxPlayerCount : int
     binarySearchCountMovingOnWall : int
@@ -105,7 +103,7 @@ and GameSetting = {
 
     levelSD : float32
 
-    createDungeonBuilder : uint16 -> uint16 -> DungeonBuilder
+    createDungeonBuilder : uint16 -> uint16 -> Dungeon.Builder
     gateCount : uint16 -> uint16 -> int
 }
 
@@ -118,12 +116,12 @@ and Model = {
 
     enemies : Map<EnemyID, Enemy>
 
-    dungeonBuilder: Dungeon.DungeonBuilder
-    dungeonModel : Dungeon.DungeonModel
-    //dungeonGateCells : int Vec2 Set
+    dungeonBuilder: Dungeon.Builder
+    dungeonModel : Dungeon.Model
+    //dungeonGateCells : int Vector2 Set
 
     buildings : Building list
-    buildingCells: HashMap<int Vec2, Building>
+    buildingCells: HashMap<int Vector2, Building>
 
     skillList : SkillList
 
@@ -157,15 +155,15 @@ type EnemyInits = {
 }
 
 type DungeonParams = {
-    dungeonBuilder : DungeonBuilder
-    dungeonModel : DungeonModel
-    //gateCells : int Vec2 Set
+    dungeonBuilder : Dungeon.Builder
+    dungeonModel : Dungeon.Model
+    //gateCells : int Vector2 Set
 
     buildings : Building list
-    buildingCells: HashMap<int Vec2, Building>
+    buildingCells: HashMap<int Vector2, Building>
 
-    enemyCells : (EnemyInits * int Vec2) []
-    initPosition : float32 Vec2
+    enemyCells : (EnemyInits * int Vector2) []
+    initPosition : float32 Vector2
 }
 
 module Model =
@@ -180,7 +178,7 @@ module Model =
     let inline gameSetting (model : Model) = model.gameSetting
 
 
-    let cellsToEnemies (gameSetting : GameSetting) (dungeonFloor) (enemyCells : (EnemyInits * int Vec2) []) cellSize : Map<_, Enemy> =
+    let cellsToEnemies (gameSetting : GameSetting) (dungeonFloor) (enemyCells : (EnemyInits * int Vector2) []) cellSize : Map<_, Enemy> =
         enemyCells
         |> Seq.indexed
         |> Seq.map(fun (index, (ei, cell)) ->
@@ -202,8 +200,8 @@ module Model =
 
             enemyId
             , Enemy.init
-                (Vec2.init 100.0f 100.0f)
-                ( (DungeonModel.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
+                (Vector2.init 100.0f 100.0f)
+                ( (Dungeon.Model.cellToCoordinate cellSize cell) + (cellSize .* 0.5f) )
                 enemyId
                 level
                 status
@@ -218,7 +216,7 @@ module Model =
         let players =
             model.players
             |> Map.map (fun _ p ->
-                let pos = (dungeonParams.initPosition - (Vec2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
+                let pos = (dungeonParams.initPosition - (Vector2.init (float32 p.id.Value) 0.0f) * (ObjectBase.size p))
                     
                 ObjectBase.mapPosition (fun _ -> pos) p
             )
@@ -280,31 +278,31 @@ module Model =
 
 module GameSetting =
     let inline collidedWithCell (gameSetting) cell =
-        Dungeon.DungeonModel.coordinateToCell
+        Dungeon.Model.coordinateToCell
             gameSetting.dungeonCellSize
         >> (=) cell
         |> Seq.exists
 
     let collidedWiithCells (gameSetting : GameSetting) cells =
-        Dungeon.DungeonModel.coordinateToCell
+        Dungeon.Model.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip Set.contains cells
         |> Seq.exists
 
     let insideCells (gameSetting : GameSetting) cells =
-        Dungeon.DungeonModel.coordinateToCell
+        Dungeon.Model.coordinateToCell
             gameSetting.dungeonCellSize
         >> flip HashMap.containsKey cells
 
     let inline insideDungeon 
         (gameSetting : GameSetting)
-        (dungeonModel : Dungeon.DungeonModel) =
+        (dungeonModel : Dungeon.Model) =
         insideCells gameSetting dungeonModel.cells
         |> Seq.forall
 
     let inline insideDungeonOfLine
         (gameSetting : GameSetting)
-        (dungeonModel : Dungeon.DungeonModel)
+        (dungeonModel : Dungeon.Model)
         count
         (p1) (p2) =
 
@@ -316,13 +314,13 @@ module GameSetting =
         |> insideDungeon gameSetting dungeonModel
 
 module Dungeon =
-    let inline generateDungeonModel (dungeonBuilder : DungeonBuilder) =
+    let inline generateDungeonModel (dungeonBuilder : Dungeon.Builder) =
         (Random.int minValue<int> maxValue<int>)
         |> SideEffect.bind(fun seed ->
             let rec loop n = async {
                 try
                     let builder = { dungeonBuilder with seed = seed + n }
-                    let dungeon = DungeonBuilder.generate builder
+                    let dungeon = Dungeon.Builder.generate builder
 
                     if length dungeon.largeRooms > 3 then
                         return Ok( builder, dungeon )
@@ -334,7 +332,7 @@ module Dungeon =
             loop 0
         )
 
-    let generateDungeonParams gameSetting gateCount dungeonBuilder (dungeonModel : DungeonModel) =
+    let generateDungeonParams gameSetting gateCount dungeonBuilder (dungeonModel : Dungeon.Model) =
         let largeRooms = toList dungeonModel.largeRooms
         let smallRooms = toList dungeonModel.smallRooms
         
@@ -343,7 +341,7 @@ module Dungeon =
 
         let fromCell =
             gameSetting.dungeonCellSize
-            |> DungeonModel.cellToCoordinate
+            |> Dungeon.Model.cellToCoordinate
 
         let rec loop() = monad {
             try
@@ -366,20 +364,20 @@ module Dungeon =
                 let initPosition =
                     initRoom.rect
                     |>> fromCell
-                    |> Rect.centerPosition
+                    |> Rectangle.centerPosition
 
 
                 let toLargeRoomCells size values =
                     seq {
                         for (i, v) in values ->
                             let room = snd largeRooms.[i]
-                            let cells = room |> Space.cellsFor size
+                            let cells = room |> Dungeon.Space.cellsFor size
                             let cell = fst cells.[ v % length cells]
                             cell
                     }
 
                 let gateBuildings: Building list =
-                    let size = Vec2.init 2 2
+                    let size = Vector2.init 2 2
                     toLargeRoomCells size largeRoomValues.[1..gateCount]
                     |> Seq.indexed
                     |>> fun (i, c) ->
@@ -445,7 +443,7 @@ module Dungeon =
                 let enemyCells =
                     seq {
                         for (index, (_, space)) in Seq.indexed smallRooms ->
-                            let cells = space |> Space.cells
+                            let cells = space |> Dungeon.Space.cells
                             let cellIndex = (enemyCellIndexs : int list).[index]
                             let cell = fst cells.[ cellIndex % length cells]
                             let ei = (enemyInints : _ list).[index]

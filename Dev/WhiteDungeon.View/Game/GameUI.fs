@@ -1,10 +1,9 @@
 ﻿namespace WhiteDungeon.View.Game
 
 
-open wraikny.Tart.Helper.Utils
-open wraikny.Tart.Math
-open wraikny.Tart.Core
-open wraikny.Tart.Advanced
+open Affogato
+open Affogato.Advanced
+open Affogato.Collections
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.Input
 
@@ -52,7 +51,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
     let mouse = new UI.MouseButtonSelecter(0.0f)
 
     let toAsdArea area =
-        asd.RectF(ws * Vec2.toVector2DF area.position, ws * Vec2.toVector2DF area.size)
+        asd.RectF(ws * Vector2.toVector2DF area.position, ws * Vector2.toVector2DF area.size)
 
     let dungeonFloorArea = gameViewSetting.gameUIDungeonFloor |> toAsdArea
 
@@ -64,7 +63,7 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
         )
 
     let dungeonFloorSetting = 
-        let col = Vec3.toColor gameViewSetting.gameUITextColor
+        let col = Vector3.toColor gameViewSetting.gameUITextColor
         { gameSceneArgs.windowSetting with
             itemMargin = 10.0f
             itemAlignment = UI.WindowSetting.Alignment.Right (0.02f * ws.X)
@@ -73,10 +72,10 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
             windowSize = UI.WindowSetting.FixWidth(dungeonFloorArea.Size.X)
 
             toggleDirection = UI.WindowSetting.ToggleDirection.Y
-            centerPositionRate = Vec2.init 0.0f 0.0f
-            togglePositionRate = Vec2.init 0.5f 0.0f
+            centerPositionRate = Vector2.init 0.0f 0.0f
+            togglePositionRate = Vector2.init 0.5f 0.0f
 
-            frameColor = Vec4.toColor gameViewSetting.gameUIFrameColor
+            frameColor = Vector4.toColor gameViewSetting.gameUIFrameColor
             rectColor = col
 
             textFont = createDynamicFont gameViewSetting.gameUITextSize col
@@ -98,8 +97,8 @@ type GameUI(gameViewSetting : GameViewSetting, gameSetting : Model.GameSetting, 
                 //windowSize = UI.WindowSetting.Fixed(playerArea.Size, false)
                 windowSize = UI.WindowSetting.FixWidth(playerArea.Size.X)
                 toggleDirection = UI.WindowSetting.ToggleDirection.Y
-                centerPositionRate = Vec2.init 0.0f 1.0f
-                togglePositionRate = Vec2.init 0.5f 1.0f
+                centerPositionRate = Vector2.init 0.0f 1.0f
+                togglePositionRate = Vector2.init 0.5f 1.0f
             }
         new UI.MouseWindow(playerStatusSetting, mouse
             , Position = playerArea.Position

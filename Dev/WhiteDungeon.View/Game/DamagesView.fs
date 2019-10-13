@@ -1,7 +1,7 @@
 ﻿namespace WhiteDungeon.View.Game
 
 open wraikny.Tart.Helper
-open wraikny.Tart.Math
+open Affogato
 open wraikny.Tart.Core
 open wraikny.MilleFeuille
 open wraikny.MilleFeuille.Objects
@@ -29,8 +29,8 @@ type DamagesView(gameViewSetting : GameViewSetting) =
     let createFont (v : FontSetting) =
         asd.Engine.Graphics.CreateDynamicFont(
             v.font,
-            v.size, Vec3.toColor v.color,
-            v.sizeOutline, Vec3.toColor v.colorOutline
+            v.size, Vector3.toColor v.color,
+            v.sizeOutline, Vector3.toColor v.colorOutline
         )
 
     let damageFont = createFont gameViewSetting.damageView
@@ -41,9 +41,9 @@ type DamagesView(gameViewSetting : GameViewSetting) =
     let mutable cameraPosition = asd.Vector2DF()
 
     member __.OnNext(pos) =
-        cameraPosition <- Vec2.toVector2DF pos
+        cameraPosition <- Vector2.toVector2DF pos
 
-    member this.Add(damages : (float32 Vec2 * float32) []) =
+    member this.Add(damages : (float32 Vector2 * float32) []) =
         for (pos, damage) in damages do
             let obj =
                 if objectsCount = 0u then
@@ -63,11 +63,11 @@ type DamagesView(gameViewSetting : GameViewSetting) =
                 let angle = (float32 <| rand.NextDouble()) * 260.0f
                 asd.Vector2DF(1.0f, 0.0f, Degree = angle)
                 * float32 gameViewSetting.damageView.size * 2.0f
-            let position = Vec2.toVector2DF pos + rnd
+            let position = Vector2.toVector2DF pos + rnd
 
             obj.Position <- position - cameraPosition
 
-            obj.AddCoroutine(seq {
+            obj.AddCoroutineAsParallel(seq {
 
                 let frame = gameViewSetting.damageTextFrame - 1
                 for i in 0..frame ->

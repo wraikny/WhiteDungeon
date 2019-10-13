@@ -1,9 +1,7 @@
 ﻿module WhiteDungeon.Core.Update.ObjectBase
 
-open wraikny.Tart.Helper
-open wraikny.Tart.Math
-open wraikny.Tart.Math.Utils
-open wraikny.Tart.Advanced
+open Affogato
+open Affogato.Advanced
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
 
@@ -17,8 +15,8 @@ let inline setDirection (direction) (obj : ObjectBase) =
 
 let inline getCorners (obj) =
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.lurd
-    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+    let lu, rd = area |> Rectangle.lurd
+    let ld, ru = lu + area.size * (Vector2.init 0.0f 1.0f), lu + area.size * (Vector2.init 1.0f 0.0f)
     [|lu; rd; ld; ru|]
 
 
@@ -37,25 +35,25 @@ let inline collidedCells (gameSetting : GameSetting) (cells) obj =
 
 let inline insideDungeon
     (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel) x =
+    (dungeonModel : Dungeon.Model) x =
     GameSetting.insideDungeon
         gameSetting
         dungeonModel
         (getCorners (ObjectBase.get x))
 
 
-let inline private bsDiffXYTogether bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
-    BinarySearch.binarySearch
+let inline private bsDiffXYTogether bsCount isInside (diff : _ Vector2) currentPosition : float32 Vector2 =
+    Utils.binarySearch
         bsCount
         isInside
         currentPosition
         (currentPosition + diff)
 
-let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosition : float32 Vec2 =
+let inline private bsDiffXYAnother bsCount isInside (diff : _ Vector2) currentPosition : float32 Vector2 =
     let searchDiff =
         (+) currentPosition
         >>
-        BinarySearch.binarySearch
+        Utils.binarySearch
             bsCount
             isInside
             currentPosition
@@ -68,18 +66,18 @@ let inline private bsDiffXYAnother bsCount isInside (diff : _ Vec2) currentPosit
         searchDiff { diff with x = 0.0f }
         |> Vector.y
 
-    Vec2.init diffX diffY
+    Vector2.init diffX diffY
 
 let inline private moveWithBS
     f
     (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel)
+    (dungeonModel : Dungeon.Model)
     (diff0) (x : ^a)
     =
     let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.lurd
-    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+    let lu, rd = area |> Rectangle.lurd
+    let ld, ru = lu + area.size * (Vector2.init 0.0f 1.0f), lu + area.size * (Vector2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 
@@ -119,13 +117,13 @@ let inline moveXYAnother a = moveWithBS bsDiffXYAnother a
 
 let inline moveReflectable
     (gameSetting : GameSetting)
-    (dungeonModel : Dungeon.DungeonModel)
+    (dungeonModel : Dungeon.Model)
     (diff0) (x : ^a)
     =
     let obj = ObjectBase.get x
     let area = obj |> ObjectBase.area
-    let lu, rd = area |> Rect.lurd
-    let ld, ru = lu + area.size * (Vec2.init 0.0f 1.0f), lu + area.size * (Vec2.init 1.0f 0.0f)
+    let lu, rd = area |> Rectangle.lurd
+    let ld, ru = lu + area.size * (Vector2.init 0.0f 1.0f), lu + area.size * (Vector2.init 1.0f 0.0f)
 
     let objectAreaPoints = [|lu; rd; ld; ru|]
 

@@ -1,11 +1,9 @@
 ﻿module WhiteDungeon.View.MainScene.Update
 
-open wraikny.Tart.Math
-
-open wraikny.Tart.Helper.Collections
+open Affogato
+open Affogato.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
-open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
 //open WhiteDungeon.Core.Game
@@ -148,7 +146,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
                             let player =
                                 Model.Player.init
                                     size
-                                    (dungeonParams.initPosition - (Vec2.init (float32 index) 0.0f) * size)
+                                    (dungeonParams.initPosition - (Vector2.init (float32 index) 0.0f) * size)
                                     level
                                     status
                                     playerId

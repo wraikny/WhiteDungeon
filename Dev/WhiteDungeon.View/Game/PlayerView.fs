@@ -1,6 +1,6 @@
 ﻿namespace WhiteDungeon.View.Game
 
-open wraikny.Tart.Math
+open Affogato
 open wraikny.Tart.Helper
 
 open WhiteDungeon.Core

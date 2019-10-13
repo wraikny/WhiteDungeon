@@ -4,7 +4,6 @@ open wraikny.Tart.Helper.Extension
 open wraikny.Tart.Helper.Collections
 open wraikny.Tart.Core
 open wraikny.Tart.Core.Libraries
-open wraikny.Tart.Advanced.Dungeon
 
 open WhiteDungeon.Core
 open WhiteDungeon.Core.Model
@@ -53,8 +52,9 @@ let inline mapEnemyOf id f (model : Model) =
         |> mapEnemies (Map.add id (f enemy)))
     |> Option.defaultValue model
 
-open wraikny.Tart.Math
-open WhiteDungeon.Core
+open Affogato
+open Affogato.Advanced
+open Affogato.Collections
 
 let inline updateSkillList f (model : Model) : Model =
     { model with skillList = f model.skillList }
@@ -184,7 +184,7 @@ let buildingsCollision (model : Model) =
     let pos = ObjectBase.position player
 
     model.buildingCells
-    |> HashMap.tryFind(DungeonModel.coordinateToCell model.gameSetting.dungeonCellSize pos)
+    |> HashMap.tryFind(Dungeon.Model.coordinateToCell model.gameSetting.dungeonCellSize pos)
     |> function
     | Some b ->
         let model, cmd = Building.whenInside b.kind model
@@ -232,7 +232,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg, ViewMsg> =
 
     | PlayerInputs (playerId, inputSet) ->
         let move, direction =
-            let isDash = inputSet |> Set.contains Dash
+            let isDash = inputSet |> Set.contains PlayerInput.Dash
             let dirs =
                 inputSet
                 |> Seq.choose(function | Direction x -> Some x | _ -> None)
